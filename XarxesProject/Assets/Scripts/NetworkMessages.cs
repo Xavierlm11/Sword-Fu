@@ -29,10 +29,20 @@ public class NetworkMessages : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            SetRemoteIP();
-            SetMessage();
+            UpdateInfo();
         }
+    }
+
+    private void UpdateInfo()
+    {
+        SetRemoteIP();
+        SendNetworkMessage();
+    }
+
+    public void SendNetworkMessage()
+    {
+        UpdateInfo();
     }
 }
