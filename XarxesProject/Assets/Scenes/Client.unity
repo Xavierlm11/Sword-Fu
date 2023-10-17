@@ -392,11 +392,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1961cff72ecd76949bf1ef38d39b4814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkSsettings: {fileID: 11400000, guid: 4a2a917f216a28241b925d4a26f12fe6, type: 2}
+  networkSettings: {fileID: 11400000, guid: 4a2a917f216a28241b925d4a26f12fe6, type: 2}
   ipField: {fileID: 1242336007}
   messageField: {fileID: 1195024833}
   ip: 
-  message: 
+  message: aaaa
   transportType: 0
   port: 0
   maxMessageCharSize: 0
