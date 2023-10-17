@@ -65,7 +65,7 @@ public class SendNetworkMessages : MonoBehaviour
         StartNetwork();
 
         networkThread = new Thread(ReceiveMessage);
-        networkThread.Start();
+        
     }
 
     private void StartNetwork()
@@ -106,7 +106,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void Update()
     {
-
+        networkThread.Start();
     }
 
     private void ReceiveMessage()
