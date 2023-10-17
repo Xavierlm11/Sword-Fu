@@ -54,95 +54,85 @@ public class SendNetworkMessages : MonoBehaviour
     [SerializeField]
     private IPEndPoint IpEndPoint;
 
+    [SerializeField]
+    private Thread networkThread;
+
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
 
     #region code
 
-    public void SetRemoteIP()
-    {
-        ip = ipField.text;
-    }
-
-    public void SetMessage()
-    {
-        message = messageField.text;
-    }
-
     private void Start()
     {
         StartNetwork();
-        Thread networkThread = new Thread(ReceiveMessage);
-        networkThread.Start();
+
+        networkThread = new Thread(ReceiveMessage);
     }
 
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            UpdateInfo();
-        }
-    }
-
-    private void ReceiveMessage()
-    {
-        receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref endPoint);
-    }
-
-    private void UpdateInfo()
-    {
-        SetRemoteIP();
-        if (!string.IsNullOrEmpty(ip) && !string.IsNullOrEmpty(message))
-        {
-            SendNetworkMessage();
-        }
-    }
-
-    public void SendNetworkMessage()
+    private void StartNetwork()
     {
         switch (transportType)
         {
             case TransportType.UDP:
-                SendMessage_Udp();
+                StartNetwork_UDP();
                 break;
-
             case TransportType.TCP:
-                SendMessage_Tcp();
+                StartNetwork_TCP();
                 break;
         }
-    }
-
-    public void StartNetwork()
-    {
-        socket = new Socket(
-            AddressFamily.InterNetwork,
-            SocketType.Dgram,
-            ProtocolType.Udp);
 
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
         IpEndPoint = new IPEndPoint(IPAddress.Any, port);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
 
         socket.Bind(IpEndPoint);
-    }
-
-    public void SendMessage_Udp()
-    {
-         
-
-        byte[] data = Encoding.ASCII.GetBytes(message);
-
-        socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
 
     }
 
-    public void SendMessage_Tcp()
+    public void StartNetwork_UDP()
     {
-        Socket newSocket = new Socket(
-            AddressFamily.InterNetwork,
-            SocketType.Stream,
-            ProtocolType.Tcp);
+        socket = new Socket(
+             AddressFamily.InterNetwork,
+             SocketType.Dgram,
+             ProtocolType.Udp);
+    }
+
+    public void StartNetwork_TCP()
+    {
+        socket = new Socket(
+           AddressFamily.InterNetwork,
+           SocketType.Stream,
+           ProtocolType.Tcp);
+    }
+
+    public void Update()
+    {
+
+    }
+
+    private void ReceiveMessage()
+    {
+        switch (transportType)
+        {
+            case TransportType.UDP:
+                ReceiveMessage_UDP();
+                break;
+            case TransportType.TCP:
+                ReceiveMessage_TCP();
+                break;
+        }
+        
+    }
+
+    public void ReceiveMessage_UDP()
+    {
+        receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref endPoint);
+    }
+
+    public void ReceiveMessage_TCP()
+    {
+
     }
 
     #endregion

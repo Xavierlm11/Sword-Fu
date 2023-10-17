@@ -261,8 +261,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 754237864}
-        m_TargetAssemblyTypeName: NetworkMessages, Assembly-CSharp
-        m_MethodName: SendNetworkMessage
+        m_TargetAssemblyTypeName: ReceiveNetworkMessages, Assembly-CSharp
+        m_MethodName: Call_SendNetworkMessage
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -396,6 +396,11 @@ MonoBehaviour:
   messageField: {fileID: 1195024833}
   ip: 
   message: 
+  transportType: 0
+  port: 0
+  maxMessageCharSize: 0
+  receivedMessageSize: 0
+  receivedDataBuffer: 
 --- !u!4 &754237865
 Transform:
   m_ObjectHideFlags: 0

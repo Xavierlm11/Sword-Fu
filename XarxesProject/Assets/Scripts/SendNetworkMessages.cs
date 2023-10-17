@@ -46,13 +46,13 @@ public class ReceiveNetworkMessages : MonoBehaviour
     private Socket socket;
 
     [SerializeField]
-    private byte[] receivedDataBuffer;
-
-    [SerializeField]
     private EndPoint endPoint;
 
     [SerializeField]
     private IPEndPoint IpEndPoint;
+
+    [SerializeField]
+    private Thread networkThread;
 
     #endregion
 
@@ -72,9 +72,43 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void Start()
     {
+
         StartNetwork();
-        Thread networkThread = new Thread(SendNetworkMessage);
-        networkThread.Start();
+
+        networkThread = new Thread(SendNetworkMessage);
+    }
+
+    public void StartNetwork()
+    {
+        switch (transportType)
+        {
+            case TransportType.UDP:
+                StartNetwork_UDP();
+                break;
+            case TransportType.TCP:
+                StartNetwork_TCP();
+                break;
+        }
+
+        //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
+        IpEndPoint = new IPEndPoint(IPAddress.Parse("10.0.103.34"), port);
+        //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
+    }
+
+    public void StartNetwork_UDP()
+    {
+        socket = new Socket(
+            AddressFamily.InterNetwork,
+            SocketType.Dgram,
+            ProtocolType.Udp);
+    }
+
+    public void StartNetwork_TCP()
+    {
+        socket = new Socket(
+            AddressFamily.InterNetwork,
+            SocketType.Stream,
+            ProtocolType.Tcp);
     }
 
     public void Update()
@@ -90,7 +124,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
         SetRemoteIP();
         if (!string.IsNullOrEmpty(ip) && !string.IsNullOrEmpty(message))
         {
-            SendNetworkMessage();
+            Call_SendNetworkMessage();
         }
     }
 
@@ -99,42 +133,32 @@ public class ReceiveNetworkMessages : MonoBehaviour
         switch (transportType)
         {
             case TransportType.UDP:
-                SendMessage_Udp();
+                SendMessage_UDP();
                 break;
 
             case TransportType.TCP:
-                SendMessage_Tcp();
+                SendMessage_TCP();
                 break;
         }
     }
 
-    public void StartNetwork()
-    {
-        socket = new Socket(
-            AddressFamily.InterNetwork,
-            SocketType.Dgram,
-            ProtocolType.Udp);
+    
 
-        //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        IpEndPoint = new IPEndPoint(IPAddress.Parse("10.0.103.34"), port);
-        //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
-
-    }
-
-    public void SendMessage_Udp()
+    public void SendMessage_UDP()
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
     }
 
-    public void SendMessage_Tcp()
+    public void SendMessage_TCP()
     {
-        Socket newSocket = new Socket(
-            AddressFamily.InterNetwork,
-            SocketType.Stream,
-            ProtocolType.Tcp);
+        
     }
 
+    public void Call_SendNetworkMessage()
+    {
+        networkThread.Start();
+    }
     #endregion
 }
