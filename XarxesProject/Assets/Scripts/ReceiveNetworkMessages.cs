@@ -65,7 +65,7 @@ public class SendNetworkMessages : MonoBehaviour
         StartNetwork();
 
         networkThread = new Thread(ReceiveMessage);
-        
+        networkThread.Start();
     }
 
     private void StartNetwork()
@@ -106,7 +106,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void Update()
     {
-        networkThread.Start();
+        
     }
 
     private void ReceiveMessage()
@@ -125,12 +125,18 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void ReceiveMessage_UDP()
     {
-        EndPoint Remote = IpEndPoint;
-        receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
-        if (receivedMessageSize>0)
+        while (true)
         {
+            EndPoint Remote = IpEndPoint;
+            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+            if (receivedMessageSize > 0)
+            {
 
+            }
         }
+        
+
+        
         
     }
 
