@@ -338,6 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 903a6fc3d93ff6044baa8758163acd59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  networkSsettings: {fileID: 11400000, guid: 4a2a917f216a28241b925d4a26f12fe6, type: 2}
   ipField: {fileID: 0}
   messageField: {fileID: 0}
   ip: 

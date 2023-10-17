@@ -13,6 +13,9 @@ public class SendNetworkMessages : MonoBehaviour
     #region variables
 
     [SerializeField]
+    private NetworkSettings networkSettings;
+
+    [SerializeField]
     private TMP_InputField ipField;
 
     [SerializeField]
@@ -62,6 +65,8 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void Start()
     {
+        port = networkSettings.port;
+        receivedMessageSize = networkSettings.messageMaxBytes;
         StartNetwork();
 
         networkThread = new Thread(ReceiveMessage);
@@ -81,7 +86,7 @@ public class SendNetworkMessages : MonoBehaviour
         }
 
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        IpEndPoint = new IPEndPoint(IPAddress.Any, 9050);
+        IpEndPoint = new IPEndPoint(IPAddress.Any, port);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
 
         socket.Bind(IpEndPoint);
