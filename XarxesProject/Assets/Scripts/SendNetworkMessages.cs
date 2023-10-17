@@ -46,9 +46,6 @@ public class ReceiveNetworkMessages : MonoBehaviour
     private Socket socket;
 
     [SerializeField]
-    private EndPoint endPoint;
-
-    [SerializeField]
     private IPEndPoint IpEndPoint;
 
     [SerializeField]

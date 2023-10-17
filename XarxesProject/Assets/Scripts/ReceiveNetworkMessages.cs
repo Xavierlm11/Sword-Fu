@@ -49,9 +49,6 @@ public class SendNetworkMessages : MonoBehaviour
     private byte[] receivedDataBuffer;
 
     [SerializeField]
-    private EndPoint endPoint;
-
-    [SerializeField]
     private IPEndPoint IpEndPoint;
 
     [SerializeField]
@@ -128,8 +125,13 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void ReceiveMessage_UDP()
     {
-        receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref endPoint);
-        Debug.Log("Received: " + receivedDataBuffer.ToString());
+        EndPoint Remote = IpEndPoint;
+        receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+        if (receivedMessageSize>0)
+        {
+
+        }
+        
     }
 
     public void ReceiveMessage_TCP()
