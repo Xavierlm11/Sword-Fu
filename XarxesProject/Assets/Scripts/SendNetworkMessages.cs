@@ -88,7 +88,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
         }
 
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        IpEndPoint = new IPEndPoint(IPAddress.Parse("10.0.103.34"), port);
+        IpEndPoint = new IPEndPoint(IPAddress.Parse("10.0.103.34"), 9050);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
     }
 
