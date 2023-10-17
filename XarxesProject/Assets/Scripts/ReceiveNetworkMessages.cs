@@ -81,7 +81,7 @@ public class SendNetworkMessages : MonoBehaviour
         }
 
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        IpEndPoint = new IPEndPoint(IPAddress.Any, port);
+        IpEndPoint = new IPEndPoint(IPAddress.Any, 9050);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
 
         socket.Bind(IpEndPoint);
@@ -128,11 +128,14 @@ public class SendNetworkMessages : MonoBehaviour
         while (true)
         {
             EndPoint Remote = IpEndPoint;
+            Debug.Log("Funca: " + receivedMessageSize.ToString());
+            receivedDataBuffer = new byte[1024];
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
             if (receivedMessageSize > 0)
             {
-
+                
             }
+            
         }
         
 
