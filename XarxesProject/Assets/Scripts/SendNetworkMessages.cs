@@ -121,11 +121,11 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void UpdateInfo()
     {
-        SetRemoteIP();
-        if (!string.IsNullOrEmpty(ip) && !string.IsNullOrEmpty(message))
-        {
-            Call_SendNetworkMessage();
-        }
+        //SetRemoteIP();
+        //if (!string.IsNullOrEmpty(ip) && !string.IsNullOrEmpty(message))
+        //{
+        //    Call_SendNetworkMessage();
+        //}
     }
 
     public void SendNetworkMessage()
@@ -149,6 +149,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
         byte[] data = Encoding.ASCII.GetBytes(message);
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
+        Debug.Log("Sended: " + message);
     }
 
     public void SendMessage_TCP()
