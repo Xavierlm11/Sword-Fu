@@ -155,12 +155,21 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     public void SendMessage_TCP()
     {
-        
+        byte[] data = Encoding.ASCII.GetBytes(message);
+
+        socket.Send(data, data.Length, SocketFlags.None);
+        Debug.Log("Sended: " + message);
     }
 
     public void Call_SendNetworkMessage()
     {
         networkThread.Start();
+    }
+
+    private void OnDisable()//he visto que recomiendan cerrar  todo al fiinal 
+    {
+        socket.Shutdown(SocketShutdown.Both);
+        socket.Close();
     }
     #endregion
 }

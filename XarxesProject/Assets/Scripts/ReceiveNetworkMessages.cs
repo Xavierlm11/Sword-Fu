@@ -48,6 +48,9 @@ public class SendNetworkMessages : MonoBehaviour
     [SerializeField]
     private Socket socket;
 
+     [SerializeField]
+    private Socket clientSocket;
+
     [SerializeField]
     private byte[] receivedDataBuffer;
 
@@ -65,7 +68,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-        port = networkSettings.port;
+        port = networkSettings.port; // da error aqui
         receivedMessageSize = networkSettings.messageMaxBytes;
         StartNetwork();
 
@@ -150,8 +153,24 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void ReceiveMessage_TCP()
     {
+        EndPoint Remote = IpEndPoint;
+        socket.Listen(10);
+        clientSocket = socket.Accept(); // accept es una funcion blocking, no se q significa
+
+        while (true)
+        {
+            receivedDataBuffer = new byte[1024];
+            // IPEndPoint clientep = (IPEndPoint)clientSocket.RemoteEndPoint;
+            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote); 
+
+        }
 
     }
 
+    private void OnDisable()//he visto que recomiendan cerrar  todo al fiinal 
+    {
+        clientSocket.Close();
+        socket.Close();
+    }
     #endregion
 }

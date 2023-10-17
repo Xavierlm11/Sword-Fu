@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -338,12 +338,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 903a6fc3d93ff6044baa8758163acd59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkSsettings: {fileID: 11400000, guid: 4a2a917f216a28241b925d4a26f12fe6, type: 2}
+  networkSettings: {fileID: 11400000, guid: 4a2a917f216a28241b925d4a26f12fe6, type: 2}
   ipField: {fileID: 0}
   messageField: {fileID: 0}
   ip: 
   message: 
-  transportType: 0
+  transportType: 1
   port: 0
   maxMessageCharSize: 0
   receivedMessageSize: 0
