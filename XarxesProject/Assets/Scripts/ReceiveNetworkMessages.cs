@@ -95,9 +95,12 @@ public class ReceiveNetworkMessages : MonoBehaviour
             EndPoint Remote = IpEndPoint;
             
             receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
-            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+
             string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
             Debug.Log("Received message from " + Remote.ToString() + ": " + message);
+
+            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+            
         }
     }
 
