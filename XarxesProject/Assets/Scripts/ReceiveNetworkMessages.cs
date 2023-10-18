@@ -8,12 +8,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-public class SendNetworkMessages : MonoBehaviour
+public class ReceiveNetworkMessages : MonoBehaviour
 {
     #region variables
-
-    [SerializeField]
-    private NetworkSettings networkSettings;
 
     [SerializeField]
     private TMP_InputField ipField;
@@ -26,18 +23,6 @@ public class SendNetworkMessages : MonoBehaviour
 
     [SerializeField]
     private string message;
-
-    public enum TransportType
-    {
-        UDP,
-        TCP
-    }
-
-    [SerializeField]
-    private TransportType transportType;
-
-    [SerializeField]
-    private int port;
 
     [SerializeField]
     private int maxMessageCharSize;
@@ -68,49 +53,16 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-        port = networkSettings.port; // da error aqui
-        receivedMessageSize = networkSettings.messageMaxBytes;
-        StartNetwork();
+        receivedMessageSize = NetworkSettings.messageMaxBytes;
+
+        socket = NetworkSettings.StartNetwork();
+        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkSettings.port);
+        socket.Bind(IpEndPoint);
 
         networkThread = new Thread(ReceiveMessage);
         networkThread.Start();
     }
 
-    private void StartNetwork()
-    {
-        switch (transportType)
-        {
-            case TransportType.UDP:
-                StartNetwork_UDP();
-                break;
-            case TransportType.TCP:
-                StartNetwork_TCP();
-                break;
-        }
-
-        //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        IpEndPoint = new IPEndPoint(IPAddress.Any, port);
-        //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
-
-        socket.Bind(IpEndPoint);
-
-    }
-
-    public void StartNetwork_UDP()
-    {
-        socket = new Socket(
-             AddressFamily.InterNetwork,
-             SocketType.Dgram,
-             ProtocolType.Udp);
-    }
-
-    public void StartNetwork_TCP()
-    {
-        socket = new Socket(
-           AddressFamily.InterNetwork,
-           SocketType.Stream,
-           ProtocolType.Tcp);
-    }
 
     public void Update()
     {
@@ -119,7 +71,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void ReceiveMessage()
     {
-        switch (transportType)
+        switch (NetworkSettings.transportType)
         {
             case TransportType.UDP:
                 ReceiveMessage_UDP();
@@ -139,16 +91,7 @@ public class SendNetworkMessages : MonoBehaviour
             Debug.Log("Funca: " + receivedMessageSize.ToString());
             receivedDataBuffer = new byte[1024];
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
-            if (receivedMessageSize > 0)
-            {
-                
-            }
-            
         }
-        
-
-        
-        
     }
 
     public void ReceiveMessage_TCP()
