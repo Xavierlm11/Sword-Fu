@@ -15,8 +15,8 @@ public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 {
     public static TransportType transportType;
 
-    public static int port;
-    public static int messageMaxBytes;
+    public int port;
+    public int messageMaxBytes;
 
     public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
     {

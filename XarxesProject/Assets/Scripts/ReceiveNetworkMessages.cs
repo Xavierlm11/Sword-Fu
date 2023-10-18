@@ -53,10 +53,10 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-        receivedMessageSize = NetworkSettings.messageMaxBytes;
+        receivedMessageSize = NetworkSettings.Instance.messageMaxBytes;
 
         socket = NetworkSettings.StartNetwork();
-        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkSettings.port);
+        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkSettings.Instance.port);
         socket.Bind(IpEndPoint);
 
         networkThread = new Thread(ReceiveMessage);

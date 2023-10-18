@@ -48,7 +48,7 @@ public class SendNetworkMessages : MonoBehaviour
     public void SetRemoteIP()
     {
         ip = ipField.text;
-        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkSettings.port);
+        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkSettings.Instance.port); 
     }
 
     public void SetMessage()
