@@ -96,11 +96,14 @@ public class ReceiveNetworkMessages : MonoBehaviour
             
             receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
 
+            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+
             string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+
+
+
             Debug.Log("Received message from " + Remote.ToString() + ": " + message);
 
-            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
-            
         }
     }
 
@@ -108,22 +111,24 @@ public class ReceiveNetworkMessages : MonoBehaviour
     {
         EndPoint Remote = IpEndPoint;
         socket.Listen(10);
-        clientSocket = socket.Accept(); // accept es una funcion blocking, no se q significa
+        clientSocket = socket.Accept(); // accept es una funcion blocking
 
         while (true)
         {
             receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
             // IPEndPoint clientep = (IPEndPoint)clientSocket.RemoteEndPoint;
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote); 
-
         }
 
     }
 
-    private void OnDisable()//he visto que recomiendan cerrar  todo al fiinal 
+    private void OnDisable()
     {
-        clientSocket.Close();
-        socket.Close();
+        if (socket.Connected)
+        {
+            clientSocket.Close();
+            socket.Close();
+        }
     }
     #endregion
 }

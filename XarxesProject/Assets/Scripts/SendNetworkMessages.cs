@@ -53,7 +53,7 @@ public class SendNetworkMessages : MonoBehaviour
     public void SetRemoteIP()
     {
         ip = ipField.text;
-        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkSettings.Instance.port); 
+        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkSettings.Instance.port);
     }
 
     public void SetMessage()
@@ -63,7 +63,6 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-
         socket = NetworkSettings.StartNetwork();
 
         networkThread = new Thread(SendNetworkMessage);
@@ -110,6 +109,7 @@ public class SendNetworkMessages : MonoBehaviour
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
         Debug.Log("Sended via UDP: " + message);
+
     }
 
     public void SendMessage_TCP()
@@ -122,13 +122,24 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void Call_SendNetworkMessage()
     {
-        networkThread.Start();
+        if (!networkThread.IsAlive)
+        {
+            Debug.Log("Message is still sending");
+        }
+        else
+        {
+            networkThread.Start();
+        }
+
     }
 
-    private void OnDisable()//he visto que recomiendan cerrar  todo al fiinal 
+    private void OnDisable()
     {
-        socket.Shutdown(SocketShutdown.Both);
-        socket.Close();
+        if(socket.Connected)
+        {
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
+        }
     }
     #endregion
 }
