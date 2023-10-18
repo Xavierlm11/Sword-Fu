@@ -61,11 +61,16 @@ public class SendNetworkMessages : MonoBehaviour
         message = messageField.text;
     }
 
+    private void OpenNewThreat()
+    {
+        networkThread = new Thread(SendNetworkMessage);
+    }
+
     private void Start()
     {
         socket = NetworkSettings.StartNetwork();
 
-        networkThread = new Thread(SendNetworkMessage);
+        OpenNewThreat();
 
         ipField.text = ip;
         messageField.text = message;
@@ -109,6 +114,7 @@ public class SendNetworkMessages : MonoBehaviour
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
         Debug.Log("Sended via UDP: " + message);
+        networkThread.Interrupt();
 
     }
 
@@ -122,15 +128,13 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void Call_SendNetworkMessage()
     {
-        if (!networkThread.IsAlive)
+        if (networkThread.ThreadState != ThreadState.Unstarted)
         {
-            Debug.Log("Message is still sending");
-        }
-        else
-        {
-            networkThread.Start();
+            OpenNewThreat();
+            
         }
 
+        networkThread.Start();
     }
 
     private void OnDisable()

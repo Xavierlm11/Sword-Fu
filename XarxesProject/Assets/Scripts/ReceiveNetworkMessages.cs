@@ -101,7 +101,6 @@ public class ReceiveNetworkMessages : MonoBehaviour
             string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
 
 
-
             Debug.Log("Received message from " + Remote.ToString() + ": " + message);
 
         }
@@ -124,11 +123,11 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void OnDisable()
     {
-        if (socket.Connected)
-        {
-            clientSocket.Close();
-            socket.Close();
-        }
+        networkThread.Abort();
+        socket.Close();
+
+        //clientSocket.Close();
+
     }
     #endregion
 }

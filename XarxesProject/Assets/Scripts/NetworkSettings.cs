@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum TransportType
 {
@@ -13,6 +14,10 @@ public enum TransportType
 [CreateAssetMenu(fileName = "NetworkSettings", menuName = "ScriptableObjects/NetworkSettings")]
 public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 {
+    public string lobbySceneName;
+    public string serverSceneName;
+    public string clientSceneName;
+
     public TransportType transportType;
 
     public int port;
@@ -57,5 +62,20 @@ public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 
         return socket;
 
+    }
+
+    public static void OnClick_GoToServerScene()
+    {
+        SceneManager.LoadScene(Instance.serverSceneName);
+    }
+
+    public static void OnClick_GoToClientScene()
+    {
+        SceneManager.LoadScene(Instance.clientSceneName);
+    }
+
+    public static void OnClick_GoToLobbyScene()
+    {
+        SceneManager.LoadScene(Instance.lobbySceneName);
     }
 }
