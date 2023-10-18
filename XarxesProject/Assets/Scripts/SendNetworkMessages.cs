@@ -87,7 +87,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void SendNetworkMessage()
     {
-        switch (NetworkSettings.transportType)
+        switch (NetworkSettings.Instance.transportType)
         {
             case TransportType.UDP:
                 SendMessage_UDP();

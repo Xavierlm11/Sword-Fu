@@ -71,7 +71,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void ReceiveMessage()
     {
-        switch (NetworkSettings.transportType)
+        switch (NetworkSettings.Instance.transportType)
         {
             case TransportType.UDP:
                 ReceiveMessage_UDP();

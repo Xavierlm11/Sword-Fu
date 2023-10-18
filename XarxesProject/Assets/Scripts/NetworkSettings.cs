@@ -13,7 +13,7 @@ public enum TransportType
 [CreateAssetMenu(fileName = "NetworkSettings", menuName = "ScriptableObjects/NetworkSettings")]
 public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 {
-    public static TransportType transportType;
+    public TransportType transportType;
 
     public int port;
     public int messageMaxBytes;
@@ -45,7 +45,7 @@ public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
     {
         Socket socket = null;
 
-        switch (transportType)
+        switch (Instance.transportType)
         {
             case TransportType.UDP:
                 socket = StartNetwork_UDP();
