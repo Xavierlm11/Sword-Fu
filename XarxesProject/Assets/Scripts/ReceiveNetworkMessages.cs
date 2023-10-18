@@ -51,6 +51,11 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     #region code
 
+    private void OnEnable()
+    {
+        Resources.LoadAll("");
+    }
+
     private void Start()
     {
         receivedMessageSize = NetworkSettings.Instance.messageMaxBytes;

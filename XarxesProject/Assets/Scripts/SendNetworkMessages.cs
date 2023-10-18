@@ -45,6 +45,11 @@ public class SendNetworkMessages : MonoBehaviour
 
     #region code
 
+    private void OnEnable()
+    {
+        Resources.LoadAll("");
+    }
+
     public void SetRemoteIP()
     {
         ip = ipField.text;
