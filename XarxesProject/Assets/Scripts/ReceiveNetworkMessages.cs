@@ -45,6 +45,9 @@ public class ReceiveNetworkMessages : MonoBehaviour
     [SerializeField]
     private Thread networkThread;
 
+    [SerializeField]
+    private Thread messagesThread;
+
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
@@ -54,6 +57,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
     private void OnEnable()
     {
         Resources.LoadAll("");
+        NetworkSettings.Call_GoToLobbyScene();
     }
 
     private void Start()
@@ -63,15 +67,55 @@ public class ReceiveNetworkMessages : MonoBehaviour
         socket = NetworkSettings.StartNetwork();
         NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkSettings.Instance.port);
         socket.Bind(IpEndPoint);
+        if(NetworkSettings.Instance.transportType == TransportType.TCP)
+        {
+            socket.Listen(10);
+            networkThread = new Thread(WaitForClient);
+            networkThread.Start();
 
-        networkThread = new Thread(ReceiveMessage);
-        networkThread.Start();
+            messagesThread = new Thread(WaitForMessages);
+            messagesThread.Start();
+        }
+        else
+        {
+            networkThread = new Thread(ReceiveMessage);
+            networkThread.Start();
+        }
+    }
+    
+    private void WaitForClient()
+    {
+
+        //Blocking
+        clientSocket = socket.Accept();
+        IPEndPoint clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
+        Debug.Log("Connected with [" + clientIpEndPoint.Address.ToString() + "] at port [" + clientIpEndPoint.Port.ToString() + "]");
+        
     }
 
-
-    public void Update()
+    private void WaitForMessages()
     {
-        
+        while (true)
+        {
+            if(clientSocket != null)
+            {
+                receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
+                receivedMessageSize = clientSocket.Receive(receivedDataBuffer);
+
+                //Blocking
+                string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+
+                if (receivedMessageSize == 0)
+                {
+                    return;
+                }
+
+                Debug.Log("Received message: " + message);
+            }
+
+           
+
+        }
     }
 
     private void ReceiveMessage()
@@ -100,9 +144,18 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
             string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
 
+            string remoteString = Remote.ToString();
+            int remoteIpIndex = remoteString.IndexOf(':');
 
-            Debug.Log("Received message from " + Remote.ToString() + ": " + message);
-
+            if (remoteIpIndex != -1)
+            {
+                string remoteIpString = remoteString.Substring(0, remoteIpIndex);
+                Debug.Log("Received message from " + remoteIpString + ": " + message);
+            }
+            else
+            {
+                Debug.Log("Received message from " + remoteString + ": " + message);
+            }
         }
     }
 
@@ -111,20 +164,25 @@ public class ReceiveNetworkMessages : MonoBehaviour
         EndPoint Remote = IpEndPoint;
         socket.Listen(10);
         clientSocket = socket.Accept(); // accept es una funcion blocking
-
-        while (true)
-        {
-            receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
-            // IPEndPoint clientep = (IPEndPoint)clientSocket.RemoteEndPoint;
-            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote); 
-        }
-
     }
 
     private void OnDisable()
     {
-        networkThread.Abort();
-        socket.Close();
+        if(networkThread != null)
+        {
+            networkThread.Abort();
+        }
+
+        if (messagesThread != null)
+        {
+            messagesThread.Abort();
+        }
+
+        if (socket != null)
+        {
+            socket.Close();
+        }
+        
 
         //clientSocket.Close();
 

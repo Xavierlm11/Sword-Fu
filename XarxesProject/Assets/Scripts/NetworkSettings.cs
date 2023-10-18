@@ -22,12 +22,18 @@ public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 
     public int port;
     public int messageMaxBytes;
+    private bool hasInitialized;
 
     public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
     {
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
         ipEndPoint = new IPEndPoint(ipAddess, port);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
+    }
+
+    private void OnEnable()
+    {
+        hasInitialized = true;
     }
 
     private static Socket StartNetwork_UDP()
@@ -66,16 +72,33 @@ public class NetworkSettings : SingletonScriptableObject<NetworkSettings>
 
     public static void OnClick_GoToServerScene()
     {
+        Instance.hasInitialized = false;
         SceneManager.LoadScene(Instance.serverSceneName);
     }
 
     public static void OnClick_GoToClientScene()
     {
+        Instance.hasInitialized = false;
         SceneManager.LoadScene(Instance.clientSceneName);
+    }
+
+    public static void Call_GoToLobbyScene()
+    {
+        if (Instance.hasInitialized)
+        {
+            SceneManager.LoadScene(Instance.lobbySceneName);
+            Instance.hasInitialized = false;
+        }
+    }
+
+    public static void GoToLobbyScene()
+    {
+        SceneManager.LoadScene(Instance.lobbySceneName);
     }
 
     public static void OnClick_GoToLobbyScene()
     {
-        SceneManager.LoadScene(Instance.lobbySceneName);
+        Instance.hasInitialized = false;
+        GoToLobbyScene();
     }
 }

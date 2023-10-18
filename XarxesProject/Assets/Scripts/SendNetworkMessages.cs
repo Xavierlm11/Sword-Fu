@@ -48,6 +48,7 @@ public class SendNetworkMessages : MonoBehaviour
     private void OnEnable()
     {
         Resources.LoadAll("");
+        NetworkSettings.Call_GoToLobbyScene();
     }
 
     public void SetRemoteIP()
@@ -92,6 +93,10 @@ public class SendNetworkMessages : MonoBehaviour
         {
             SetRemoteIP();
         }
+        if (!string.IsNullOrEmpty(message))
+        {
+            SetMessage();
+        }
     }
 
     public void SendNetworkMessage()
@@ -120,6 +125,25 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void SendMessage_TCP()
     {
+        if (NetworkSettings.Instance.transportType == TransportType.TCP)
+        {
+            try
+            {
+                socket.Connect(IpEndPoint);
+            }
+            catch (SocketException error)
+            {
+                Debug.Log("Unable to connect to server. Error: " + error.ToString());
+                return;
+            }
+        }
+
+        if (!socket.Connected)
+        {
+            Debug.Log("Socket is not connected to server");
+            return;
+        }
+
         byte[] data = Encoding.ASCII.GetBytes(message);
 
         socket.Send(data, data.Length, SocketFlags.None);
@@ -131,7 +155,6 @@ public class SendNetworkMessages : MonoBehaviour
         if (networkThread.ThreadState != ThreadState.Unstarted)
         {
             OpenNewThreat();
-            
         }
 
         networkThread.Start();
@@ -139,11 +162,15 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void OnDisable()
     {
-        if(socket.Connected)
+        if (socket != null)
         {
-            socket.Shutdown(SocketShutdown.Both);
-            socket.Close();
+            if (socket.Connected)
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+            }
         }
+        
     }
     #endregion
 }
