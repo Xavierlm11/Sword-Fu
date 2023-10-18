@@ -93,9 +93,11 @@ public class ReceiveNetworkMessages : MonoBehaviour
         while (true)
         {
             EndPoint Remote = IpEndPoint;
-            Debug.Log("Funca: " + receivedMessageSize.ToString());
-            receivedDataBuffer = new byte[1024];
+            
+            receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+            string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+            Debug.Log("Received message from " + Remote.ToString() + ": " + message);
         }
     }
 
@@ -107,7 +109,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
         while (true)
         {
-            receivedDataBuffer = new byte[1024];
+            receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
             // IPEndPoint clientep = (IPEndPoint)clientSocket.RemoteEndPoint;
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote); 
 
