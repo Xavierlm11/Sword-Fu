@@ -54,13 +54,13 @@ public class SendNetworkMessages : MonoBehaviour
     private void OnEnable()
     {
         Resources.LoadAll("");
-        NetworkSettings.Call_GoToLobbyScene();
+        NetworkManager.Call_GoToLobbyScene();
     }
 
     public void SetRemoteIP()
     {
         ip = ipField.text;
-        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkSettings.Instance.port);
+        NetworkManager.SetEndPoint(ref IpEndPoint, IPAddress.Parse(ip), NetworkManager.Instance.port);
     }
 
     public void SetMessage()
@@ -79,7 +79,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-        socket = NetworkSettings.StartNetwork();
+        socket = NetworkManager.StartNetwork();
 
         OpenNewThreat();
 
@@ -112,7 +112,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void SendNetworkMessage()
     {
-        switch (NetworkSettings.Instance.transportType)
+        switch (NetworkManager.Instance.transportType)
         {
             case TransportType.UDP:
                 SendMessage_UDP();
@@ -136,7 +136,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     public void SendMessage_TCP()
     {
-        if (NetworkSettings.Instance.transportType == TransportType.TCP)
+        if (NetworkManager.Instance.transportType == TransportType.TCP)
         {
             try
             {

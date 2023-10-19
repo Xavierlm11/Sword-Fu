@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d3a439154244b24d8d396bd9f044d49, type: 3}
   m_Name: NetworkSettings
   m_EditorClassIdentifier: 
+  udpString: UDP
+  tcpString: TCP
   lobbySceneName: Lobby
   serverSceneName: Server
   clientSceneName: Client
-  transportType: 1
+  _transportType: 1
   port: 9050
   messageMaxBytes: 1024

@@ -57,17 +57,17 @@ public class ReceiveNetworkMessages : MonoBehaviour
     private void OnEnable()
     {
         Resources.LoadAll("");
-        NetworkSettings.Call_GoToLobbyScene();
+        NetworkManager.Call_GoToLobbyScene();
     }
 
     private void Start()
     {
-        receivedMessageSize = NetworkSettings.Instance.messageMaxBytes;
+        receivedMessageSize = NetworkManager.Instance.messageMaxBytes;
 
-        socket = NetworkSettings.StartNetwork();
-        NetworkSettings.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkSettings.Instance.port);
+        socket = NetworkManager.StartNetwork();
+        NetworkManager.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkManager.Instance.port);
         socket.Bind(IpEndPoint);
-        if(NetworkSettings.Instance.transportType == TransportType.TCP)
+        if(NetworkManager.Instance.transportType == TransportType.TCP)
         {
             socket.Listen(10);
             networkThread = new Thread(WaitForClient);
@@ -99,7 +99,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
         {
             if(clientSocket != null)
             {
-                receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
+                receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
                 receivedMessageSize = clientSocket.Receive(receivedDataBuffer);
 
                 //Blocking
@@ -120,7 +120,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void ReceiveMessage()
     {
-        switch (NetworkSettings.Instance.transportType)
+        switch (NetworkManager.Instance.transportType)
         {
             case TransportType.UDP:
                 ReceiveMessage_UDP();
@@ -138,7 +138,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
         {
             EndPoint Remote = IpEndPoint;
             
-            receivedDataBuffer = new byte[NetworkSettings.Instance.messageMaxBytes];
+            receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
 
             receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
 
