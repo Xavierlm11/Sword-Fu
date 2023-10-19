@@ -19,10 +19,16 @@ public class SendNetworkMessages : MonoBehaviour
     private TMP_InputField messageField;
 
     [SerializeField]
+    private TMP_InputField nickNameField;
+
+    [SerializeField]
     private string ip;
 
     [SerializeField]
     private string message;
+    
+    [SerializeField]
+    private string nickName;
 
     [SerializeField]
     private int maxMessageCharSize;
@@ -62,6 +68,10 @@ public class SendNetworkMessages : MonoBehaviour
         message = messageField.text;
     }
 
+    public void SetNickName()
+    {
+        nickName = nickNameField.text;
+    }
     private void OpenNewThreat()
     {
         networkThread = new Thread(SendNetworkMessage);
@@ -75,6 +85,7 @@ public class SendNetworkMessages : MonoBehaviour
 
         ipField.text = ip;
         messageField.text = message;
+        nickNameField.text = nickName;
 
         UpdateInfo();
     }
