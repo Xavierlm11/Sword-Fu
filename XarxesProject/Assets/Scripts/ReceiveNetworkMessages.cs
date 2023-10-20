@@ -117,11 +117,10 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
 
 
-                // Envía un mensaje de vuelta
+                // Envía una respuesta de vuelta.
                 string replyMessage = "Received your message: " + message;
                 byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
                 clientSocket.Send(replyData, replyData.Length, SocketFlags.None);
-
             }
         }
     }

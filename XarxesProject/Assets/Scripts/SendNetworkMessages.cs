@@ -144,6 +144,8 @@ public class SendNetworkMessages : MonoBehaviour
 
         ReceiveResponse();
 
+        networkThread.Interrupt();
+
     }
 
     public void SendMessage_UDP()
@@ -195,14 +197,52 @@ public class SendNetworkMessages : MonoBehaviour
 
     private void ReceiveResponse()
     {
-        // Espera la respuesta del receptor y muestra en la consola
-        if (socket != null)
+        switch (NetworkManager.Instance.transportType)
         {
-            receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
-            int receivedSize = socket.Receive(receivedDataBuffer);
-            string responseMessage = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedSize);
-            Debug.Log("Received response: " + responseMessage);
+            case TransportType.UDP:
+                ReceiveResponse_UDP();
+                break;
+            case TransportType.TCP:
+                ReceiveResponse_TCP();
+                break;
         }
+    }
+
+   
+
+    private void ReceiveResponse_UDP()
+    {
+        while (true)
+        {
+            EndPoint Remote = IpEndPoint;
+
+            receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
+
+            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+
+            string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+
+            string remoteString = Remote.ToString();
+            int remoteIpIndex = remoteString.IndexOf(':');
+
+            if (remoteIpIndex != -1)
+            {
+                string remoteIpString = remoteString.Substring(0, remoteIpIndex);
+                Debug.Log("Received response from " + remoteIpString + ": " + message);
+            }
+            else
+            {
+                Debug.Log("Received response from " + remoteString + ": " + message);
+            }
+        }
+    }
+
+
+    private void ReceiveResponse_TCP()
+    {
+        EndPoint Remote = IpEndPoint;
+        socket.Listen(10);
+        
     }
 
     public void Call_SendNetworkMessage()
