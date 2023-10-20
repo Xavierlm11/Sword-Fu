@@ -122,6 +122,9 @@ public class ReceiveNetworkMessages : MonoBehaviour
                 byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
                 clientSocket.Send(replyData, replyData.Length, SocketFlags.None);
             }
+
+           
+
         }
     }
 
@@ -170,8 +173,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
     {
         EndPoint Remote = IpEndPoint;
         socket.Listen(10);
-        //Blocking
-        clientSocket = socket.Accept();
+        clientSocket = socket.Accept(); // accept es una funcion blocking
     }
 
     private void OnDisable()
