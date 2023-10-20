@@ -50,6 +50,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     private ChatLog _chatLog;
 
+    private bool isMessage = false;
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@ public class SendNetworkMessages : MonoBehaviour
         {
             UpdateInfo();
         }
+        if (isMessage) CallToChat(); 
     }
 
     private void UpdateInfo()
@@ -137,12 +139,20 @@ public class SendNetworkMessages : MonoBehaviour
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
         Debug.Log("Sended via UDP: " + message);
-        _chatLog.LogMessageToChat(nickName+": "+message);//para hacer que el mensaje se vea en el chat
-        //no se xq no me deja usar la funcion por algo del transform y thread
+        isMessage = true;
+       
 
         
         networkThread.Interrupt();
 
+    }
+
+    void CallToChat()
+    {
+
+        _chatLog.LogMessageToChat(nickName + ": " + message);//para hacer que el mensaje se vea en el chat
+        //no se xq no me deja usar la funcion por algo del transform y thread
+        isMessage = false;
     }
 
     public void SendMessage_TCP()

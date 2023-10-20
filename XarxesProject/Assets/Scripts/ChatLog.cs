@@ -46,6 +46,11 @@ public class ChatLog : MonoBehaviour
 
     public void LogMessageToChat(string text) // usar esta funcion para llamarla desde otros scripts para que escriba en el chat
     {
+        LogAlCuadrado(text);
+    }
+
+    private void LogAlCuadrado(string text)
+    {
         Message _newMessage = new Message();
 
         if (messageLog.Count >= maxMessages)
