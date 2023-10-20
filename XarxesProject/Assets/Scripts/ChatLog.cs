@@ -52,13 +52,13 @@ public class ChatLog : MonoBehaviour
         }
 
         newMessage.nickname = nick;
-        newMessage.message = text;
+        newMessage.messageText = text;
 
         GameObject newTextObj = Instantiate(textObject, chatPanelTransform);
 
         newMessage.uiText = newTextObj.GetComponent<TMP_Text>();
 
-        newMessage.uiText.text = newMessage.nickname + ": " + newMessage.message;
+        newMessage.uiText.text = newMessage.nickname + ": " + newMessage.messageText;
 
         messageLog.Add(newMessage);
     }
@@ -68,6 +68,6 @@ public class ChatLog : MonoBehaviour
 public class Message
 {
     public string nickname;
-    public string message;
+    public string messageText;
     public TMP_Text uiText;
 }

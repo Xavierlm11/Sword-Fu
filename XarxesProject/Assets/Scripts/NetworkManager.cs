@@ -8,6 +8,25 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public class Server
+{
+
+}
+
+public class Client
+{
+    bool isHost;
+    string nickname;
+    string localIp;
+
+    public Client(string nick, string ip, bool host = false)
+    {
+        nickname = nick;
+        localIp = ip; 
+        isHost = host;
+    }
+}
+
 public enum TransportType
 {
     UDP,
@@ -17,6 +36,8 @@ public enum TransportType
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]
 public class NetworkManager : SingletonScriptableObject<NetworkManager>
 {
+    #region variables
+
     public string udpString;
     public string tcpString;
 
@@ -43,10 +64,23 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public int port;
     public int messageMaxBytes;
-    private bool hasInitialized;
+    public bool hasInitialized;
 
     [SerializeField]
     private string nickname;
+
+    [SerializeField]
+    private Client localClient;
+
+    [SerializeField]
+    private List<Client> clients;
+
+
+    #endregion
+
+    //__________________________________________________________________________
+
+    #region methods
 
     public void SetNickname(string newNick)
     {
@@ -133,17 +167,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     }
 
-    public static void OnClick_GoToServerScene()
-    {
-        Instance.hasInitialized = false;
-        SceneManager.LoadScene(Instance.serverSceneName);
-    }
 
-    public static void OnClick_GoToClientScene()
-    {
-        Instance.hasInitialized = false;
-        SceneManager.LoadScene(Instance.clientSceneName);
-    }
 
     public static void Call_GoToLobbyScene()
     {
@@ -165,5 +189,10 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         GoToLobbyScene();
     }
 
-    
+    public static void CreateClient(string nick, string ip, bool isHost = false)
+    {
+        Client client = new Client(nick, ip, isHost);
+    }
+
+    #endregion
 }

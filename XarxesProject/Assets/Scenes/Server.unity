@@ -424,7 +424,7 @@ GameObject:
   - component: {fileID: 983773278}
   - component: {fileID: 983773277}
   m_Layer: 0
-  m_Name: ConnectionManager
+  m_Name: ServerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -449,6 +449,7 @@ MonoBehaviour:
   maxMessageCharSize: 0
   receivedMessageSize: 0
   receivedDataBuffer: 
+  sendNetworkMessages: {fileID: 0}
 --- !u!4 &983773278
 Transform:
   m_ObjectHideFlags: 0
@@ -542,7 +543,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 684085402692789889, guid: 79ab8ec84f5999d458cac3633ba3e512, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 684085402692789889, guid: 79ab8ec84f5999d458cac3633ba3e512, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -725,7 +726,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3868052214735961863, guid: 0b0d860a9baa3574c94cc41b9c1d222d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 50
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3868052214735961863, guid: 0b0d860a9baa3574c94cc41b9c1d222d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
