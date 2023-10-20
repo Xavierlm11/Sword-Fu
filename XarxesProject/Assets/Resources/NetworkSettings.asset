@@ -17,6 +17,7 @@ MonoBehaviour:
   lobbySceneName: Lobby
   serverSceneName: Server
   clientSceneName: Client
-  _transportType: 1
+  _transportType: 0
   port: 9050
   messageMaxBytes: 1024
+  nickname: Pipo

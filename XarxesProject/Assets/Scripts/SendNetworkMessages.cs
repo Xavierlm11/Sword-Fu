@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 public class SendNetworkMessages : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class SendNetworkMessages : MonoBehaviour
     [SerializeField]
     private ReceiveNetworkMessages receiveNetworkMessages;
 
-    private ChatLog _chatLog;
+    private ChatLog chatLog;
 
     private bool isMessage = false;
     private byte[] receivedDataBuffer;
@@ -85,31 +86,34 @@ public class SendNetworkMessages : MonoBehaviour
         networkThread = new Thread(SendNetworkMessage);
     }
 
-    private void Start()
+    private void SetInitualValues()
     {
-        socket = NetworkManager.StartNetwork();
-
-        OpenNewThreat();
-
         ipField.text = ip;
         messageField.text = message;
         nicknameField.text = NetworkManager.Instance.GetNickname();
 
-        _chatLog = chatLogObj.GetComponent<ChatLog>();
-
         UpdateInfo();
+    }
+
+    private void Start()
+    {
+        socket = NetworkManager.StartNetwork();
+
+        SetInitualValues();
+
+        OpenNewThreat();
+        chatLog = chatLogObj.GetComponent<ChatLog>();
+
+        
+
     }
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            UpdateInfo();
-        }
         if (isMessage) CallToChat(); 
     }
 
-    private void UpdateInfo()
+    public void UpdateInfo()
     {
         if (!string.IsNullOrEmpty(ip))
         {
@@ -118,6 +122,10 @@ public class SendNetworkMessages : MonoBehaviour
         if (!string.IsNullOrEmpty(message))
         {
             SetMessage();
+        }
+        if (!string.IsNullOrEmpty(NetworkManager.Instance.GetNickname()))
+        {
+            SetNickname();
         }
     }
 
@@ -152,7 +160,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     void CallToChat()
     {
-        _chatLog.LogMessageToChat(NetworkManager.Instance.GetNickname(), message);
+        chatLog.LogMessageToChat(NetworkManager.Instance.GetNickname(), message);
         isMessage = false;
     }
 
@@ -218,5 +226,12 @@ public class SendNetworkMessages : MonoBehaviour
             }
         }
     }
+
+    public void OnClick_GetLocalIPv4()
+    {
+        ipField.text = NetworkManager.Instance.GetLocalIPv4();
+        UpdateInfo();
+    }
+
     #endregion
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using TMPro;
@@ -55,6 +56,14 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public string GetNickname()
     {
         return nickname;
+    }
+
+    public string GetLocalIPv4()
+    {
+        return Dns.GetHostEntry(Dns.GetHostName())
+        .AddressList.First(
+        f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        .ToString();
     }
 
     public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
