@@ -45,9 +45,13 @@ public class SendNetworkMessages : MonoBehaviour
     [SerializeField]
     private GameObject chatLogObj;
 
+    [SerializeField]
+    private ReceiveNetworkMessages receiveNetworkMessages;
+
     private ChatLog _chatLog;
 
     private bool isMessage = false;
+    private byte[] receivedDataBuffer;
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
@@ -129,6 +133,9 @@ public class SendNetworkMessages : MonoBehaviour
                 SendMessage_TCP();
                 break;
         }
+
+        ReceiveResponse();
+
     }
 
     public void SendMessage_UDP()
@@ -176,6 +183,18 @@ public class SendNetworkMessages : MonoBehaviour
 
         Debug.Log("Sended via TCP: " + message);
         isMessage = true;
+    }
+
+    private void ReceiveResponse()
+    {
+        // Espera la respuesta del receptor y muestra en la consola
+        if (socket != null)
+        {
+            receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
+            int receivedSize = socket.Receive(receivedDataBuffer);
+            string responseMessage = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedSize);
+            Debug.Log("Received response: " + responseMessage);
+        }
     }
 
     public void Call_SendNetworkMessage()

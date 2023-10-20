@@ -48,6 +48,9 @@ public class ReceiveNetworkMessages : MonoBehaviour
     [SerializeField]
     private Thread messagesThread;
 
+    [SerializeField]
+    private SendNetworkMessages sendNetworkMessages;
+
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
@@ -111,6 +114,14 @@ public class ReceiveNetworkMessages : MonoBehaviour
                 }
 
                 Debug.Log("Received message: " + message);
+
+
+
+                // Envía un mensaje de vuelta
+                string replyMessage = "Received your message: " + message;
+                byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
+                clientSocket.Send(replyData, replyData.Length, SocketFlags.None);
+
             }
 
            
