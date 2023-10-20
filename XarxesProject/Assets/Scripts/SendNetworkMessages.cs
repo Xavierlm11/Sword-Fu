@@ -45,6 +45,11 @@ public class SendNetworkMessages : MonoBehaviour
     [SerializeField]
     private Thread networkThread;
 
+    [SerializeField]
+    private GameObject chatLogObj;
+
+    private ChatLog _chatLog;
+
     #endregion
 
     //-----------------------------------------------------------------------------------------------------------
@@ -86,6 +91,8 @@ public class SendNetworkMessages : MonoBehaviour
         ipField.text = ip;
         messageField.text = message;
         nickNameField.text = nickName;
+
+        _chatLog = chatLogObj.GetComponent<ChatLog>();
 
         UpdateInfo();
     }
@@ -130,6 +137,10 @@ public class SendNetworkMessages : MonoBehaviour
 
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
         Debug.Log("Sended via UDP: " + message);
+        _chatLog.LogMessageToChat(nickName+": "+message);//para hacer que el mensaje se vea en el chat
+        //no se xq no me deja usar la funcion por algo del transform y thread
+
+        
         networkThread.Interrupt();
 
     }
@@ -158,7 +169,10 @@ public class SendNetworkMessages : MonoBehaviour
         byte[] data = Encoding.ASCII.GetBytes(message);
 
         socket.Send(data, data.Length, SocketFlags.None);
+
         Debug.Log("Sended via TCP: " + message);
+        _chatLog.LogMessageToChat(nickName + ": " + message);//para hacer que el mensaje se vea en el chat
+
     }
 
     public void Call_SendNetworkMessage()
