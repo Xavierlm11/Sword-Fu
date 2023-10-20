@@ -15,9 +15,9 @@ public class Server
 
 public class Client
 {
-    bool isHost;
-    string nickname;
-    string localIp;
+    public bool isHost;
+    public string nickname;
+    public string localIp;
 
     public Client(string nick, string ip, bool host = false)
     {
@@ -44,6 +44,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public string lobbySceneName;
     public string serverSceneName;
     public string clientSceneName;
+    public string chatSceneName;
 
     [SerializeField]
     private TransportType _transportType;
@@ -58,6 +59,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         private set
         {
             _transportType = value;
+            ConnectionManager.Instance.SetSocket();
         }
     }
         
@@ -65,9 +67,6 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public int port;
     public int messageMaxBytes;
     public bool hasInitialized;
-
-    [SerializeField]
-    private string nickname;
 
     [SerializeField]
     private Client localClient;
@@ -82,30 +81,40 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     #region methods
 
-    public void SetNickname(string newNick)
+    public void SetLocalClient(Client cl)
     {
-        nickname = newNick;
+        localClient = cl;
     }
 
-    public string GetNickname()
+    public Client GetLocalClient()
     {
-        return nickname;
+        return localClient;
     }
 
-    public string GetLocalIPv4()
-    {
-        return Dns.GetHostEntry(Dns.GetHostName())
-        .AddressList.First(
-        f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-        .ToString();
-    }
+    //public void SetNickname(string newNick)
+    //{
+    //    nickname = newNick;
+    //}
 
-    public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
-    {
-        //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-        ipEndPoint = new IPEndPoint(ipAddess, port);
-        //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
-    }
+    //public string GetNickname()
+    //{
+    //    return nickname;
+    //}
+
+    //public string GetLocalIPv4()
+    //{
+    //    return Dns.GetHostEntry(Dns.GetHostName())
+    //    .AddressList.First(
+    //    f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+    //    .ToString();
+    //}
+
+    //public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
+    //{
+    //    //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
+    //    ipEndPoint = new IPEndPoint(ipAddess, port);
+    //    //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
+    //}
 
     public void OnClick_ChangeTransportType(TMP_Dropdown dropdown)
     {
@@ -189,9 +198,10 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         GoToLobbyScene();
     }
 
-    public static void CreateClient(string nick, string ip, bool isHost = false)
+    public Client CreateClient(string nick, string ip, bool isHost = false)
     {
-        Client client = new Client(nick, ip, isHost);
+        Client newClient = new Client(nick, ip, isHost);
+        return newClient;
     }
 
     #endregion

@@ -65,65 +65,62 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     private void Start()
     {
-        receivedMessageSize = NetworkManager.Instance.messageMaxBytes;
+        //StartReceivingMessages();
 
-        socket = NetworkManager.StartNetwork();
-        NetworkManager.SetEndPoint(ref IpEndPoint, IPAddress.Any, NetworkManager.Instance.port);
-        socket.Bind(IpEndPoint);
-        if(NetworkManager.Instance.transportType == TransportType.TCP)
-        {
-            socket.Listen(10);
-            networkThread = new Thread(WaitForClient);
-            networkThread.Start();
+        //if (NetworkManager.Instance.transportType == TransportType.TCP)
+        //{
+        //    socket.Listen(10);
+        //    networkThread = new Thread(WaitForClient);
+        //    networkThread.Start();
 
-            messagesThread = new Thread(WaitForMessages);
-            messagesThread.Start();
-        }
-        else
-        {
-            networkThread = new Thread(ReceiveMessage);
-            networkThread.Start();
-        }
+        //    messagesThread = new Thread(WaitForMessages);
+        //    messagesThread.Start();
+        //}
+        //else
+        //{
+        //    networkThread = new Thread(ReceiveMessage);
+        //    networkThread.Start();
+        //}
     }
+
     
-    private void WaitForClient()
-    {
 
-        //Blocking
-        clientSocket = socket.Accept();
-        IPEndPoint clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
-        Debug.Log("Connected with [" + clientIpEndPoint.Address.ToString() + "] at port [" + clientIpEndPoint.Port.ToString() + "]");
-        
-    }
+    //private void WaitForClient()
+    //{
+    //    //Blocking
+    //    clientSocket = socket.Accept();
+    //    IPEndPoint clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
+    //    Debug.Log("Connected with [" + clientIpEndPoint.Address.ToString() + "] at port [" + clientIpEndPoint.Port.ToString() + "]");
+    //}
 
     private void WaitForMessages()
     {
-        while (true)
-        {
-            if(clientSocket != null)
-            {
-                receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
-                receivedMessageSize = clientSocket.Receive(receivedDataBuffer);
+        //while (true)
+        //{
+        //    if(clientSocket != null)
+        //    {
+        //        receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
+        //        receivedMessageSize = clientSocket.Receive(receivedDataBuffer);
 
-                //Blocking
-                string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+        //        //Blocking
+        //        string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
 
-                if (receivedMessageSize == 0)
-                {
-                    return;
-                }
+        //        if (receivedMessageSize == 0)
+        //        {
+        //            return;
+        //        }
 
-                Debug.Log("Received message: " + message);
+        //        Debug.Log("Received message: " + message);
 
 
 
-                // Envía un mensaje de vuelta
-                string replyMessage = "Received your message: " + message;
-                byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
-                clientSocket.Send(replyData, replyData.Length, SocketFlags.None);
+        //        // Envía un mensaje de vuelta
+        //        string replyMessage = "Received your message: " + message;
+        //        byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
+        //        clientSocket.Send(replyData, replyData.Length, SocketFlags.None);
 
-            }
-        }
+        //    }
+        //}
     }
 
     private void ReceiveMessage()
@@ -134,7 +131,7 @@ public class ReceiveNetworkMessages : MonoBehaviour
                 ReceiveMessage_UDP();
                 break;
             case TransportType.TCP:
-                ReceiveMessage_TCP();
+                //ReceiveMessage_TCP();
                 break;
         }
         
@@ -142,55 +139,55 @@ public class ReceiveNetworkMessages : MonoBehaviour
 
     public void ReceiveMessage_UDP()
     {
-        while (true)
-        {
-            EndPoint Remote = IpEndPoint;
+        //while (true)
+        //{
+        //    EndPoint Remote = IpEndPoint;
             
-            receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
+        //    receivedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
 
-            receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
+        //    receivedMessageSize = socket.ReceiveFrom(receivedDataBuffer, ref Remote);
 
-            string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
+        //    string message = Encoding.ASCII.GetString(receivedDataBuffer, 0, receivedMessageSize);
 
-            string remoteString = Remote.ToString();
-            int remoteIpIndex = remoteString.IndexOf(':');
+        //    string remoteString = Remote.ToString();
+        //    int remoteIpIndex = remoteString.IndexOf(':');
 
-            if (remoteIpIndex != -1)
-            {
-                string remoteIpString = remoteString.Substring(0, remoteIpIndex);
-                Debug.Log("Received message from " + remoteIpString + ": " + message);
-            }
-            else
-            {
-                Debug.Log("Received message from " + remoteString + ": " + message);
-            }
-        }
+        //    if (remoteIpIndex != -1)
+        //    {
+        //        string remoteIpString = remoteString.Substring(0, remoteIpIndex);
+        //        Debug.Log("Received message from " + remoteIpString + ": " + message);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Received message from " + remoteString + ": " + message);
+        //    }
+        //}
     }
 
-    public void ReceiveMessage_TCP()
-    {
-        EndPoint Remote = IpEndPoint;
-        socket.Listen(10);
-        //Blocking
-        clientSocket = socket.Accept();
-    }
+    //public void ReceiveMessage_TCP()
+    //{
+    //    EndPoint Remote = IpEndPoint;
+    //    socket.Listen(10);
+    //    //Blocking
+    //    clientSocket = socket.Accept();
+    //}
 
     private void OnDisable()
     {
-        if(networkThread != null)
-        {
-            networkThread.Abort();
-        }
+        ////if(networkThread != null)
+        ////{
+        ////    networkThread.Abort();
+        ////}
 
-        if (messagesThread != null)
-        {
-            messagesThread.Abort();
-        }
+        ////if (messagesThread != null)
+        ////{
+        ////    messagesThread.Abort();
+        ////}
 
-        if (socket != null)
-        {
-            socket.Close();
-        }
+        ////if (socket != null)
+        ////{
+        ////    socket.Close();
+        ////}
         
 
         //clientSocket.Close();
