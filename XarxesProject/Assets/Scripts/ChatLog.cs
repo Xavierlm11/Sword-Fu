@@ -19,7 +19,7 @@ public class ChatLog : MonoBehaviour
     [SerializeField]
     private Transform chatPanel; //no se como hacer q funcione el scroll
    
-    private Transform chatPanelTrans; //no se como hacer q funcione el scroll
+    private Transform chatPanelTransform; //no se como hacer q funcione el scroll
 
     
    // [SerializeField]
@@ -28,53 +28,46 @@ public class ChatLog : MonoBehaviour
     [SerializeField]
     private GameObject textObject;
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        chatPanelTrans = chatPanel;
+        chatPanelTransform = chatPanel;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space ))
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-            LogMessageToChat("amogas: "+ "sus");
+            LogMessageToChat("amogas","sus");
         }
     }
 
-    public void LogMessageToChat(string text) // usar esta funcion para llamarla desde otros scripts para que escriba en el chat
+    public void LogMessageToChat(string nick, string text)
     {
-        LogAlCuadrado(text);
-    }
-
-    private void LogAlCuadrado(string text)
-    {
-        Message _newMessage = new Message();
+        Message newMessage = new Message();
 
         if (messageLog.Count >= maxMessages)
         {
-            Destroy(messageLog[0].textObj.gameObject);
+            Destroy(messageLog[0].uiText.gameObject);
             messageLog.Remove(messageLog[0]);
         }
 
-        _newMessage.text = text;
+        newMessage.nickname = nick;
+        newMessage.message = text;
 
-        GameObject _newTextObj = Instantiate(textObject, chatPanelTrans);
+        GameObject newTextObj = Instantiate(textObject, chatPanelTransform);
 
-        _newMessage.textObj = _newTextObj.GetComponent<TMP_Text>();
+        newMessage.uiText = newTextObj.GetComponent<TMP_Text>();
 
-        _newMessage.textObj.text = _newMessage.text;
+        newMessage.uiText.text = newMessage.nickname + ": " + newMessage.message;
 
-        messageLog.Add(_newMessage);
+        messageLog.Add(newMessage);
     }
 }
 
 [System.Serializable]
 public class Message
 {
-
-    public string text;
-    public TMP_Text textObj;
+    public string nickname;
+    public string message;
+    public TMP_Text uiText;
 }

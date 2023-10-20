@@ -19,16 +19,13 @@ public class SendNetworkMessages : MonoBehaviour
     private TMP_InputField messageField;
 
     [SerializeField]
-    private TMP_InputField nickNameField;
+    private TMP_InputField nicknameField;
 
     [SerializeField]
     private string ip;
 
     [SerializeField]
     private string message;
-    
-    [SerializeField]
-    private string nickName;
 
     [SerializeField]
     private int maxMessageCharSize;
@@ -74,10 +71,11 @@ public class SendNetworkMessages : MonoBehaviour
         message = messageField.text;
     }
 
-    public void SetNickName()
+    public void SetNickname()
     {
-        nickName = nickNameField.text;
+        NetworkManager.Instance.SetNickname(nicknameField.text);
     }
+
     private void OpenNewThreat()
     {
         networkThread = new Thread(SendNetworkMessage);
@@ -91,7 +89,7 @@ public class SendNetworkMessages : MonoBehaviour
 
         ipField.text = ip;
         messageField.text = message;
-        nickNameField.text = nickName;
+        nicknameField.text = NetworkManager.Instance.GetNickname();
 
         _chatLog = chatLogObj.GetComponent<ChatLog>();
 
@@ -140,8 +138,6 @@ public class SendNetworkMessages : MonoBehaviour
         socket.SendTo(data, data.Length, SocketFlags.None, IpEndPoint);
         Debug.Log("Sended via UDP: " + message);
         isMessage = true;
-       
-
         
         networkThread.Interrupt();
 
@@ -149,9 +145,7 @@ public class SendNetworkMessages : MonoBehaviour
 
     void CallToChat()
     {
-
-        _chatLog.LogMessageToChat(nickName + ": " + message);//para hacer que el mensaje se vea en el chat
-        //no se xq no me deja usar la funcion por algo del transform y thread
+        _chatLog.LogMessageToChat(NetworkManager.Instance.GetNickname(), message);
         isMessage = false;
     }
 
@@ -181,8 +175,7 @@ public class SendNetworkMessages : MonoBehaviour
         socket.Send(data, data.Length, SocketFlags.None);
 
         Debug.Log("Sended via TCP: " + message);
-        _chatLog.LogMessageToChat(nickName + ": " + message);//para hacer que el mensaje se vea en el chat
-
+        isMessage = true;
     }
 
     public void Call_SendNetworkMessage()
@@ -205,7 +198,6 @@ public class SendNetworkMessages : MonoBehaviour
                 socket.Close();
             }
         }
-        
     }
     #endregion
 }

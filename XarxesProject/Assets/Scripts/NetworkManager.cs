@@ -44,6 +44,19 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public int messageMaxBytes;
     private bool hasInitialized;
 
+    [SerializeField]
+    private string nickname;
+
+    public void SetNickname(string newNick)
+    {
+        nickname = newNick;
+    }
+
+    public string GetNickname()
+    {
+        return nickname;
+    }
+
     public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
     {
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
