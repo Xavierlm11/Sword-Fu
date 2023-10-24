@@ -172,39 +172,27 @@ public class SendNetworkMessages : MonoBehaviour
     //    UpdateInfo();
     //}
 
-    public void SendDebugMessage()
-    {
-        switch (NetworkManager.Instance.transportType)
-        {
-            case TransportType.UDP:
-                SendDebugMessage_UDP();
-                break;
+    
 
-            case TransportType.TCP:
-                SendDebugMessage_TCP();
-                break;
-        }
-    }
+    //private void SendDebugMessage_UDP()
+    //{
+    //    byte[] data = Encoding.ASCII.GetBytes(debugMessage);
 
-    private void SendDebugMessage_UDP()
-    {
-        byte[] data = Encoding.ASCII.GetBytes(debugMessage);
+    //    ConnectionManager.Instance.socket.SendTo(data, data.Length, SocketFlags.None, ConnectionManager.Instance.ipEndPointToSend);
+    //    Debug.Log("Sended via UDP: " + debugMessage);
+    //    ConnectionManager.Instance.isMessage = true;
+    //}
 
-        ConnectionManager.Instance.socket.SendTo(data, data.Length, SocketFlags.None, ConnectionManager.Instance.ipEndPointToSend);
-        Debug.Log("Sended via UDP: " + debugMessage);
-        ConnectionManager.Instance.isMessage = true;
-    }
+    //private void SendDebugMessage_TCP()
+    //{
+    //    byte[] data = Encoding.ASCII.GetBytes(debugMessage);
 
-    private void SendDebugMessage_TCP()
-    {
-        byte[] data = Encoding.ASCII.GetBytes(debugMessage);
+    //    ConnectionManager.Instance.socket.Send(data, data.Length, SocketFlags.None);
 
-        ConnectionManager.Instance.socket.Send(data, data.Length, SocketFlags.None);
+    //    Debug.Log("Sended via TCP: " + debugMessage);
 
-        Debug.Log("Sended via TCP: " + debugMessage);
-
-        ConnectionManager.Instance.isMessage = true;
-    }
+    //    ConnectionManager.Instance.isMessage = true;
+    //}
 
     #endregion
 }
