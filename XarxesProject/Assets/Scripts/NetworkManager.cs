@@ -13,6 +13,24 @@ public class Server
 
 }
 
+//public class Message
+//{
+//    public Client client;
+//    public string messageText;
+//}
+
+public class DebugMessage
+{
+    public int ip;
+    public string debugMessageText;
+}
+
+//public class DataTransfered
+//{
+//    MethodsToSend method;
+//    T data;
+//}
+
 public class Client
 {
     public bool isHost;
@@ -31,6 +49,12 @@ public enum TransportType
 {
     UDP,
     TCP
+}
+
+public enum MethodsToSend
+{
+    ConnectionConfirmation,
+    DebugMessage
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]
