@@ -96,6 +96,10 @@ public class Client
     public string nickname;
     public string localIp;
 
+    public Client()
+    {
+
+    }
     public Client(string nick, string ip, bool host = false)
     {
         nickname = nick;

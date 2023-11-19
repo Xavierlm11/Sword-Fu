@@ -241,9 +241,9 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     {
-        if (NetworkManager.Instance.clients.Exists(x=>x.localIp == connectionRequest.clientRequesting.localIp))
+        if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp))
         {
-            Send_Data(()=>ConnectionConfirmation(false, "A client with this IP is already connected"));
+            Send_Data(() => ConnectionConfirmation(false, "A client with this IP is already connected"));
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
@@ -255,6 +255,23 @@ public class ConnectionManager : MonoBehaviour
             Send_Data(() => ConnectionConfirmation(true));
         }
     }
+
+    //public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
+    //{
+    //    if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.senderIp))
+    //    {
+    //        Send_Data(() => ConnectionConfirmation(false, "A client with this IP is already connected"));
+    //    }
+    //    else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.senderNickname))
+    //    {
+    //        Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+    //    }
+    //    else
+    //    {
+    //        //NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
+    //        Send_Data(() => ConnectionConfirmation(true));
+    //    }
+    //}
 
     public void ConnectionConfirmation(bool confirmation, string reason = null)
     {
@@ -331,6 +348,7 @@ public class ConnectionManager : MonoBehaviour
 
         Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
 
+        //ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
         ConnectionRequest connectionRequest = new ConnectionRequest(client);
 
         SerializeToJsonAndSend(connectionRequest);
@@ -342,6 +360,9 @@ public class ConnectionManager : MonoBehaviour
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
         string json = JsonUtility.ToJson(objectToSerialize);
+
+        ConnectionRequest a = JsonUtility.FromJson<ConnectionRequest>(json);
+
         stream = new MemoryStream();
         binaryWriter = new BinaryWriter(stream);
         binaryWriter.Write(json);
