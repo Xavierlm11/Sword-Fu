@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class ConnectionManager : MonoBehaviour
 {
@@ -215,25 +216,25 @@ public class ConnectionManager : MonoBehaviour
         string json = binaryReader.ReadString();
 
         GenericSendClass sendClass = new GenericSendClass();
-        sendClass = JsonUtility.FromJson<GenericSendClass>(json);
+        sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
         switch (sendClass.sendCode)
         {
             case SendCode.ConnectionRequest:
                 ConnectionRequest connectionRequest = new ConnectionRequest();
-                connectionRequest = JsonUtility.FromJson<ConnectionRequest>(json);
+                connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
                 Receive_ConnectionRequest(connectionRequest);
                 break;
 
             case SendCode.ConnectionConfirmation:
                 ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
-                connectionConfirmation = JsonUtility.FromJson<ConnectionConfirmation>(json);
+                connectionConfirmation = JsonConvert.DeserializeObject<ConnectionConfirmation>(json);
                 Receive_ConnectionConfirmation(connectionConfirmation);
                 break;
 
             case SendCode.DebugMessage:
                 DebugMessage debugMessage = new DebugMessage();
-                debugMessage = JsonUtility.FromJson<DebugMessage>(json);
+                debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
                 Receive_DebugMessage(debugMessage);
                 break;
         }
@@ -359,9 +360,8 @@ public class ConnectionManager : MonoBehaviour
 
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
-        string json = JsonUtility.ToJson(objectToSerialize);
 
-        ConnectionRequest a = JsonUtility.FromJson<ConnectionRequest>(json);
+        string json = JsonConvert.SerializeObject(objectToSerialize);
 
         stream = new MemoryStream();
         binaryWriter = new BinaryWriter(stream);
@@ -474,6 +474,9 @@ public class ConnectionManager : MonoBehaviour
 
     private void OnDisable()
     {
+        //Reset info
+        NetworkManager.Instance.clients.Clear();
+
         //Close to Send
         if (socket != null)
         {

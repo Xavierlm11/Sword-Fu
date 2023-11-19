@@ -100,7 +100,7 @@ public class Client
     {
 
     }
-    public Client(string nick, string ip, bool host = false)
+    public Client(string ip, string nick, bool host = false)
     {
         nickname = nick;
         localIp = ip; 
