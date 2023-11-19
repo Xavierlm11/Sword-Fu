@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -48,6 +49,10 @@ public class ConnectionManager : MonoBehaviour
 
     private Action dataMethod;
 
+    private MemoryStream stream;
+    private BinaryWriter binaryWriter;
+    private BinaryReader binaryReader;
+
     #endregion
 
     //______________________________________________________________________________________________
@@ -90,6 +95,8 @@ public class ConnectionManager : MonoBehaviour
 
         SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.port);
         socket.Bind(ipEndPointToReceive);
+
+        Debug.Log("EndPoint set and socket binded");
     }
 
     private void WaitForClient()
@@ -147,20 +154,28 @@ public class ConnectionManager : MonoBehaviour
 
             transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
 
-            string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
-
-            string remoteString = Remote.ToString();
-            int remoteIpIndex = remoteString.IndexOf(':');
-
-            if (remoteIpIndex != -1)
+            if (transferedDataSize == 0)
             {
-                string remoteIpString = remoteString.Substring(0, remoteIpIndex);
-                Debug.Log("Received message from " + remoteIpString + ": " + message);
+                return;
             }
-            else
-            {
-                Debug.Log("Received message from " + remoteString + ": " + message);
-            }
+
+            DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
+
+
+            //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
+
+            //string remoteString = Remote.ToString();
+            //int remoteIpIndex = remoteString.IndexOf(':');
+
+            //if (remoteIpIndex != -1)
+            //{
+            //    string remoteIpString = remoteString.Substring(0, remoteIpIndex);
+            //    Debug.Log("Received message from " + remoteIpString + ": " + message);
+            //}
+            //else
+            //{
+            //    Debug.Log("Received message from " + remoteString + ": " + message);
+            //}
         }
     }
 
@@ -173,15 +188,19 @@ public class ConnectionManager : MonoBehaviour
                 transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
                 transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
 
-                //Blocking
-                string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
+                
+
+                ////Blocking
+                //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
 
                 if (transferedDataSize == 0)
                 {
                     return;
                 }
 
-                Debug.Log("Received message: " + message);
+                DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
+
+                //Debug.Log("Received message: " + message);
 
 
 
@@ -194,6 +213,37 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    public void DeserializeJsonAndReceive(byte[] dataReceived, int dataSize)
+    {
+        stream = new MemoryStream(dataReceived, 0, dataSize);
+        binaryReader = new BinaryReader(stream);
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        string json = binaryReader.ReadString();
+
+        GenericSendClass sendClass = new GenericSendClass();
+        sendClass = JsonUtility.FromJson<GenericSendClass>(json);
+
+        switch (sendClass.sendCode)
+        {
+            case SendCode.ConnectionConfirmation:
+
+                break;
+
+            case SendCode.DebugMessage:
+                DebugMessage debugMessage = new DebugMessage();
+                debugMessage = JsonUtility.FromJson<DebugMessage>(json);
+                Receive_DebugMessage(debugMessage);
+                break;
+        }
+    }
+
+    public void Receive_DebugMessage(DebugMessage debugMessage)
+    {
+        Debug.Log("IP: " + debugMessage.senderIp.ToString() + ". Nickname: " + debugMessage.senderNickname.ToString() + ". Message: " + debugMessage.debugMessageText.ToString());
+    }
+
     public void Call_ConnectionConfirmation()
     {
         if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
@@ -201,27 +251,48 @@ public class ConnectionManager : MonoBehaviour
             OpenNewThreat_Send();
         }
 
-        dataMethod = ConnectionConfirmation;
+        dataMethod = ConnectionConfirmationRequest;
         networkThreadToSendData.Start();
     }
 
-    private void ConnectionConfirmation()
+    private void ConnectionConfirmationRequest()
     {
         switch (NetworkManager.Instance.transportType)
         {
             case TransportType.UDP:
-                ConnectionConfirmation_UDP();
+                ConnectionConfirmationRequest_UDP();
                 break;
 
             case TransportType.TCP:
-                ConnectionConfirmation_TCP();
+                ConnectionConfirmationRequest_TCP();
                 break;
         }
     }
 
-    private void ConnectionConfirmation_UDP()
+    private void ConnectionConfirmationRequest_UDP()
     {
-        SendDebugMessage();
+        //SendDebugMessage();
+
+        Debug.Log("Sending request");
+
+        DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
+
+        SerializeToJsonAndSend(debugMessage);
+
+        Debug.Log("Sent request");
+
+    }
+
+    public void SerializeToJsonAndSend<T>(T objectToSerialize)
+    {
+        string json = JsonUtility.ToJson(objectToSerialize);
+        stream = new MemoryStream();
+        binaryWriter = new BinaryWriter(stream);
+        binaryWriter.Write(json);
+
+        byte[] data = stream.ToArray();//Encoding.ASCII.GetBytes(json);
+
+        socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
 
     public void SendDebugMessage()
@@ -258,7 +329,7 @@ public class ConnectionManager : MonoBehaviour
         //ConnectionManager.Instance.isMessage = true;
     }
 
-    private void ConnectionConfirmation_TCP()
+    private void ConnectionConfirmationRequest_TCP()
     {
         LobbyManager.Instance.serverHasConfirmedConnection = true;
     }

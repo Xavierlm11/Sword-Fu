@@ -93,6 +93,7 @@ public class LobbyManager : MonoBehaviour
     {
         if (!NicknameIsEmpty() && !RemoteIpIsEmpty())
         {
+            UpdateInfo();
             ConfirmConnection();
         }
     }
@@ -142,6 +143,7 @@ public class LobbyManager : MonoBehaviour
 
     public void UpdateInfo()
     {
+        Debug.Log("IP Edited");
         if (!RemoteIpIsEmpty())
         {
             ConnectionManager.Instance.SetRemoteIP(remoteIpField.text);

@@ -19,10 +19,27 @@ public class Server
 //    public string messageText;
 //}
 
-public class DebugMessage
+public class DebugMessage : GenericSendClass
 {
-    public int ip;
+    public DebugMessage()
+    {
+        
+    }
+    public DebugMessage(string ip, string nickname, string message)
+    {
+        senderIp = ip;
+        senderNickname = nickname;
+        debugMessageText = message;
+        sendCode = SendCode.DebugMessage;
+    }
+    public string senderIp;
+    public string senderNickname;
     public string debugMessageText;
+}
+
+public class GenericSendClass
+{
+    public SendCode sendCode;
 }
 
 //public class DataTransfered
@@ -51,7 +68,7 @@ public enum TransportType
     TCP
 }
 
-public enum MethodsToSend
+public enum SendCode
 {
     ConnectionConfirmation,
     DebugMessage
