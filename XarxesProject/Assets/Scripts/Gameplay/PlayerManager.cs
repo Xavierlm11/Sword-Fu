@@ -5,14 +5,8 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public GameObject playerPrefab;
+    public List<GameObject> spawnPoints = new List<GameObject>();
     private List<GameObject> players = new List<GameObject>();
-    private List<Vector3> spawnPoints = new List<Vector3>
-    {
-        new Vector3(0, 0, 0),
-        new Vector3(0, 0, 10),
-        new Vector3(10, 0, 0),
-        new Vector3(10, 0, 10)
-    };
 
     public int numberOfPlayers = 4; // Puedes ajustar esto desde el editor de Unity
 
@@ -48,8 +42,8 @@ public class PlayerManager : MonoBehaviour
         {
             if (i < spawnPoints.Count)
             {
-                players[i].transform.position = spawnPoints[i];
-                Debug.Log($"{players[i].name} aparece en el punto {spawnPoints[i]}.");
+                players[i].transform.position = spawnPoints[i].transform.position;
+                Debug.Log($"{players[i].name} aparece en el punto {spawnPoints[i].name}.");
             }
             else
             {
