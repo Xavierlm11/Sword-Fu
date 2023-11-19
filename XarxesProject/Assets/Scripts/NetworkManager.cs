@@ -19,6 +19,11 @@ public class Server
 //    public string messageText;
 //}
 
+#region send classes
+public class GenericSendClass
+{
+    public SendCode sendCode;
+}
 public class DebugMessage : GenericSendClass
 {
     public DebugMessage()
@@ -37,16 +42,53 @@ public class DebugMessage : GenericSendClass
     public string debugMessageText;
 }
 
-public class GenericSendClass
+//public class ConnectionRequest : GenericSendClass
+//{
+//    public ConnectionRequest()
+//    {
+
+//    }
+//    public ConnectionRequest(string ip, string nickname)
+//    {
+//        senderIp = ip;
+//        senderNickname = nickname;
+//        sendCode = SendCode.ConnectionRequest;
+//    }
+//    public string senderIp;
+//    public string senderNickname;
+//}
+
+public class ConnectionRequest : GenericSendClass
 {
-    public SendCode sendCode;
+    public ConnectionRequest()
+    {
+
+    }
+    public ConnectionRequest(Client client)
+    {
+        clientRequesting = client;
+        sendCode = SendCode.ConnectionRequest;
+    }
+    public Client clientRequesting;
 }
 
-//public class DataTransfered
-//{
-//    MethodsToSend method;
-//    T data;
-//}
+public class ConnectionConfirmation : GenericSendClass
+{
+    public ConnectionConfirmation()
+    {
+
+    }
+    public ConnectionConfirmation(bool accepted)
+    {
+        acceptedConnection = accepted;
+        sendCode = SendCode.ConnectionConfirmation;
+    }
+
+    public bool acceptedConnection;
+    public string reasonToDeny;
+}
+
+#endregion
 
 public class Client
 {
@@ -70,6 +112,7 @@ public enum TransportType
 
 public enum SendCode
 {
+    ConnectionRequest,
     ConnectionConfirmation,
     DebugMessage
 }
@@ -113,7 +156,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     private Client localClient;
 
     [SerializeField]
-    private List<Client> clients;
+    public List<Client> clients = new List<Client>();
 
 
     #endregion
@@ -131,31 +174,6 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     {
         return localClient;
     }
-
-    //public void SetNickname(string newNick)
-    //{
-    //    nickname = newNick;
-    //}
-
-    //public string GetNickname()
-    //{
-    //    return nickname;
-    //}
-
-    //public string GetLocalIPv4()
-    //{
-    //    return Dns.GetHostEntry(Dns.GetHostName())
-    //    .AddressList.First(
-    //    f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-    //    .ToString();
-    //}
-
-    //public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
-    //{
-    //    //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
-    //    ipEndPoint = new IPEndPoint(ipAddess, port);
-    //    //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
-    //}
 
     public void OnClick_ChangeTransportType(TMP_Dropdown dropdown)
     {

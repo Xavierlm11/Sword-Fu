@@ -49,6 +49,7 @@ public class ConnectionManager : MonoBehaviour
 
     private Action dataMethod;
 
+
     private MemoryStream stream;
     private BinaryWriter binaryWriter;
     private BinaryReader binaryReader;
@@ -161,6 +162,8 @@ public class ConnectionManager : MonoBehaviour
 
             DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
 
+            //socket.SendTo(transferedDataBuffer, transferedDataSize, SocketFlags.None, Remote);
+
 
             //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
 
@@ -188,8 +191,6 @@ public class ConnectionManager : MonoBehaviour
                 transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
                 transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
 
-                
-
                 ////Blocking
                 //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
 
@@ -199,15 +200,6 @@ public class ConnectionManager : MonoBehaviour
                 }
 
                 DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-
-                //Debug.Log("Received message: " + message);
-
-
-
-                ////// Envía un mensaje de vuelta
-                ////string replyMessage = "Received your message: " + message;
-                ////byte[] replyData = Encoding.ASCII.GetBytes(replyMessage);
-                ////connectedClientSocket.Send(replyData, replyData.Length, SocketFlags.None);
 
             }
         }
@@ -227,8 +219,16 @@ public class ConnectionManager : MonoBehaviour
 
         switch (sendClass.sendCode)
         {
-            case SendCode.ConnectionConfirmation:
+            case SendCode.ConnectionRequest:
+                ConnectionRequest connectionRequest = new ConnectionRequest();
+                connectionRequest = JsonUtility.FromJson<ConnectionRequest>(json);
+                Receive_ConnectionRequest(connectionRequest);
+                break;
 
+            case SendCode.ConnectionConfirmation:
+                ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
+                connectionConfirmation = JsonUtility.FromJson<ConnectionConfirmation>(json);
+                Receive_ConnectionConfirmation(connectionConfirmation);
                 break;
 
             case SendCode.DebugMessage:
@@ -239,45 +239,101 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
+    {
+        if (NetworkManager.Instance.clients.Exists(x=>x.localIp == connectionRequest.clientRequesting.localIp))
+        {
+            Send_Data(()=>ConnectionConfirmation(false, "A client with this IP is already connected"));
+        }
+        else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
+        {
+            Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+        }
+        else
+        {
+            NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
+            Send_Data(() => ConnectionConfirmation(true));
+        }
+    }
+
+    public void ConnectionConfirmation(bool confirmation, string reason = null)
+    {
+        ConnectionConfirmation connectionRequest = new ConnectionConfirmation(confirmation);
+
+        if (!confirmation)
+        {
+            connectionRequest.reasonToDeny = reason;
+        }
+
+        SerializeToJsonAndSend(connectionRequest);
+
+    }
+
+    public void Receive_ConnectionConfirmation(ConnectionConfirmation connectionConfirmation)
+    {
+        if (connectionConfirmation.acceptedConnection)
+        {
+            Debug.Log("You are connected to the Server!");
+        }
+        else
+        {
+            Debug.Log("Could not connect to server: " + connectionConfirmation.reasonToDeny);
+        }
+    }
+
     public void Receive_DebugMessage(DebugMessage debugMessage)
     {
         Debug.Log("IP: " + debugMessage.senderIp.ToString() + ". Nickname: " + debugMessage.senderNickname.ToString() + ". Message: " + debugMessage.debugMessageText.ToString());
     }
-
-    public void Call_ConnectionConfirmation()
+    public void Send_Data(Action method)
     {
         if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
         {
             OpenNewThreat_Send();
         }
 
-        dataMethod = ConnectionConfirmationRequest;
+        dataMethod = method;
+
         networkThreadToSendData.Start();
     }
 
-    private void ConnectionConfirmationRequest()
+    //public void Send_ConnectionRequest()
+    //{
+    //    if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
+    //    {
+    //        OpenNewThreat_Send();
+    //    }
+
+    //    dataMethod = ConnectionConfirmationRequest;
+    //    networkThreadToSendData.Start();
+    //}
+
+    public void ConnectionRequest()
     {
         switch (NetworkManager.Instance.transportType)
         {
             case TransportType.UDP:
-                ConnectionConfirmationRequest_UDP();
+                ConnectionRequest_UDP();
                 break;
 
             case TransportType.TCP:
-                ConnectionConfirmationRequest_TCP();
+                ConnectionRequest_TCP();
                 break;
         }
     }
 
-    private void ConnectionConfirmationRequest_UDP()
+    private void ConnectionRequest_UDP()
     {
-        //SendDebugMessage();
 
         Debug.Log("Sending request");
 
-        DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
+        //DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
 
-        SerializeToJsonAndSend(debugMessage);
+        Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
+
+        ConnectionRequest connectionRequest = new ConnectionRequest(client);
+
+        SerializeToJsonAndSend(connectionRequest);
 
         Debug.Log("Sent request");
 
@@ -290,7 +346,7 @@ public class ConnectionManager : MonoBehaviour
         binaryWriter = new BinaryWriter(stream);
         binaryWriter.Write(json);
 
-        byte[] data = stream.ToArray();//Encoding.ASCII.GetBytes(json);
+        byte[] data = stream.ToArray();
 
         socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
@@ -329,20 +385,9 @@ public class ConnectionManager : MonoBehaviour
         //ConnectionManager.Instance.isMessage = true;
     }
 
-    private void ConnectionConfirmationRequest_TCP()
+    private void ConnectionRequest_TCP()
     {
         LobbyManager.Instance.serverHasConfirmedConnection = true;
-    }
-
-    public void Call_SendNetworkData()
-    {
-        if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
-        {
-            OpenNewThreat_Send();
-        }
-
-        dataMethod = SendNetworkData;
-        networkThreadToSendData.Start();
     }
 
     public void SendNetworkData()

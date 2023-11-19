@@ -94,13 +94,13 @@ public class LobbyManager : MonoBehaviour
         if (!NicknameIsEmpty() && !RemoteIpIsEmpty())
         {
             UpdateInfo();
-            ConfirmConnection();
+            ConnectToServer();
         }
     }
 
-    private void ConfirmConnection()
+    private void ConnectToServer()
     {
-        ConnectionManager.Instance.Call_ConnectionConfirmation();
+        ConnectionManager.Instance.Send_Data(ConnectionManager.Instance.ConnectionRequest);
     }
 
     public void OnClick_GetLocalIPv4()
