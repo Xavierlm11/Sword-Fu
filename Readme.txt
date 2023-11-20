@@ -19,6 +19,14 @@ usar los clientes que se conecten a él (Client Port). Ambos campos tienen un bo
 Por el lado del cliente, los campos de Nickname y puertos son iguales, pero hay un campo IP en el que hay que introducir la 
 IP del servidor, y al finalizar hay que pulsar el botón "Join", el cual te llevará a la sala de espera con el servidor.
 
+[Estructura]
+El código se basa principalmente en varios Singleton. El primero (que también es un ScriptableObject) se llama NetworkManager
+y contiene datos de la configuración de la aplicación y clases básicas como la de cliente y otras usadas para el traspaso
+de información entre clientes, además de datos sobre el cliente local. El LobbyManager maneja los menús y lo que ocurre cuando
+ el usuario interactúa con botones o InputFields. El ConnectionManager gestiona los sockets que usan los clientes y las 
+conexiones entre estos. El PartyManager gestion la lista de jugadores que hay en la sala y el PlayerManager controla la generación
+de jugadores y la actualización de sus posiciones.
+
 
 [Problemas]
 Teníamos un error que no supimos exactamente como solventar, ya que este se producía al llamar a la función Socket.Bind()
