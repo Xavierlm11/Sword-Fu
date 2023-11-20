@@ -42,22 +42,6 @@ public class DebugMessage : GenericSendClass
     public string debugMessageText;
 }
 
-//public class ConnectionRequest : GenericSendClass
-//{
-//    public ConnectionRequest()
-//    {
-
-//    }
-//    public ConnectionRequest(string ip, string nickname)
-//    {
-//        senderIp = ip;
-//        senderNickname = nickname;
-//        sendCode = SendCode.ConnectionRequest;
-//    }
-//    public string senderIp;
-//    public string senderNickname;
-//}
-
 public class ConnectionRequest : GenericSendClass
 {
     public ConnectionRequest()
