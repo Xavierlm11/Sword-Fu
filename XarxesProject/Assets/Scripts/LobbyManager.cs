@@ -28,6 +28,9 @@ public class LobbyManager : MonoBehaviour
     private TMP_Text titleIp;
 
     [SerializeField]
+    private TMP_Text titlePort;
+
+    [SerializeField]
     private string temp_nickname;
 
     [SerializeField]
@@ -197,7 +200,7 @@ public class LobbyManager : MonoBehaviour
                 {
                     if (item == waitingRoomMenu || item==startGameButton)
                     {
-                        titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
+                        //titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
                         item.SetActive(true);
                     }
                     else
@@ -224,7 +227,7 @@ public class LobbyManager : MonoBehaviour
                 {
                     if (item == waitingRoomMenu)
                     {
-                        titleIp.text = remoteIpField.text;
+                        //titleIp.text = remoteIpField.text;
                         item.SetActive(true);
                     }
                     else
@@ -334,16 +337,19 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
+            ConnectionManager.Instance.SetSocket();
 
             NetworkManager.Instance.remotePort = int.Parse(host_clientPortField.text);
             NetworkManager.Instance.localPort = int.Parse(host_serverPortField.text);
-
             ConnectionManager.Instance.UpdateEndPoints();
 
-            BeTheServer();
             ConnectionManager.Instance.StartConnections();
 
+            BeTheServer();
+
             ChangeStage(stages.waitingHost);
+            titleIp.text = NetworkManager.Instance.localIp.ToString();
+            titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }
 
@@ -366,22 +372,21 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
+            ConnectionManager.Instance.SetSocket();
 
             NetworkManager.Instance.remotePort = int.Parse(client_serverPortField.text);
             NetworkManager.Instance.localPort = int.Parse(client_localPortField.text);
-
             ConnectionManager.Instance.UpdateEndPoints();
 
-            //NetworkManager.Instance.remoteIp = int.Parse(client_serverPortField.text);
-            //NetworkManager.Instance.localPort = int.Parse(client_localPortField.text);
+            ConnectionManager.Instance.StartConnections();
 
             BeTheClient();
-            ConnectionManager.Instance.UpdateEndPointToSend();
-            //UpdateRemoteIP();
-            ConnectionManager.Instance.StartConnections();
-            ChangeStage(stages.waitingHost);
-
+            
             ConnectToServer();
+
+            ChangeStage(stages.waitingClient);
+            titleIp.text = NetworkManager.Instance.remoteIp.ToString();
+            titlePort.text = NetworkManager.Instance.remotePort.ToString();
         }
 
 
@@ -395,7 +400,6 @@ public class LobbyManager : MonoBehaviour
         NetworkManager.Instance.clients.Add(cl);
 
         Debug.Log("You are the server");
-        //SceneManager.LoadScene(NetworkManager.Instance.chatSceneName);
     }
 
     public void BeTheClient()
@@ -406,8 +410,6 @@ public class LobbyManager : MonoBehaviour
         NetworkManager.Instance.SetLocalClient(cl);
 
         Debug.Log("You are a client");
-
-        //SceneManager.LoadScene(NetworkManager.Instance.chatSceneName);
     }
 
     private void ConnectToServer()

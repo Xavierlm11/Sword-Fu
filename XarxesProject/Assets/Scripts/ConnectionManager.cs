@@ -98,9 +98,8 @@ public class ConnectionManager : MonoBehaviour
 
     public void StartConnections()
     {
-        SetSocket();
+        
 
-        //SetInitialValues();
         StartReceivingMessages();
 
         OpenNewThreat_Receive();
@@ -115,12 +114,6 @@ public class ConnectionManager : MonoBehaviour
     public void StartReceivingMessages()
     {
         transferedDataSize = NetworkManager.Instance.messageMaxBytes;
-
-        //SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.remotePort);
-        socket.Bind(ipEndPointToReceive);
-
-        //NetworkManager.Instance.UpdateRemotePort(((IPEndPoint)socket.LocalEndPoint).Port);
-        //LobbyManager.Instance.SetLocalPort();
 
         Debug.Log("EndPoint set and socket binded");
     }
@@ -199,13 +192,10 @@ public class ConnectionManager : MonoBehaviour
                 ////Blocking
                 //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
 
-                if (transferedDataSize == 0)
+                if (transferedDataSize != 0)
                 {
-                    return;
+                    DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
                 }
-
-                DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-
             }
         }
     }
@@ -246,8 +236,6 @@ public class ConnectionManager : MonoBehaviour
                 PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
                 Receive_PlayerPositions(PlayerPositionsInfo);
                 break;
-
-
         }
     }
 
@@ -271,23 +259,6 @@ public class ConnectionManager : MonoBehaviour
             Send_Data(() => ConnectionConfirmation(true));
         }
     }
-
-    //public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
-    //{
-    //    if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.senderIp))
-    //    {
-    //        Send_Data(() => ConnectionConfirmation(false, "A client with this IP is already connected"));
-    //    }
-    //    else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.senderNickname))
-    //    {
-    //        Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
-    //    }
-    //    else
-    //    {
-    //        //NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
-    //        Send_Data(() => ConnectionConfirmation(true));
-    //    }
-    //}
 
     public void ConnectionConfirmation(bool confirmation, string reason = null)
     {
@@ -330,17 +301,6 @@ public class ConnectionManager : MonoBehaviour
         networkThreadToSendData.Start();
     }
 
-    //public void Send_ConnectionRequest()
-    //{
-    //    if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
-    //    {
-    //        OpenNewThreat_Send();
-    //    }
-
-    //    dataMethod = ConnectionConfirmationRequest;
-    //    networkThreadToSendData.Start();
-    //}
-
     public void ConnectionRequest()
     {
         switch (NetworkManager.Instance.transportType)
@@ -357,17 +317,7 @@ public class ConnectionManager : MonoBehaviour
 
     private void ConnectionRequest_UDP()
     {
-
         Debug.Log("Sending request");
-
-        //DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
-
-        //Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
-
-        //ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
-        
-        
-
 
         if(NetworkManager.Instance.GetLocalClient() == null)
         {
@@ -380,7 +330,6 @@ public class ConnectionManager : MonoBehaviour
         SerializeToJsonAndSend(connectionRequest);
 
         Debug.Log("Sent request");
-
     }
 
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
@@ -487,19 +436,8 @@ public class ConnectionManager : MonoBehaviour
 
     public void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
     {
-        //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
         ipEndPoint = new IPEndPoint(ipAddess, port);
-        //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
     }
-
-    //public void SetRemoteIP(string ip)
-    //{
-    //    SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(ip), NetworkManager.Instance.serverPort);
-    //}
-    //public void SetRemoteEndPoint(IPEndPoint endPoint)
-    //{
-
-    //}
 
     public void UpdateEndPoints()
     {
@@ -510,6 +448,7 @@ public class ConnectionManager : MonoBehaviour
     public void UpdateEndPointToReceive()
     {
         SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.localPort);
+        socket.Bind(ipEndPointToReceive);
     }
 
     public void UpdateEndPointToSend()
