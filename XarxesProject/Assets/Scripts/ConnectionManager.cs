@@ -48,12 +48,14 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField]
     private int maxTransferedDataSize;
 
+    [SerializeField]
+    private PartyManager partyObj;
+
     [Serializable]
     public class PlayerPositionsInfo
     {
-        public string senderIp;
-        public string senderNickname;
-        public List<PlayerPosition> playerPositions;
+        public string playerIp;
+        public PlayerPosition playerPositions;
     }
 
     [Serializable]
@@ -63,6 +65,17 @@ public class ConnectionManager : MonoBehaviour
         public float positionX;
         public float positionY;
         public float positionZ;
+    }
+
+    [SerializeField]
+    public class PartyPlayersInfo
+    {
+        public string playerName;
+        public int playerID;
+        public int playersConected;
+
+        public PlayerPositionsInfo playerInfo;
+
     }
 
     private Action dataMethod;
@@ -80,9 +93,10 @@ public class ConnectionManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if(Instance == null) 
-        { 
+        if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -92,8 +106,8 @@ public class ConnectionManager : MonoBehaviour
 
     private void Start()
     {
-        
 
+        
     }
 
     //This is called when the user tries to create/join a room. It connects the player to the network
@@ -245,6 +259,25 @@ public class ConnectionManager : MonoBehaviour
                 PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
                 Receive_PlayerPositions(PlayerPositionsInfo);
                 break;
+
+            case SendCode.PartyManager:
+                PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
+                Receive_PartyPlayersInfo(PPI);
+                break;
+
+            case SendCode.SendIdPlayer:
+                SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
+                Receive_SendIdPlayer(sIP);
+                break;
+        }
+    }
+
+    private void Receive_SendIdPlayer(SendIdPlayer sIP)
+    {
+        if (!NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            partyObj.playerID=sIP.playerId;
+
         }
     }
 
@@ -264,9 +297,57 @@ public class ConnectionManager : MonoBehaviour
 
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
+
+            //partyObj.AddPartyPlayer();
+            AddNewPartyPlayer(connectionRequest.clientRequesting);
             UpdateEndPointToSend();
             Send_Data(() => ConnectionConfirmation(true));
         }
+    }
+
+    public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
+    {
+        PartyPlayersInfo newplayer = new PartyPlayersInfo();
+        int newID = 0;
+        foreach (PartyPlayersInfo item in partyObj.partyPlayersList)
+        {
+            if (item.playerID >= newID)
+            {
+                newID = item.playerID + 1;
+            }
+        }
+        newplayer.playerID = newID;
+        newplayer.playerInfo.playerIp = cl.localIp;
+        newplayer.playerName = cl.nickname;
+        partyObj.partyPlayersList.Add(newplayer);
+        SendIdToPlayer(newplayer);
+        //aqui falta que le devuelva al player o al host su player id
+
+    }
+
+    //public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
+    //{
+    //    if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.senderIp))
+    //    {
+    //        Send_Data(() => ConnectionConfirmation(false, "A client with this IP is already connected"));
+    //    }
+    //    else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.senderNickname))
+    //    {
+    //        Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+    //    }
+    //    else
+    //    {
+    //        //NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
+    //        Send_Data(() => ConnectionConfirmation(true));
+    //    }
+    //}
+
+    public void SendIdToPlayer(PartyPlayersInfo playersInfo)
+    {
+        SendIdPlayer sendId = new SendIdPlayer(playersInfo);
+
+        SerializeToJsonAndSend(sendId);
+
     }
 
     public void ConnectionConfirmation(bool confirmation, string reason = null)
@@ -316,6 +397,23 @@ public class ConnectionManager : MonoBehaviour
         networkThreadToSendData.Start();
     }
 
+    public void Receive_PartyPlayersInfo(PartyPlayersInfo ppi)
+    {
+
+        // partyObj.partyPlayersList.Add(ppi);
+
+    }
+    //public void Send_ConnectionRequest()
+    //{
+    //    if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
+    //    {
+    //        OpenNewThreat_Send();
+    //    }
+
+    //    dataMethod = ConnectionConfirmationRequest;
+    //    networkThreadToSendData.Start();
+    //}
+
     public void ConnectionRequest()
     {
         switch (NetworkManager.Instance.transportType)
@@ -339,12 +437,21 @@ public class ConnectionManager : MonoBehaviour
     {
         Debug.Log("Sending request");
 
-        if(NetworkManager.Instance.GetLocalClient() == null)
+        //DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
+
+        //Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
+
+        //ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
+
+
+
+
+        if (NetworkManager.Instance.GetLocalClient() == null)
         {
             Debug.Log("There is no local client");
             return;
         }
-        
+
         ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient());
 
         SerializeToJsonAndSend(connectionRequest);
@@ -519,15 +626,15 @@ public class ConnectionManager : MonoBehaviour
         // PlayerPositionsInfo.senderNickname: Apodo del remitente
         // PlayerPositionsInfo.playerPositions: Lista de posiciones de jugadores
 
-        foreach (var playerPosition in PlayerPositionsInfo.playerPositions)
-        {
-            // Accede a la información de cada jugador
-            // playerPosition.playerName: Nombre del jugador
-            // playerPosition.positionX: Posición X del jugador
-            // playerPosition.positionY: Posición Y del jugador
-            // playerPosition.positionZ: Posición Z del jugador
+        //foreach (var playerPosition in PlayerPositionsInfo.playerPositions)
+        //{
+        //    // Accede a la información de cada jugador
+        //    // playerPosition.playerName: Nombre del jugador
+        //    // playerPosition.positionX: Posición X del jugador
+        //    // playerPosition.positionY: Posición Y del jugador
+        //    // playerPosition.positionZ: Posición Z del jugador
 
-        }
+        //}
     }
 
     #endregion

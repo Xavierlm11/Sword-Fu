@@ -72,6 +72,23 @@ public class ConnectionConfirmation : GenericSendClass
     public string reasonToDeny;
 }
 
+
+public class SendIdPlayer : GenericSendClass
+{
+    public int playerId =2;
+   // public string playerIp;
+    public SendIdPlayer()
+    {
+
+    }
+    public SendIdPlayer(ConnectionManager.PartyPlayersInfo ppi)
+    {
+        playerId = ppi.playerID;
+        sendCode = SendCode.SendIdPlayer;
+        //playerIp = ppi.playerInfo.playerIp;
+    }
+    
+}
 #endregion
 
 public class Client
@@ -104,7 +121,9 @@ public enum SendCode
     ConnectionRequest,
     ConnectionConfirmation,
     DebugMessage,
-    PlayerPositions
+    PlayerPositions,
+    PartyManager,
+    SendIdPlayer
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]

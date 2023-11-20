@@ -9,33 +9,73 @@ public class PlayerManager : MonoBehaviour
     public List<GameObject> spawnPoints = new List<GameObject>();
     private List<GameObject> players = new List<GameObject>();
 
-    public int numberOfPlayers = 4;
+    public int numberOfPlayers = 2;
 
     private ConnectionManager connectionManager;
+    private PartyManager partyManagerObj;
 
     void Start()
     {
         connectionManager = FindObjectOfType<ConnectionManager>();
 
-        
+
         //Llama ala funcion de crear un nuevo player segun el numero de players que le hayas asignado
-        for (int i = 0; i < numberOfPlayers; i++)
+
+        partyManagerObj = GameObject.FindGameObjectWithTag("PartyManager").GetComponent<PartyManager>();
+
+
+        foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
         {
-            AddPlayer("Player " + (i + 1));
+            if (item.playerID == partyManagerObj.playerID)
+            {
+
+                AddPlayer(item.playerName, true);
+            }
+            else
+            {
+                AddPlayer(item.playerName);
+
+            }
         }
+        //for (int i = 0; i < numberOfPlayers; i++)
+        //{
+        //    AddPlayer("Player " + (i + 1));
+        //}
 
         AssignSpawnPoints();
 
-        StartCoroutine(SendPlayerPositionsToServer());
+        
     }
 
+    private void Update()
+    {
+        foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
+        {
+            if (item.playerID != partyManagerObj.playerID)
+            {
+
+
+            }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+
+    }
+
+
+    void AddPlayer(string playerName, bool isLocal = false)
     //Funcion que añade un player
-    void AddPlayer(string playerName)
+
     {
         if (players.Count < numberOfPlayers)
         {
             GameObject newPlayer = Instantiate(playerPrefab);
             newPlayer.name = playerName;
+            newPlayer.GetComponent<PlayerMovement>().isLocal = isLocal;
+            if (isLocal) newPlayer.GetComponent<PlayerMovement>().playerId = partyManagerObj.playerID;
+
             players.Add(newPlayer);
             Debug.Log($"{playerName} se ha unido al juego.");
         }
@@ -61,21 +101,5 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    IEnumerator SendPlayerPositionsToServer()
-    {
-        while (true)
-        {
-            string message = "PlayerPositions,";
-
-            foreach (GameObject player in players)
-            {
-                Vector3 position = player.transform.position;
-                message += $"{player.name},{position.x},{position.y},{position.z},{player.transform.rotation.eulerAngles.y},";
-            }
-
-            connectionManager.Send_Data(() => connectionManager.SerializeToJsonAndSend(message));
-
-           
-        }
-    }
+    
 }
