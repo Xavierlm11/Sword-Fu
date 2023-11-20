@@ -5,12 +5,14 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 5f;
-    public float rotationSpeed = 20f;
+    public float rotationSpeed = 40f;
 
 
     public GameObject balaPrefab;
     public Transform puntoDeDisparo;
     public float velocidadBala = 10f;
+    public float shootRate = 1f;
+    float nextFireRate;
 
     void Update()
     {
@@ -31,21 +33,32 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
-            Disparar();
+            
+                Disparar();
+            
         }
-
+        
     }
 
     void Disparar()
     {
-        GameObject bala = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
-        Rigidbody rbBala = bala.GetComponent<Rigidbody>();
-
-        if (rbBala != null)
+        if (Time.time > nextFireRate)
         {
-            rbBala.velocity = bala.transform.forward * velocidadBala;
+            GameObject bala = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
+            Rigidbody rbBala = bala.GetComponent<Rigidbody>();
+
+            nextFireRate = Time.time + shootRate;
+
+
+            if (rbBala != null)
+            {
+                rbBala.velocity = bala.transform.forward * velocidadBala;
+            }
+
+
+            Destroy(bala, 5f);
+
         }
     }
-
 
 }
