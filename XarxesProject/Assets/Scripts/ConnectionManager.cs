@@ -377,10 +377,19 @@ public class ConnectionManager : MonoBehaviour
 
         //DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
 
-        Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
+        //Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
 
         //ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
-        ConnectionRequest connectionRequest = new ConnectionRequest(client);
+        
+        
+
+
+        if(NetworkManager.Instance.GetLocalClient() == null)
+        {
+            return;
+        }
+        
+        ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient());
 
         SerializeToJsonAndSend(connectionRequest);
 
