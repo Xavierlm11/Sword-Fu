@@ -1,7 +1,7 @@
 # Sword Fu
 
 Github: https://github.com/Xavierlm11/Sword-Fu
-(Remake Branch)
+
 
 -21/11/2023:
 [Novedades]
