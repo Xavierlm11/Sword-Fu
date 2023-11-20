@@ -65,6 +65,8 @@ public class ConnectionManager : MonoBehaviour
         public float positionX;
         public float positionY;
         public float positionZ;
+        public float rotY;
+        public int playerId;
     }
 
     [SerializeField]
@@ -621,19 +623,13 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_PlayerPositions(PlayerPositionsInfo PlayerPositionsInfo)
     {
-        // Aquí puedes procesar la información de las posiciones de los jugadores
-        // PlayerPositionsInfo.senderIp: IP del remitente
-        // PlayerPositionsInfo.senderNickname: Apodo del remitente
-        // PlayerPositionsInfo.playerPositions: Lista de posiciones de jugadores
+        //Aquí puedes procesar la información de las posiciones de los jugadores
 
-        //foreach (var playerPosition in PlayerPositionsInfo.playerPositions)
+        PlayerManager.Instance.UpdatePlayers(PlayerPositionsInfo);
+        //foreach (PlayerPositionsInfo playerPosition in PlayerPositionsInfo)
         //{
-        //    // Accede a la información de cada jugador
-        //    // playerPosition.playerName: Nombre del jugador
-        //    // playerPosition.positionX: Posición X del jugador
-        //    // playerPosition.positionY: Posición Y del jugador
-        //    // playerPosition.positionZ: Posición Z del jugador
-
+           
+            
         //}
     }
 

@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     //Variables
+
+    public static PlayerManager Instance;
     public GameObject playerPrefab;
     public List<GameObject> spawnPoints = new List<GameObject>();
     private List<GameObject> players = new List<GameObject>();
@@ -16,7 +18,17 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
-        connectionManager = FindObjectOfType<ConnectionManager>();
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+        // connectionManager = FindObjectOfType<ConnectionManager>();
 
 
         //Llama ala funcion de crear un nuevo player segun el numero de players que le hayas asignado
@@ -44,7 +56,7 @@ public class PlayerManager : MonoBehaviour
 
         AssignSpawnPoints();
 
-        
+
     }
 
     private void Update()
@@ -59,6 +71,18 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    public void UpdatePlayers(ConnectionManager.PlayerPositionsInfo ppi)
+    {
+        foreach (GameObject item in players)
+        {
+            if (ppi.playerPositions.playerId == item.GetComponent<PlayerMovement>().playerId)
+            {
+                Vector3 newpos = new Vector3(ppi.playerPositions.positionX, ppi.playerPositions.positionY, ppi.playerPositions.positionZ);
+                item.transform.position = newpos;
+                //item.transform.rotation.eulerAngles.y = ppi.playerPositions.rotY;
+            }
+        }
+    }
     private void FixedUpdate()
     {
 
@@ -101,5 +125,5 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    
+
 }

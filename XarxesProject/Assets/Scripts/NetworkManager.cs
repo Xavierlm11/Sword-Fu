@@ -89,6 +89,30 @@ public class SendIdPlayer : GenericSendClass
     }
     
 }
+
+public class SendTransPlayer : GenericSendClass
+{
+    public Vector3 pos;
+    public float angRot;
+    public int playerId;
+   // public string playerIp;
+    public SendTransPlayer()
+    {
+
+    }
+    public SendTransPlayer(ConnectionManager.PlayerPositionsInfo ppi)
+    {
+        ConnectionManager.PlayerPosition newPos = ppi.playerPositions;
+        pos = new Vector3(newPos.positionX,newPos.positionY,newPos.positionZ);
+        angRot = newPos.rotY;
+        playerId = newPos.playerId;
+        sendCode = SendCode.PlayerPositions;
+        //playerIp = ppi.playerInfo.playerIp;
+    }
+    
+}
+
+
 #endregion
 
 public class Client
