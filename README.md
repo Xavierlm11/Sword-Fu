@@ -1,9 +1,7 @@
-# XarxesProject
+# Sword Fu
 
 Github: https://github.com/Xavierlm11/XarxesProject
 (Remake Branch)
-
-Sword Fu:
 
 -21/11/2023:
 [Novedades]
