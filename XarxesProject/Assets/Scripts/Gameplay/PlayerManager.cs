@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    //Variables
     public GameObject playerPrefab;
     public List<GameObject> spawnPoints = new List<GameObject>();
     private List<GameObject> players = new List<GameObject>();
@@ -17,7 +18,7 @@ public class PlayerManager : MonoBehaviour
         connectionManager = FindObjectOfType<ConnectionManager>();
 
         
-
+        //Llama ala funcion de crear un nuevo player segun el numero de players que le hayas asignado
         for (int i = 0; i < numberOfPlayers; i++)
         {
             AddPlayer("Player " + (i + 1));
@@ -28,6 +29,7 @@ public class PlayerManager : MonoBehaviour
         StartCoroutine(SendPlayerPositionsToServer());
     }
 
+    //Funcion que añade un player
     void AddPlayer(string playerName)
     {
         if (players.Count < numberOfPlayers)
@@ -42,7 +44,7 @@ public class PlayerManager : MonoBehaviour
             Debug.Log("¡Ya hay suficientes jugadores en el juego!");
         }
     }
-
+    //Hace que aparezcan los players en los puntos de spawn por orden
     void AssignSpawnPoints()
     {
         for (int i = 0; i < players.Count; i++)
