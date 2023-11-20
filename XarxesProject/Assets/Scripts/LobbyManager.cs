@@ -22,6 +22,9 @@ public class LobbyManager : MonoBehaviour
     private TMP_InputField remoteIpField;
 
     [SerializeField]
+    private TMP_Text titleIp;
+
+    [SerializeField]
     private string temp_nickname;
 
     [SerializeField]
@@ -30,15 +33,62 @@ public class LobbyManager : MonoBehaviour
     [SerializeField]
     public bool serverHasConfirmedConnection;
 
+    private bool isNoName = false;
+    private bool isNoIp = false;
+
+
+    [SerializeField]
+    private GameObject ipObj;
+
+    [SerializeField]
+    private GameObject lobbyObj;
+
+    [SerializeField]
+    private GameObject waitingObj;
+
+    [SerializeField]
+    private GameObject playObj;
+
+    [SerializeField]
+    private GameObject setNameObj;
+
+    [SerializeField]
+    private GameObject noNameObj;
+
+     [SerializeField]
+    private GameObject noIpObj;
+
+    [SerializeField]
+    private float popUpMessageTime = 2.0f;
+    private float popUpMessageDt = 0.0f;
+
+    public List<GameObject> stagesList;
+    private stages stage = stages.lobby;
+    public enum stages
+    {
+        lobby,
+        waitingHost,
+        selectIp,
+        waitingClient,
+    }
+
     #endregion
 
     #region methods
 
     private void Start()
     {
+        stagesList = new List<GameObject>();
         serverHasConfirmedConnection = false;
         SetTransportType();
         SetInitialValues();
+        stagesList.Add(ipObj);
+        stagesList.Add(lobbyObj);
+        stagesList.Add(waitingObj);
+        stagesList.Add(setNameObj);
+        stagesList.Add(playObj);
+        ChangeStage(stages.lobby);
+        
     }
     private void Update()
     {
@@ -47,7 +97,106 @@ public class LobbyManager : MonoBehaviour
             serverHasConfirmedConnection = false;
             BeTheClient();
         }
+
+        if (isNoName ||isNoIp)
+        {
+            popUpMessageDt += Time.deltaTime;
+            if (popUpMessageDt >= popUpMessageTime)
+            {
+
+                if (isNoName)
+                {
+                    isNoName = false;
+                    noNameObj.SetActive(false); 
+                }
+                else if(isNoIp)
+                {
+                    isNoIp = false;
+                    noIpObj.SetActive(false);
+                }
+                popUpMessageDt = 0.0f;
+            }
+        }
     }
+
+    private void ChangeStage(stages newStage)
+    {
+        stage = newStage;
+
+        switch (stage)
+        {
+            case stages.lobby:
+                
+                foreach (GameObject item in stagesList)
+                {
+                    if (item == setNameObj || item == lobbyObj)
+                    {
+                        item.SetActive(true);
+                    }
+                    else
+                    {
+                        item.SetActive(false);
+                    }
+                }
+
+
+                break;
+            case stages.waitingHost:
+                foreach (GameObject item in stagesList)
+                {
+                    if (item == waitingObj ||item==playObj)
+                    {
+                        titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
+                        item.SetActive(true);
+                    }
+                    else
+                    {
+                        item.SetActive(false);
+                    }
+                }
+                break;
+            case stages.selectIp:
+                foreach (GameObject item in stagesList)
+                {
+                    if (item == ipObj)
+                    {
+                        item.SetActive(true);
+                    }
+                    else
+                    {
+                        item.SetActive(false);
+                    }
+                }
+                break;
+            case stages.waitingClient:
+                foreach (GameObject item in stagesList)
+                {
+                    if (item == waitingObj)
+                    {
+                        titleIp.text = remoteIpField.text;
+                        item.SetActive(true);
+                    }
+                    else
+                    {
+                        item.SetActive(false);
+                    }
+                }
+                break;
+        }
+    }
+
+    private void PopUpNoName()
+    {
+        isNoName = true;
+        noNameObj.SetActive(true);
+    }
+    private void PopUpNoIp()
+    {
+        isNoIp = true;
+        noIpObj.SetActive(true);
+    }
+
+
 
     private bool NicknameIsEmpty()
     {
@@ -64,7 +213,9 @@ public class LobbyManager : MonoBehaviour
         if (!NicknameIsEmpty())
         {
             BeTheServer();
+            ChangeStage(stages.waitingHost);
         }
+        else PopUpNoName();
     }
 
     public void BeTheServer()
@@ -88,14 +239,23 @@ public class LobbyManager : MonoBehaviour
 
         //SceneManager.LoadScene(NetworkManager.Instance.chatSceneName);
     }
-
+    public void OnClick_WriteIpClient()
+    {
+        if (!NicknameIsEmpty() )
+        {
+            ChangeStage(stages.selectIp);
+        }
+        else PopUpNoName();
+    }
     public void OnClick_BeTheClient()
     {
-        if (!NicknameIsEmpty() && !RemoteIpIsEmpty())
+        if ( !RemoteIpIsEmpty())
         {
             UpdateInfo();
             ConnectToServer();
+            ChangeStage(stages.waitingClient);
         }
+        else PopUpNoIp();
     }
 
     private void ConnectToServer()

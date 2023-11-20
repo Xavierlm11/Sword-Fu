@@ -1,2 +1,5 @@
 # XarxesProject
-albert monngolo
+
+Used packages:
+
+-Newtonsoft Json
