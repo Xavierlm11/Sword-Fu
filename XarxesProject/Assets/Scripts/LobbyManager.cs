@@ -73,6 +73,9 @@ public class LobbyManager : MonoBehaviour
     [SerializeField]
     private TMP_InputField client_serverPortField;
 
+    [SerializeField]
+    private GameObject noPortPopUp;
+
     #endregion
 
     [SerializeField]
@@ -260,23 +263,17 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_BeTheServer()
     {
-        //if (!NicknameIsEmpty())
-        //{
-            //////BeTheServer();
-            ChangeStage(stages.settingHost);
-        //}
-        //else PopUpNoName();
+        ChangeStage(stages.settingHost);
+        OnClick_GetLocalIPv4();
+        host_localPortField.text = NetworkManager.Instance.localPort.ToString();
     }
 
     public void OnClick_BeTheClient()
     {
-        //if (!NicknameIsEmpty())
-        //{
-            //////ConnectionManager.Instance.StartConnections();
-            ChangeStage(stages.settingClient);
-        //}
-        //else PopUpNoName();
-        
+        //////ConnectionManager.Instance.StartConnections();
+        ChangeStage(stages.settingClient);
+        client_localPortField.text = NetworkManager.Instance.localPort.ToString();
+        client_serverPortField.text = NetworkManager.Instance.serverPort.ToString();
     }
 
     public void SetLocalPort()
@@ -302,14 +299,21 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_CreateRoom()
     {
-        if (!RemoteIpIsEmpty())
+        if (RemoteIpIsEmpty())
         {
-            //////ConnectionManager.Instance.StartConnections();
-            //////UpdateInfo();
-            //////ConnectToServer();
+            PopUpNoIp();
+        }
+        else if (Host_NicknameIsEmpty())
+        {
+            PopUpNoName();
+        }
+        else
+        {
+            ConnectionManager.Instance.StartConnections();
+            //UpdateInfo();
+            //ConnectToServer();
             ChangeStage(stages.waitingHost);
         }
-        else PopUpNoIp();
     }
 
     public void OnClick_AutoPort()
@@ -321,13 +325,21 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_JoinHost()
     {
-        if (!Client_NicknameIsEmpty())
+        if (Client_NicknameIsEmpty())
+        {
+            PopUpNoName();
+        }
+        else if (RemoteIpIsEmpty())
+        {
+            PopUpNoIp();
+        }
+        else
         {
             ////////BeTheClient();
             ChangeStage(stages.waitingHost);
         }
-        else PopUpNoName();
-        
+
+
     }
 
     public void BeTheServer()
