@@ -48,6 +48,23 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField]
     private int maxTransferedDataSize;
 
+    [Serializable]
+    public class PlayerPositionsInfo
+    {
+        public string senderIp;
+        public string senderNickname;
+        public List<PlayerPosition> playerPositions;
+    }
+
+    [Serializable]
+    public class PlayerPosition
+    {
+        public string playerName;
+        public float positionX;
+        public float positionY;
+        public float positionZ;
+    }
+
     private Action dataMethod;
 
 
@@ -237,6 +254,12 @@ public class ConnectionManager : MonoBehaviour
                 debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
                 Receive_DebugMessage(debugMessage);
                 break;
+            case SendCode.PlayerPositions:
+                PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
+                Receive_PlayerPositions(PlayerPositionsInfo);
+                break;
+
+
         }
     }
 
@@ -498,6 +521,24 @@ public class ConnectionManager : MonoBehaviour
             networkThreadToReceiveData.Abort();
         }
 
+    }
+
+    public void Receive_PlayerPositions(PlayerPositionsInfo PlayerPositionsInfo)
+    {
+        // Aquí puedes procesar la información de las posiciones de los jugadores
+        // PlayerPositionsInfo.senderIp: IP del remitente
+        // PlayerPositionsInfo.senderNickname: Apodo del remitente
+        // PlayerPositionsInfo.playerPositions: Lista de posiciones de jugadores
+
+        foreach (var playerPosition in PlayerPositionsInfo.playerPositions)
+        {
+            // Accede a la información de cada jugador
+            // playerPosition.playerName: Nombre del jugador
+            // playerPosition.positionX: Posición X del jugador
+            // playerPosition.positionY: Posición Y del jugador
+            // playerPosition.positionZ: Posición Z del jugador
+
+        }
     }
 
     #endregion

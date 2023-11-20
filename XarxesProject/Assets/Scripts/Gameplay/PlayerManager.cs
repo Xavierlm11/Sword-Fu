@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
     public List<GameObject> spawnPoints = new List<GameObject>();
     private List<GameObject> players = new List<GameObject>();
 
-    public int numberOfPlayers = 4; // Puedes ajustar esto desde el editor de Unity
+    public int numberOfPlayers = 4;
 
     private ConnectionManager connectionManager;
 
@@ -16,7 +16,8 @@ public class PlayerManager : MonoBehaviour
     {
         connectionManager = FindObjectOfType<ConnectionManager>();
 
-        // Simulación de agregar jugadores al inicio del juego
+        
+
         for (int i = 0; i < numberOfPlayers; i++)
         {
             AddPlayer("Player " + (i + 1));
@@ -62,21 +63,17 @@ public class PlayerManager : MonoBehaviour
     {
         while (true)
         {
-            
             string message = "PlayerPositions,";
 
             foreach (GameObject player in players)
             {
                 Vector3 position = player.transform.position;
-                message += $"{player.name},{position.x},{position.y},{position.z},";
+                message += $"{player.name},{position.x},{position.y},{position.z},{player.transform.rotation.eulerAngles.y},";
             }
 
-            
             connectionManager.Send_Data(() => connectionManager.SerializeToJsonAndSend(message));
 
-            
-            yield return new WaitForSeconds(0.1f);
+           
         }
     }
-
 }

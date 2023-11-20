@@ -118,7 +118,8 @@ public enum SendCode
 {
     ConnectionRequest,
     ConnectionConfirmation,
-    DebugMessage
+    DebugMessage,
+    PlayerPositions
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]
