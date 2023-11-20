@@ -17,7 +17,10 @@ MonoBehaviour:
   lobbySceneName: Lobby
   serverSceneName: Server
   clientSceneName: Client
+  chatSceneName: 
   _transportType: 0
-  port: 9050
+  defaultPort: 5000
+  localPort: 64294
+  serverPort: 0
   messageMaxBytes: 1024
-  nickname: Pipo
+  hasInitialized: 1

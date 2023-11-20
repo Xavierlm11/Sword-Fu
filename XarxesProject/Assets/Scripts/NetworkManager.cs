@@ -153,7 +153,10 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     }
         
 
-    public int port;
+    public int defaultPort;
+    public int localPort;
+    public int serverPort;
+
     public int messageMaxBytes;
     public bool hasInitialized;
 
@@ -178,6 +181,16 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public Client GetLocalClient()
     {
         return localClient;
+    }
+
+    public void UpdateLocalPort(int newPort)
+    {
+        localPort = newPort;
+    }
+
+    public void UpdateServerPort(int newPort)
+    {
+        serverPort = newPort;
     }
 
     public void OnClick_ChangeTransportType(TMP_Dropdown dropdown)

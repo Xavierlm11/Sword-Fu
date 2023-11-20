@@ -92,7 +92,12 @@ public class ConnectionManager : MonoBehaviour
 
     private void Start()
     {
-        isMessage = false;
+        
+
+    }
+
+    public void StartConnections()
+    {
         SetSocket();
 
         //SetInitialValues();
@@ -100,7 +105,6 @@ public class ConnectionManager : MonoBehaviour
 
         OpenNewThreat_Receive();
         OpenNewThreat_Send();
-
     }
 
     public void SetSocket()
@@ -108,12 +112,15 @@ public class ConnectionManager : MonoBehaviour
         socket = NetworkManager.StartNetwork();
     }
 
-    private void StartReceivingMessages()
+    public void StartReceivingMessages()
     {
         transferedDataSize = NetworkManager.Instance.messageMaxBytes;
 
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.port);
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.localPort);
         socket.Bind(ipEndPointToReceive);
+
+        NetworkManager.Instance.UpdateLocalPort(((IPEndPoint)socket.LocalEndPoint).Port);
+        LobbyManager.Instance.SetLocalPort();
 
         Debug.Log("EndPoint set and socket binded");
     }
@@ -492,7 +499,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void SetRemoteIP(string ip)
     {
-        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(ip), NetworkManager.Instance.port);
+        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(ip), NetworkManager.Instance.serverPort);
     }
 
     private void OnDisable()

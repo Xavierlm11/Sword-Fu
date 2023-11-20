@@ -16,7 +16,10 @@ public class LobbyManager : MonoBehaviour
     private TMP_Dropdown transportDropdown;
 
     [SerializeField]
-    private TMP_InputField nicknameField;
+    private TMP_InputField client_nicknameField;
+
+    [SerializeField]
+    private TMP_InputField host_nicknameField;
 
     [SerializeField]
     private TMP_InputField remoteIpField;
@@ -36,27 +39,41 @@ public class LobbyManager : MonoBehaviour
     private bool isNoName = false;
     private bool isNoIp = false;
 
+    #region menus
+    [SerializeField]
+    private GameObject settingClientMenu;
 
     [SerializeField]
-    private GameObject ipObj;
+    private GameObject settingHostMenu;
 
     [SerializeField]
-    private GameObject lobbyObj;
+    private GameObject offlineMenu;
 
     [SerializeField]
-    private GameObject waitingObj;
+    private GameObject waitingRoomMenu;
 
     [SerializeField]
-    private GameObject playObj;
+    private GameObject startGameButton;
 
     [SerializeField]
-    private GameObject setNameObj;
+    private GameObject noNicknamePopUp;
 
     [SerializeField]
-    private GameObject noNameObj;
+    private GameObject noIpPopUp;
 
-     [SerializeField]
-    private GameObject noIpObj;
+    [SerializeField]
+    private TextMeshProUGUI ipText;
+
+    [SerializeField]
+    private TMP_InputField host_localPortField;
+
+    [SerializeField]
+    private TMP_InputField client_localPortField;
+
+    [SerializeField]
+    private TMP_InputField client_serverPortField;
+
+    #endregion
 
     [SerializeField]
     private float popUpMessageTime = 2.0f;
@@ -67,8 +84,9 @@ public class LobbyManager : MonoBehaviour
     public enum stages
     {
         lobby,
+        settingHost,
         waitingHost,
-        selectIp,
+        settingClient,
         waitingClient,
     }
 
@@ -76,17 +94,29 @@ public class LobbyManager : MonoBehaviour
 
     #region methods
 
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void Start()
     {
         stagesList = new List<GameObject>();
         serverHasConfirmedConnection = false;
         SetTransportType();
         SetInitialValues();
-        stagesList.Add(ipObj);
-        stagesList.Add(lobbyObj);
-        stagesList.Add(waitingObj);
-        stagesList.Add(setNameObj);
-        stagesList.Add(playObj);
+        stagesList.Add(settingClientMenu);
+        stagesList.Add(settingHostMenu);
+        stagesList.Add(offlineMenu);
+        stagesList.Add(waitingRoomMenu);
+        stagesList.Add(startGameButton);
         ChangeStage(stages.lobby);
         
     }
@@ -98,21 +128,22 @@ public class LobbyManager : MonoBehaviour
             BeTheClient();
         }
 
-        if (isNoName ||isNoIp)
+        if (isNoName || isNoIp)
         {
             popUpMessageDt += Time.deltaTime;
+
             if (popUpMessageDt >= popUpMessageTime)
             {
 
                 if (isNoName)
                 {
                     isNoName = false;
-                    noNameObj.SetActive(false); 
+                    noNicknamePopUp.SetActive(false); 
                 }
                 else if(isNoIp)
                 {
                     isNoIp = false;
-                    noIpObj.SetActive(false);
+                    noIpPopUp.SetActive(false);
                 }
                 popUpMessageDt = 0.0f;
             }
@@ -129,7 +160,7 @@ public class LobbyManager : MonoBehaviour
                 
                 foreach (GameObject item in stagesList)
                 {
-                    if (item == setNameObj || item == lobbyObj)
+                    if (item == offlineMenu)
                     {
                         item.SetActive(true);
                     }
@@ -138,13 +169,12 @@ public class LobbyManager : MonoBehaviour
                         item.SetActive(false);
                     }
                 }
-
-
                 break;
-            case stages.waitingHost:
+
+            case stages.settingHost:
                 foreach (GameObject item in stagesList)
                 {
-                    if (item == waitingObj ||item==playObj)
+                    if (item == settingHostMenu)
                     {
                         titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
                         item.SetActive(true);
@@ -155,10 +185,25 @@ public class LobbyManager : MonoBehaviour
                     }
                 }
                 break;
-            case stages.selectIp:
+
+            case stages.waitingHost:
                 foreach (GameObject item in stagesList)
                 {
-                    if (item == ipObj)
+                    if (item == waitingRoomMenu || item==startGameButton)
+                    {
+                        titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
+                        item.SetActive(true);
+                    }
+                    else
+                    {
+                        item.SetActive(false);
+                    }
+                }
+                break;
+            case stages.settingClient:
+                foreach (GameObject item in stagesList)
+                {
+                    if (item == settingClientMenu)
                     {
                         item.SetActive(true);
                     }
@@ -171,7 +216,7 @@ public class LobbyManager : MonoBehaviour
             case stages.waitingClient:
                 foreach (GameObject item in stagesList)
                 {
-                    if (item == waitingObj)
+                    if (item == waitingRoomMenu)
                     {
                         titleIp.text = remoteIpField.text;
                         item.SetActive(true);
@@ -188,19 +233,24 @@ public class LobbyManager : MonoBehaviour
     private void PopUpNoName()
     {
         isNoName = true;
-        noNameObj.SetActive(true);
+        noNicknamePopUp.SetActive(true);
     }
     private void PopUpNoIp()
     {
         isNoIp = true;
-        noIpObj.SetActive(true);
+        noIpPopUp.SetActive(true);
     }
 
 
 
-    private bool NicknameIsEmpty()
+    private bool Host_NicknameIsEmpty()
     {
-        return string.IsNullOrEmpty(nicknameField.text);
+        return string.IsNullOrEmpty(host_nicknameField.text);
+    }
+
+    private bool Client_NicknameIsEmpty()
+    {
+        return string.IsNullOrEmpty(client_nicknameField.text);
     }
 
     private bool RemoteIpIsEmpty()
@@ -210,18 +260,80 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_BeTheServer()
     {
-        if (!NicknameIsEmpty())
+        //if (!NicknameIsEmpty())
+        //{
+            //////BeTheServer();
+            ChangeStage(stages.settingHost);
+        //}
+        //else PopUpNoName();
+    }
+
+    public void OnClick_BeTheClient()
+    {
+        //if (!NicknameIsEmpty())
+        //{
+            //////ConnectionManager.Instance.StartConnections();
+            ChangeStage(stages.settingClient);
+        //}
+        //else PopUpNoName();
+        
+    }
+
+    public void SetLocalPort()
+    {
+        host_localPortField.text = NetworkManager.Instance.localPort.ToString();
+        client_localPortField.text = NetworkManager.Instance.localPort.ToString();
+    }
+
+    public void OnClick_LocalDefaultPort()
+    {
+        int defPort = NetworkManager.Instance.defaultPort;
+        host_localPortField.text = defPort.ToString();
+        client_localPortField.text = defPort.ToString();
+        NetworkManager.Instance.UpdateLocalPort(defPort);
+    }
+
+    public void OnClick_ServerDefaultPort()
+    {
+        int defPort = NetworkManager.Instance.defaultPort;
+        client_serverPortField.text = defPort.ToString();
+        NetworkManager.Instance.UpdateServerPort(defPort);
+    }
+
+    public void OnClick_CreateRoom()
+    {
+        if (!RemoteIpIsEmpty())
         {
-            BeTheServer();
+            //////ConnectionManager.Instance.StartConnections();
+            //////UpdateInfo();
+            //////ConnectToServer();
+            ChangeStage(stages.waitingHost);
+        }
+        else PopUpNoIp();
+    }
+
+    public void OnClick_AutoPort()
+    {
+        NetworkManager.Instance.localPort = 0;
+        ConnectionManager.Instance.SetSocket();
+        ConnectionManager.Instance.StartReceivingMessages();
+    }
+
+    public void OnClick_JoinHost()
+    {
+        if (!Client_NicknameIsEmpty())
+        {
+            ////////BeTheClient();
             ChangeStage(stages.waitingHost);
         }
         else PopUpNoName();
+        
     }
 
     public void BeTheServer()
     {
         NetworkManager.Instance.hasInitialized = false;
-        Client cl = NetworkManager.Instance.CreateClient(nicknameField.text, ConnectionManager.Instance.GetLocalIPv4(), true);
+        Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, ConnectionManager.Instance.GetLocalIPv4(), true);
         NetworkManager.Instance.SetLocalClient(cl);
 
         Debug.Log("You are the server");
@@ -232,30 +344,12 @@ public class LobbyManager : MonoBehaviour
     {
         NetworkManager.Instance.hasInitialized = false;
 
-        Client cl = NetworkManager.Instance.CreateClient(nicknameField.text, ConnectionManager.Instance.GetLocalIPv4());
+        Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, ConnectionManager.Instance.GetLocalIPv4());
         NetworkManager.Instance.SetLocalClient(cl);
 
         Debug.Log("You are a client");
 
         //SceneManager.LoadScene(NetworkManager.Instance.chatSceneName);
-    }
-    public void OnClick_WriteIpClient()
-    {
-        if (!NicknameIsEmpty() )
-        {
-            ChangeStage(stages.selectIp);
-        }
-        else PopUpNoName();
-    }
-    public void OnClick_BeTheClient()
-    {
-        if ( !RemoteIpIsEmpty())
-        {
-            UpdateInfo();
-            ConnectToServer();
-            ChangeStage(stages.waitingClient);
-        }
-        else PopUpNoIp();
     }
 
     private void ConnectToServer()
@@ -266,11 +360,13 @@ public class LobbyManager : MonoBehaviour
     public void OnClick_GetLocalIPv4()
     {
         remoteIpField.text = ConnectionManager.Instance.GetLocalIPv4();
+        ipText.text = ConnectionManager.Instance.GetLocalIPv4();
     }
 
     private void SetInitialValues()
     {
-        nicknameField.text = temp_nickname;
+        client_nicknameField.text = temp_nickname;
+        host_nicknameField.text = temp_nickname;
         remoteIpField.text = temp_ip;
 
         UpdateInfo();
