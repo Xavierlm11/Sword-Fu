@@ -5,11 +5,16 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 5f;
-    public float rotationSpeed = 20f; // Cambiado a float y movido fuera de la función Update
-    
+    public float rotationSpeed = 20f;
+
+
+    public GameObject balaPrefab;
+    public Transform puntoDeDisparo;
+    public float velocidadBala = 10f;
+
     void Update()
     {
-        // Obtener la entrada del jugador
+        
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -22,6 +27,25 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movementDirection), rotationSpeed * Time.deltaTime);
         }
-     
+
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Disparar();
+        }
+
     }
+
+    void Disparar()
+    {
+        GameObject bala = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
+        Rigidbody rbBala = bala.GetComponent<Rigidbody>();
+
+        if (rbBala != null)
+        {
+            rbBala.velocity = bala.transform.forward * velocidadBala;
+        }
+    }
+
+
 }
