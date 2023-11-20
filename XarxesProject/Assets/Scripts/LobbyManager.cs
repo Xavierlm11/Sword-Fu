@@ -392,6 +392,7 @@ public class LobbyManager : MonoBehaviour
 
     }
 
+    //Creates a client as a host
     public void BeTheServer()
     {
         NetworkManager.Instance.hasInitialized = false;
@@ -402,6 +403,7 @@ public class LobbyManager : MonoBehaviour
         Debug.Log("You are the server");
     }
 
+    //Creates a client (not a host)
     public void BeTheClient()
     {
         NetworkManager.Instance.hasInitialized = false;

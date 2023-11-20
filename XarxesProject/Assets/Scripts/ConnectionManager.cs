@@ -96,16 +96,19 @@ public class ConnectionManager : MonoBehaviour
 
     }
 
+    //This is called when the user tries to create/join a room. It connects the player to the network
     public void StartConnections()
     {
-        
-
+        //Sets the maximum transfered data size
         StartReceivingMessages();
 
+        //Starts being able to receive data
         OpenNewThreat_Receive();
+        //Starts being able to send data
         OpenNewThreat_Send();
     }
 
+    //Creates the socket
     public void SetSocket()
     {
         socket = NetworkManager.StartNetwork();
@@ -128,10 +131,10 @@ public class ConnectionManager : MonoBehaviour
 
     private void Update()
     {
-        if (isMessage)
-        {
-            CallToChat();
-        }
+        //if (isMessage)
+        //{
+        //    CallToChat();
+        //}
     }
 
     private void CallToChat()
@@ -143,6 +146,7 @@ public class ConnectionManager : MonoBehaviour
     {
         networkThreadToSendData = new Thread(SendNetworkData);
     }
+
     private void OpenNewThreat_Receive()
     {
         switch (NetworkManager.Instance.transportType)
@@ -163,6 +167,7 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    //Main function of receiving data (in a threat)
     public void ReceiveData_UDP()
     {
         while (true)
@@ -200,6 +205,10 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    //The deserialization gets the base class of the transfered data first.
+    //This base class only contains a code, which indicates what is the child class
+    //Depending of this code, we deserialize the info into the corresponding child class
+    //Finally, a function is called in each case, depending on how we want to respond after receiving that type of info
     public void DeserializeJsonAndReceive(byte[] dataReceived, int dataSize)
     {
         stream = new MemoryStream(dataReceived, 0, dataSize);
@@ -289,6 +298,12 @@ public class ConnectionManager : MonoBehaviour
     {
         Debug.Log("IP: " + debugMessage.senderIp.ToString() + ". Nickname: " + debugMessage.senderNickname.ToString() + ". Message: " + debugMessage.debugMessageText.ToString());
     }
+
+    //This is the main function to send data. 
+    //You call this function when you want to interact with other clients.
+    //This interaction depends on the method that you pass as a parameter,
+    //which will be called in another threat. 
+    //The method usually consists con creating a custom class, serialize it and send it.
     public void Send_Data(Action method)
     {
         if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
@@ -315,6 +330,11 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+
+    //This method creates a custom class that, when arriving to the server,
+    //tells them that a client wants to connect to them.
+    //After the server checks if the same IP and port is already connected or
+    //the nickname is already taken, it sends back a confirmation or denial.
     private void ConnectionRequest_UDP()
     {
         Debug.Log("Sending request");
@@ -332,6 +352,8 @@ public class ConnectionManager : MonoBehaviour
         Debug.Log("Sent request");
     }
 
+    //The main function that gets custom classes depending on the
+    //information you want to send, serialize them and send them.
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
 
@@ -426,6 +448,8 @@ public class ConnectionManager : MonoBehaviour
         dataMethod();
     }
 
+    //Gets the local IP of this computer. Useful for testing the application on
+    //two instances on the same computer, which act as a server and as a client.
     public string GetLocalIPv4()
     {
         return Dns.GetHostEntry(Dns.GetHostName())
@@ -439,6 +463,9 @@ public class ConnectionManager : MonoBehaviour
         ipEndPoint = new IPEndPoint(ipAddess, port);
     }
 
+    //Update the EndPoints to receive and send information
+    //These depends on the parameters that are set in the menus
+    //and stored in the NetworkManager
     public void UpdateEndPoints()
     {
         UpdateEndPointToReceive();
