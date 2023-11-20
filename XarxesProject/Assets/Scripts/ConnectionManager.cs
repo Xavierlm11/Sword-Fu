@@ -116,11 +116,11 @@ public class ConnectionManager : MonoBehaviour
     {
         transferedDataSize = NetworkManager.Instance.messageMaxBytes;
 
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, 0);// NetworkManager.Instance.localPort);
+        //SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.remotePort);
         socket.Bind(ipEndPointToReceive);
 
-        NetworkManager.Instance.UpdateLocalPort(((IPEndPoint)socket.LocalEndPoint).Port);
-        LobbyManager.Instance.SetLocalPort();
+        //NetworkManager.Instance.UpdateRemotePort(((IPEndPoint)socket.LocalEndPoint).Port);
+        //LobbyManager.Instance.SetLocalPort();
 
         Debug.Log("EndPoint set and socket binded");
     }
@@ -180,30 +180,10 @@ public class ConnectionManager : MonoBehaviour
 
             transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
 
-            if (transferedDataSize == 0)
+            if (transferedDataSize != 0)
             {
-                return;
+                DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
             }
-
-            DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-
-            //socket.SendTo(transferedDataBuffer, transferedDataSize, SocketFlags.None, Remote);
-
-
-            //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
-
-            //string remoteString = Remote.ToString();
-            //int remoteIpIndex = remoteString.IndexOf(':');
-
-            //if (remoteIpIndex != -1)
-            //{
-            //    string remoteIpString = remoteString.Substring(0, remoteIpIndex);
-            //    Debug.Log("Received message from " + remoteIpString + ": " + message);
-            //}
-            //else
-            //{
-            //    Debug.Log("Received message from " + remoteString + ": " + message);
-            //}
         }
     }
 
@@ -529,7 +509,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateEndPointToReceive()
     {
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse(NetworkManager.Instance.localIp), NetworkManager.Instance.localPort);
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.localPort);
     }
 
     public void UpdateEndPointToSend()

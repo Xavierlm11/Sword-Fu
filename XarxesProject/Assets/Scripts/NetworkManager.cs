@@ -152,9 +152,11 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
             ConnectionManager.Instance.SetSocket();
         }
     }
-        
 
-    public int defaultPort;
+    public int defaultServerPort;
+    public int defaultClientPort;
+
+    //public int defaultPort;
     public int localPort;
     public int remotePort;
 
@@ -272,8 +274,6 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     }
 
-
-
     public static void Call_GoToLobbyScene()
     {
         if (Instance.hasInitialized)
@@ -296,7 +296,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public Client CreateClient(string nick, string ip, int port, bool isHost = false)
     {
-        Client newClient = new Client(nick, ip, port, isHost);
+        Client newClient = new Client(ip, nick, port, isHost);
         return newClient;
     }
 

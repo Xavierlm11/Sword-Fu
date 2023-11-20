@@ -65,7 +65,10 @@ public class LobbyManager : MonoBehaviour
     private TextMeshProUGUI ipText;
 
     [SerializeField]
-    private TMP_InputField host_localPortField;
+    private TMP_InputField host_serverPortField;
+
+    [SerializeField]
+    private TMP_InputField host_clientPortField;
 
     [SerializeField]
     private TMP_InputField client_localPortField;
@@ -275,35 +278,46 @@ public class LobbyManager : MonoBehaviour
     {
         ChangeStage(stages.settingHost);
         OnClick_GetLocalIPv4();
-        host_localPortField.text = NetworkManager.Instance.localPort.ToString();
+        host_clientPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
+        host_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
         UpdateLocalIp();
     }
 
     public void OnClick_BeTheClient()
     {
         ChangeStage(stages.settingClient);
-        client_localPortField.text = NetworkManager.Instance.localPort.ToString();
-        client_serverPortField.text = NetworkManager.Instance.remotePort.ToString();
+        client_localPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
+        client_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
         UpdateLocalIp();
     }
 
-    public void SetLocalPort()
-    {
-        host_localPortField.text = NetworkManager.Instance.localPort.ToString();
-        client_localPortField.text = NetworkManager.Instance.localPort.ToString();
-    }
+    //public void SetLocalPort()
+    //{
+    //    host_clientPortField.text = NetworkManager.Instance.localPort.ToString();
+    //    host_serverPortField.text = NetworkManager.Instance.localPort.ToString();
+    //    client_localPortField.text = NetworkManager.Instance.localPort.ToString();
+    //}
 
-    public void OnClick_LocalDefaultPort()
+    //public void OnClick_LocalDefaultPort()
+    //{
+    //    int defPort = NetworkManager.Instance.defaultPort;
+    //    host_localPortField.text = defPort.ToString();
+    //    client_localPortField.text = defPort.ToString();
+    //    NetworkManager.Instance.UpdateLocalPort(defPort);
+    //}
+
+    public void OnClick_ClientDefaultPort()
     {
-        int defPort = NetworkManager.Instance.defaultPort;
-        host_localPortField.text = defPort.ToString();
+        int defPort = NetworkManager.Instance.defaultClientPort;
+        host_clientPortField.text = defPort.ToString();
         client_localPortField.text = defPort.ToString();
         NetworkManager.Instance.UpdateLocalPort(defPort);
     }
 
     public void OnClick_ServerDefaultPort()
     {
-        int defPort = NetworkManager.Instance.defaultPort;
+        int defPort = NetworkManager.Instance.defaultServerPort;
+        host_serverPortField.text = defPort.ToString();
         client_serverPortField.text = defPort.ToString();
         NetworkManager.Instance.UpdateRemotePort(defPort);
     }
@@ -320,6 +334,12 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
+
+            NetworkManager.Instance.remotePort = int.Parse(host_clientPortField.text);
+            NetworkManager.Instance.localPort = int.Parse(host_serverPortField.text);
+
+            ConnectionManager.Instance.UpdateEndPoints();
+
             BeTheServer();
             ConnectionManager.Instance.StartConnections();
 
@@ -346,6 +366,15 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
+
+            NetworkManager.Instance.remotePort = int.Parse(client_serverPortField.text);
+            NetworkManager.Instance.localPort = int.Parse(client_localPortField.text);
+
+            ConnectionManager.Instance.UpdateEndPoints();
+
+            //NetworkManager.Instance.remoteIp = int.Parse(client_serverPortField.text);
+            //NetworkManager.Instance.localPort = int.Parse(client_localPortField.text);
+
             BeTheClient();
             ConnectionManager.Instance.UpdateEndPointToSend();
             //UpdateRemoteIP();

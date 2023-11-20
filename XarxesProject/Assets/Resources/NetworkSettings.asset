@@ -19,10 +19,11 @@ MonoBehaviour:
   clientSceneName: Client
   chatSceneName: 
   _transportType: 0
-  defaultPort: 5000
-  localPort: 60537
+  defaultServerPort: 5000
+  defaultClientPort: 6000
+  localPort: 6000
   remotePort: 5000
   localIp: 26.145.90.77
   remoteIp: 26.145.90.77
   messageMaxBytes: 1024
-  hasInitialized: 1
+  hasInitialized: 0
