@@ -116,7 +116,7 @@ public class ConnectionManager : MonoBehaviour
     {
         transferedDataSize = NetworkManager.Instance.messageMaxBytes;
 
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.localPort);
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, 0);// NetworkManager.Instance.localPort);
         socket.Bind(ipEndPointToReceive);
 
         NetworkManager.Instance.UpdateLocalPort(((IPEndPoint)socket.LocalEndPoint).Port);
@@ -261,6 +261,7 @@ public class ConnectionManager : MonoBehaviour
                 debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
                 Receive_DebugMessage(debugMessage);
                 break;
+
             case SendCode.PlayerPositions:
                 PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
                 Receive_PlayerPositions(PlayerPositionsInfo);
@@ -272,9 +273,9 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     {
-        if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp))
+        if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
         {
-            Send_Data(() => ConnectionConfirmation(false, "A client with this IP is already connected"));
+            Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
@@ -283,6 +284,10 @@ public class ConnectionManager : MonoBehaviour
         else
         {
             NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
+
+            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
+            UpdateEndPointToSend();
             Send_Data(() => ConnectionConfirmation(true));
         }
     }
@@ -386,6 +391,7 @@ public class ConnectionManager : MonoBehaviour
 
         if(NetworkManager.Instance.GetLocalClient() == null)
         {
+            Debug.Log("There is no local client");
             return;
         }
         
@@ -499,17 +505,38 @@ public class ConnectionManager : MonoBehaviour
         .ToString();
     }
 
-    public static void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
+    public void SetEndPoint(ref IPEndPoint ipEndPoint, IPAddress ipAddess, int port)
     {
         //IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(“-----”),port);
         ipEndPoint = new IPEndPoint(ipAddess, port);
         //IpEndPoint = new IPEndPoint(IPAddress.Any, port);
     }
 
-    public void SetRemoteIP(string ip)
+    //public void SetRemoteIP(string ip)
+    //{
+    //    SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(ip), NetworkManager.Instance.serverPort);
+    //}
+    //public void SetRemoteEndPoint(IPEndPoint endPoint)
+    //{
+
+    //}
+
+    public void UpdateEndPoints()
     {
-        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(ip), NetworkManager.Instance.serverPort);
+        UpdateEndPointToReceive();
+        UpdateEndPointToSend();
     }
+
+    public void UpdateEndPointToReceive()
+    {
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse(NetworkManager.Instance.localIp), NetworkManager.Instance.localPort);
+    }
+
+    public void UpdateEndPointToSend()
+    {
+        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.remotePort);
+    }
+
 
     private void OnDisable()
     {

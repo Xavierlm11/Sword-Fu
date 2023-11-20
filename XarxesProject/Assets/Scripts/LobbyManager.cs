@@ -261,19 +261,30 @@ public class LobbyManager : MonoBehaviour
         return string.IsNullOrEmpty(remoteIpField.text);
     }
 
+    public void UpdateRemoteIp()
+    {
+        NetworkManager.Instance.UpdateRemoteIP(remoteIpField.text);
+    }
+
+    public void UpdateLocalIp()
+    {
+        NetworkManager.Instance.UpdateLocatIP(ConnectionManager.Instance.GetLocalIPv4());
+    }
+
     public void OnClick_BeTheServer()
     {
         ChangeStage(stages.settingHost);
         OnClick_GetLocalIPv4();
         host_localPortField.text = NetworkManager.Instance.localPort.ToString();
+        UpdateLocalIp();
     }
 
     public void OnClick_BeTheClient()
     {
-        //////ConnectionManager.Instance.StartConnections();
         ChangeStage(stages.settingClient);
         client_localPortField.text = NetworkManager.Instance.localPort.ToString();
-        client_serverPortField.text = NetworkManager.Instance.serverPort.ToString();
+        client_serverPortField.text = NetworkManager.Instance.remotePort.ToString();
+        UpdateLocalIp();
     }
 
     public void SetLocalPort()
@@ -294,7 +305,7 @@ public class LobbyManager : MonoBehaviour
     {
         int defPort = NetworkManager.Instance.defaultPort;
         client_serverPortField.text = defPort.ToString();
-        NetworkManager.Instance.UpdateServerPort(defPort);
+        NetworkManager.Instance.UpdateRemotePort(defPort);
     }
 
     public void OnClick_CreateRoom()
@@ -309,9 +320,9 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
+            BeTheServer();
             ConnectionManager.Instance.StartConnections();
-            //UpdateInfo();
-            //ConnectToServer();
+
             ChangeStage(stages.waitingHost);
         }
     }
@@ -335,8 +346,13 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
-            ////////BeTheClient();
+            BeTheClient();
+            ConnectionManager.Instance.UpdateEndPointToSend();
+            //UpdateRemoteIP();
+            ConnectionManager.Instance.StartConnections();
             ChangeStage(stages.waitingHost);
+
+            ConnectToServer();
         }
 
 
@@ -345,8 +361,9 @@ public class LobbyManager : MonoBehaviour
     public void BeTheServer()
     {
         NetworkManager.Instance.hasInitialized = false;
-        Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, ConnectionManager.Instance.GetLocalIPv4(), true);
+        Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.localPort, true);
         NetworkManager.Instance.SetLocalClient(cl);
+        NetworkManager.Instance.clients.Add(cl);
 
         Debug.Log("You are the server");
         //SceneManager.LoadScene(NetworkManager.Instance.chatSceneName);
@@ -356,7 +373,7 @@ public class LobbyManager : MonoBehaviour
     {
         NetworkManager.Instance.hasInitialized = false;
 
-        Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, ConnectionManager.Instance.GetLocalIPv4());
+        Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.localPort);
         NetworkManager.Instance.SetLocalClient(cl);
 
         Debug.Log("You are a client");
@@ -380,8 +397,6 @@ public class LobbyManager : MonoBehaviour
         client_nicknameField.text = temp_nickname;
         host_nicknameField.text = temp_nickname;
         remoteIpField.text = temp_ip;
-
-        UpdateInfo();
     }
 
     private void SetTransportType()
@@ -406,15 +421,6 @@ public class LobbyManager : MonoBehaviour
             {
                 transportDropdown.value = i;
             }
-        }
-    }
-
-    public void UpdateInfo()
-    {
-        Debug.Log("IP Edited");
-        if (!RemoteIpIsEmpty())
-        {
-            ConnectionManager.Instance.SetRemoteIP(remoteIpField.text);
         }
     }
 

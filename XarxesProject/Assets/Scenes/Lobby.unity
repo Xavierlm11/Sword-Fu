@@ -938,7 +938,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -953,6 +953,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: UpdateInfo
       objectReference: {fileID: 0}
@@ -962,7 +966,7 @@ PrefabInstance:
       objectReference: {fileID: 1582657407}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: UpdateInfo
+      value: UpdateRemoteIp
       objectReference: {fileID: 0}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -974,6 +978,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2122167256152088192, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3482437473860961836, guid: fa3840405ddb1f2438587ca91af8c2fe, type: 3}

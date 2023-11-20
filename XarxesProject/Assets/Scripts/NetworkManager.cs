@@ -95,15 +95,16 @@ public class Client
     public bool isHost;
     public string nickname;
     public string localIp;
-
+    public int localPort;
     public Client()
     {
 
     }
-    public Client(string ip, string nick, bool host = false)
+    public Client(string ip, string nick, int port, bool host = false)
     {
         nickname = nick;
-        localIp = ip; 
+        localIp = ip;
+        localPort = port;
         isHost = host;
     }
 }
@@ -155,7 +156,10 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public int defaultPort;
     public int localPort;
-    public int serverPort;
+    public int remotePort;
+
+    public string localIp;
+    public string remoteIp;
 
     public int messageMaxBytes;
     public bool hasInitialized;
@@ -188,9 +192,24 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         localPort = newPort;
     }
 
-    public void UpdateServerPort(int newPort)
+    public void UpdateRemotePort(int newPort)
     {
-        serverPort = newPort;
+        remotePort = newPort;
+    }
+
+    public void UpdateRemoteIP(string newIp)
+    {
+        ////Debug.Log("IP Edited");
+        //if (!RemoteIpIsEmpty())
+        //{
+        //    ConnectionManager.Instance.SetRemoteIP(remoteIpField.text);
+        //}
+        remoteIp = newIp;
+    }
+
+    public void UpdateLocatIP(string newIp)
+    {
+        localIp = newIp;
     }
 
     public void OnClick_ChangeTransportType(TMP_Dropdown dropdown)
@@ -275,9 +294,9 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         GoToLobbyScene();
     }
 
-    public Client CreateClient(string nick, string ip, bool isHost = false)
+    public Client CreateClient(string nick, string ip, int port, bool isHost = false)
     {
-        Client newClient = new Client(nick, ip, isHost);
+        Client newClient = new Client(nick, ip, port, isHost);
         return newClient;
     }
 
