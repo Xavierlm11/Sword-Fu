@@ -21,9 +21,10 @@ MonoBehaviour:
   _transportType: 0
   defaultServerPort: 5000
   defaultClientPort: 6000
-  localPort: 6000
-  remotePort: 5000
-  localIp: 26.145.90.77
-  remoteIp: 26.145.90.77
+  defaultPort: 5000
+  localPort: 0
+  remotePort: 0
+  localIp: 10.0.101.30
+  remoteIp: 10.0.101.30
   messageMaxBytes: 1024
-  hasInitialized: 0
+  hasInitialized: 1

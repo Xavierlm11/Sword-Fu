@@ -285,7 +285,11 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     {
-        if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
+        if (NetworkManager.Instance.GetLocalClient() == null || !NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            Debug.Log("Received Message but is not host");
+        }
+        else if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
         {
             Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
         }
@@ -298,12 +302,12 @@ public class ConnectionManager : MonoBehaviour
             NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
 
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
-            NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
+            //NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
 
             //partyObj.AddPartyPlayer();
-            AddNewPartyPlayer(connectionRequest.clientRequesting);
+            //AddNewPartyPlayer(connectionRequest.clientRequesting);
             UpdateEndPointToSend();
-            Send_Data(() => ConnectionConfirmation(true));
+            Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
         }
     }
 
@@ -352,14 +356,9 @@ public class ConnectionManager : MonoBehaviour
 
     }
 
-    public void ConnectionConfirmation(bool confirmation, string reason = null)
+    public void ConnectionConfirmation(bool confirmation, string reason = null, List<Client> clientList = null)
     {
-        ConnectionConfirmation connectionRequest = new ConnectionConfirmation(confirmation);
-
-        if (!confirmation)
-        {
-            connectionRequest.reasonToDeny = reason;
-        }
+        ConnectionConfirmation connectionRequest = new ConnectionConfirmation(confirmation, reason, clientList);
 
         SerializeToJsonAndSend(connectionRequest);
 
@@ -370,6 +369,7 @@ public class ConnectionManager : MonoBehaviour
         if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
+            LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient);
         }
         else
         {
@@ -583,13 +583,13 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateEndPointToReceive()
     {
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.localPort);
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.defaultPort);
         socket.Bind(ipEndPointToReceive);
     }
 
     public void UpdateEndPointToSend()
     {
-        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.remotePort);
+        SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
     }
 
 

@@ -62,13 +62,16 @@ public class ConnectionConfirmation : GenericSendClass
     {
 
     }
-    public ConnectionConfirmation(bool accepted)
+    public ConnectionConfirmation(bool accepted, string reason, List<Client> clients)
     {
         acceptedConnection = accepted;
+        clientList = clients;
+        reasonToDeny = reason;
         sendCode = SendCode.ConnectionConfirmation;
     }
 
     public bool acceptedConnection;
+    public List<Client> clientList;
     public string reasonToDeny;
 }
 
@@ -183,7 +186,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public int defaultServerPort;
     public int defaultClientPort;
 
-    //public int defaultPort;
+    public int defaultPort;
     public int localPort;
     public int remotePort;
 
