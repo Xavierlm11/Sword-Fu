@@ -583,8 +583,12 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateEndPointToReceive()
     {
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.defaultPort);
-        socket.Bind(ipEndPointToReceive);
+        SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            
+            socket.Bind(ipEndPointToReceive);
+        }
     }
 
     public void UpdateEndPointToSend()

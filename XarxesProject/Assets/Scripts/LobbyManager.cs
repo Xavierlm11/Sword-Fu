@@ -22,7 +22,7 @@ public class LobbyManager : MonoBehaviour
     private TMP_InputField host_nicknameField;
 
     [SerializeField]
-    private TMP_InputField remoteIpField;
+    public TMP_InputField remoteIpField;
 
     [SerializeField]
     private TMP_Text titleIp;
@@ -362,11 +362,13 @@ public class LobbyManager : MonoBehaviour
 
             //NetworkManager.Instance.remotePort = int.Parse(host_clientPortField.text);
             //NetworkManager.Instance.localPort = int.Parse(host_serverPortField.text);
+            BeTheServer();
+
             ConnectionManager.Instance.UpdateEndPoints();
 
             ConnectionManager.Instance.StartConnections();
 
-            BeTheServer();
+
 
             ChangeStage(stages.waitingHost);
             titleIp.text = NetworkManager.Instance.localIp.ToString();
@@ -398,11 +400,11 @@ public class LobbyManager : MonoBehaviour
             //NetworkManager.Instance.remotePort = int.Parse(client_serverPortField.text);
             //NetworkManager.Instance.localPort = int.Parse(client_localPortField.text);
 
+            BeTheClient();
+
             ConnectionManager.Instance.UpdateEndPoints();
 
             ConnectionManager.Instance.StartConnections();
-
-            BeTheClient();
             
             ConnectToServer();
 
