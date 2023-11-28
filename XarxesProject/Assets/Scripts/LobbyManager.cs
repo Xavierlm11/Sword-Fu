@@ -403,10 +403,10 @@ public class LobbyManager : MonoBehaviour
             BeTheClient();
 
             ConnectionManager.Instance.UpdateEndPoints();
-
+            
             ConnectionManager.Instance.StartConnections();
             
-            ConnectToServer();
+            //ConnectToServer();
 
             ChangeStage(stages.waitingConnection);
             titleIp.text = NetworkManager.Instance.remoteIp.ToString();
