@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     public int playerId = 0;
     public float speed = 5f;
     public float rotationSpeed = 40f;
+    private Rigidbody rb;
+    public Vector3 direction;
 
 
     public GameObject balaPrefab;
@@ -18,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         if (isLocal)
         {
             StartCoroutine(SendPlayerPositionsToServer());
@@ -26,24 +30,21 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (isLocal)
-        {
+        //if (isLocal)
+        //{
 
 
             //Detecta los imputs
             float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+        float vertical = Input.GetAxis("Vertical");
+
+        // El movimiento de los jugadores hecho de forma que gire de forma suave
+        direction = new Vector3(horizontal, 0f, vertical).normalized;
 
 
-            //El movimiento de los jugadores hecho de forma que gire de forma suave
-            Vector3 movementDirection = new Vector3(horizontal, 0, vertical);
-            movementDirection.Normalize();
-
-            transform.position = transform.position + movementDirection * speed * Time.deltaTime;
-
-            if (movementDirection != Vector3.zero)
+            if (direction != Vector3.zero)
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movementDirection), rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
             }
 
             //Al hacer click izquierdo del raton actiba la funcion de disparo
@@ -54,8 +55,13 @@ public class PlayerMovement : MonoBehaviour
 
             }
 
-        }
+        //}
 
+    }
+
+    private void FixedUpdate()
+    {
+        rb.velocity = direction * speed;
     }
 
     void Disparar()
