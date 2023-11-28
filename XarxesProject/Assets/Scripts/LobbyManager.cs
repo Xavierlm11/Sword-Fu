@@ -447,6 +447,10 @@ public class LobbyManager : MonoBehaviour
         ipText.text = ConnectionManager.Instance.GetLocalIPv4();
     }
 
+    public void OnClick_LoadGame()
+    {
+        SceneManager.LoadScene("Game");
+    }
     private void SetInitialValues()
     {
         client_nicknameField.text = temp_nickname;
