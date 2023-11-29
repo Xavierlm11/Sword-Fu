@@ -202,6 +202,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     [SerializeField]
     public List<Client> clients = new List<Client>();
 
+    public bool appIsQuitting;
 
     #endregion
 
@@ -328,6 +329,17 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     {
         Client newClient = new Client(ip, nick, port, isHost);
         return newClient;
+    }
+
+    public void DeleteClients()
+    {
+        for(int i = clients.Count -1; i>= 0; i--)
+        {
+            clients[i] = null;
+        }
+        clients.Clear();
+
+        localClient = null;
     }
 
     #endregion

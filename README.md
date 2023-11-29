@@ -42,6 +42,12 @@ importante que el Host se conecte primero y el otro cliente segundo.
 -Xavi L: Reestructuración de los menús y conexiones entre estos y el Gameplay.
 -Albert M: Gameplay
 
-[Used Packages]
+[External]
 
--Newtonsoft Json: Hemos usado este package para poder serializar objectos dentro de otros objetos y ponerlos en un Json.
+-Newtonsoft Json: 
+https://github.com/JamesNK/Newtonsoft.Json
+Hemos usado este package para poder serializar objectos dentro de otros objetos y ponerlos en un Json.
+
+-UnityMainThreadDispatcher: 
+https://github.com/PimDeWitte/UnityMainThreadDispatcher
+Hemos usado esta clase para llamar a funciones en el threat principal

@@ -186,13 +186,27 @@ public class ConnectionManager : MonoBehaviour
     //Main function of receiving data (in a threat)
     public void ReceiveData_UDP()
     {
-        while (true)
+        while (!NetworkManager.Instance.appIsQuitting)
         {
             EndPoint Remote = ipEndPointToReceive;
 
             transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
 
-            transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
+            try
+            {
+                transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
+            }
+            catch
+            {
+                transferedDataSize = 0;
+                if(!NetworkManager.Instance.appIsQuitting)
+                {
+                    Debug.Log("Could not connect to server: Host not found");
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
+                }
+            }
+            
 
             if (transferedDataSize != 0)
             {
@@ -200,6 +214,8 @@ public class ConnectionManager : MonoBehaviour
             }
         }
     }
+
+    
 
     public void ReceiveData_TCP()
     {
@@ -291,10 +307,14 @@ public class ConnectionManager : MonoBehaviour
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
         {
+            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            UpdateEndPointToSend();
             Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
+            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            UpdateEndPointToSend();
             Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
         }
         else
@@ -306,6 +326,7 @@ public class ConnectionManager : MonoBehaviour
 
             //partyObj.AddPartyPlayer();
             //AddNewPartyPlayer(connectionRequest.clientRequesting);
+
             UpdateEndPointToSend();
             Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
         }
@@ -366,14 +387,20 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_ConnectionConfirmation(ConnectionConfirmation connectionConfirmation)
     {
-        if (connectionConfirmation.acceptedConnection)
+        if (NetworkManager.Instance.GetLocalClient() != null && NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            Debug.Log("Received Message but is host");
+        }
+        else if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
-            LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient);
+            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
         }
         else
         {
             Debug.Log("Could not connect to server: " + connectionConfirmation.reasonToDeny);
+            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
+            UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
     }
 
@@ -592,7 +619,7 @@ public class ConnectionManager : MonoBehaviour
         else
         {
             SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
-            socket.Connect(ipEndPointToReceive);
+            //socket.Connect(ipEndPointToReceive);
         }
     }
 
@@ -601,6 +628,13 @@ public class ConnectionManager : MonoBehaviour
         SetEndPoint(ref ipEndPointToSend, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
     }
 
+    public void EndConnections()
+    {
+        NetworkManager.Instance.DeleteClients();
+
+        networkThreadToReceiveData.Abort();
+        networkThreadToSendData.Abort();
+    }
 
     private void OnDisable()
     {

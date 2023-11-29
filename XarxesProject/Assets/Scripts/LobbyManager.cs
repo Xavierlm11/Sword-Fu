@@ -119,8 +119,14 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        NetworkManager.Instance.appIsQuitting = true;
+    }
+
     private void Start()
     {
+        NetworkManager.Instance.appIsQuitting = false;
         stagesList = new List<GameObject>();
         serverHasConfirmedConnection = false;
         SetTransportType();
