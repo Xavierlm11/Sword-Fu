@@ -121,7 +121,7 @@ public class ConnectionManager : MonoBehaviour
         //Starts being able to receive data
         OpenNewThreat_Receive();
         //Starts being able to send data
-        //OpenNewThreat_Send();
+        OpenNewThreat_Send();
     }
 
     //Creates the socket
@@ -191,8 +191,6 @@ public class ConnectionManager : MonoBehaviour
             EndPoint Remote = ipEndPointToReceive;
 
             transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
-
-            socket.Connect(ipEndPointToReceive);
 
             transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
 
@@ -585,11 +583,16 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateEndPointToReceive()
     {
-        SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
+        
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
-            
+            SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.defaultPort);
             socket.Bind(ipEndPointToReceive);
+        }
+        else
+        {
+            SetEndPoint(ref ipEndPointToReceive, IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
+            socket.Connect(ipEndPointToReceive);
         }
     }
 

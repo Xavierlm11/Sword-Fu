@@ -406,7 +406,7 @@ public class LobbyManager : MonoBehaviour
             
             ConnectionManager.Instance.StartConnections();
             
-            //ConnectToServer();
+            ConnectToServer();
 
             ChangeStage(stages.waitingConnection);
             titleIp.text = NetworkManager.Instance.remoteIp.ToString();
