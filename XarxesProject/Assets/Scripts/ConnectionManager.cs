@@ -194,12 +194,16 @@ public class ConnectionManager : MonoBehaviour
         {
             int recv;
             byte[] data = new byte[1024];
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
+            
 
             Socket newsock = new Socket(AddressFamily.InterNetwork,
                             SocketType.Dgram, ProtocolType.Udp);
 
+            //Debug.Log(ipEndPointToReceive);
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
             newsock.Bind(ipep);
+            //IPEndPoint ipep = ipEndPointToReceive;
+            
             Debug.Log("Waiting for a client...");
 
             IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
@@ -252,10 +256,9 @@ public class ConnectionManager : MonoBehaviour
         }
         else
         {
-            byte[] data = new byte[1024];
+            byte[] data = new byte[NetworkManager.Instance.messageMaxBytes];
             string input, stringData;
-            IPEndPoint ipep = new IPEndPoint(
-                            IPAddress.Parse("127.0.0.1"), 9050);
+            IPEndPoint ipep = ipEndPointToReceive;
 
             Socket server = new Socket(AddressFamily.InterNetwork,
                            SocketType.Dgram, ProtocolType.Udp);
