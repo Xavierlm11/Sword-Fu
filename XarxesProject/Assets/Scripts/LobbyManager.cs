@@ -368,6 +368,7 @@ public class LobbyManager : MonoBehaviour
 
             //NetworkManager.Instance.remotePort = int.Parse(host_clientPortField.text);
             //NetworkManager.Instance.localPort = int.Parse(host_serverPortField.text);
+
             BeTheServer();
 
             ConnectionManager.Instance.UpdateEndPoints();
@@ -412,7 +413,7 @@ public class LobbyManager : MonoBehaviour
             
             ConnectionManager.Instance.StartConnections();
             
-            ConnectToServer();
+            //ConnectToServer();
 
             ChangeStage(stages.waitingConnection);
             titleIp.text = NetworkManager.Instance.remoteIp.ToString();
@@ -426,7 +427,7 @@ public class LobbyManager : MonoBehaviour
     public void BeTheServer()
     {
         NetworkManager.Instance.hasInitialized = false;
-        Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.localPort, true);
+        Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort, true);
         NetworkManager.Instance.SetLocalClient(cl);
         NetworkManager.Instance.clients.Add(cl);
 
@@ -438,7 +439,7 @@ public class LobbyManager : MonoBehaviour
     {
         NetworkManager.Instance.hasInitialized = false;
 
-        Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.localPort);
+        Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort);
         NetworkManager.Instance.SetLocalClient(cl);
 
         Debug.Log("You are a client");
