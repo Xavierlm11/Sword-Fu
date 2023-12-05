@@ -371,7 +371,7 @@ public class LobbyManager : MonoBehaviour
 
             BeTheServer();
 
-            ConnectionManager.Instance.UpdateEndPoints();
+            //ConnectionManager.Instance.UpdateEndPoints();
 
             ConnectionManager.Instance.StartConnections();
 
@@ -409,7 +409,7 @@ public class LobbyManager : MonoBehaviour
 
             BeTheClient();
 
-            ConnectionManager.Instance.UpdateEndPoints();
+            //ConnectionManager.Instance.UpdateEndPoints();
             
             ConnectionManager.Instance.StartConnections();
             

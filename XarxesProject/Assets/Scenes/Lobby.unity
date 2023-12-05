@@ -11347,7 +11347,6 @@ MonoBehaviour:
   isMessage: 0
   transferedDataBuffer: 
   transferedDataSize: 0
-  maxTransferedDataSize: 0
   partyObj: {fileID: 0}
 --- !u!222 &7052098916615215234
 CanvasRenderer:

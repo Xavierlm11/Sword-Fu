@@ -193,7 +193,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public string localIp;
     public string remoteIp;
 
-    public int messageMaxBytes;
+    public int maxTransferedDataSize;
     public bool hasInitialized;
 
     [SerializeField]

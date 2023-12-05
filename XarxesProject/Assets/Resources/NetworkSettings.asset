@@ -24,8 +24,8 @@ MonoBehaviour:
   defaultPort: 5000
   localPort: 0
   remotePort: 0
-  localIp: 10.0.103.21
-  remoteIp: 10.0.103.21
-  messageMaxBytes: 1024
+  localIp: 26.145.90.77
+  remoteIp: 26.145.90.77
+  maxTransferedDataSize: 1024
   hasInitialized: 0
   appIsQuitting: 1

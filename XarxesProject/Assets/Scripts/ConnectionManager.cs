@@ -31,7 +31,7 @@ public class ConnectionManager : MonoBehaviour
 
     //public Socket socketToReceive;
     //public Socket socketToSend;
-    public Socket localSocket;
+    public Socket socket;
     public Socket connectedClientSocket;
 
     public bool isMessage;
@@ -45,8 +45,8 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField]
     private int transferedDataSize;
 
-    [SerializeField]
-    private int maxTransferedDataSize;
+    //[SerializeField]
+    //private int maxTransferedDataSize;
 
     [SerializeField]
     private PartyManager partyObj;
@@ -86,6 +86,8 @@ public class ConnectionManager : MonoBehaviour
     private MemoryStream stream;
     private BinaryWriter binaryWriter;
     private BinaryReader binaryReader;
+
+    public string inputToSend;
 
     #endregion
 
@@ -129,12 +131,12 @@ public class ConnectionManager : MonoBehaviour
     //Creates the socket
     public void SetSocket()
     {
-        localSocket = NetworkManager.StartNetwork();
+        socket = NetworkManager.StartNetwork();
     }
 
     public void StartReceivingMessages()
     {
-        transferedDataSize = NetworkManager.Instance.messageMaxBytes;
+        transferedDataSize = NetworkManager.Instance.maxTransferedDataSize;
 
         //Debug.Log("EndPoint set and socket binded");
     }
@@ -142,13 +144,34 @@ public class ConnectionManager : MonoBehaviour
     private void WaitForClient()
     {
         //Blocking
-        connectedClientSocket = localSocket.Accept();
+        connectedClientSocket = socket.Accept();
         IPEndPoint clientIpEndPoint = (IPEndPoint)connectedClientSocket.RemoteEndPoint;
         Debug.Log("Connected with [" + clientIpEndPoint.Address.ToString() + "] at port [" + clientIpEndPoint.Port.ToString() + "]");
     }
 
     private void Update()
     {
+        if (Input.GetKey(KeyCode.W))
+        {
+            inputToSend = "W";
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            inputToSend = "A";
+        }
+        else if(Input.GetKey(KeyCode.S))
+        {
+            inputToSend = "S";
+        }
+        else if(Input.GetKey(KeyCode.D))
+        {
+            inputToSend = "D";
+        }
+        else
+        {
+            inputToSend = "NONE";
+        }
+
         //if (isMessage)
         //{
         //    CallToChat();
@@ -175,7 +198,7 @@ public class ConnectionManager : MonoBehaviour
                 break;
 
             case TransportType.TCP:
-                localSocket.Listen(10);
+                socket.Listen(10);
                 networkThreadToReceiveConnections = new Thread(WaitForClient);
                 networkThreadToReceiveConnections.Start();
 
@@ -193,38 +216,45 @@ public class ConnectionManager : MonoBehaviour
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
             int recv;
-            byte[] data = new byte[1024];
-            
-
-            Socket newsock = new Socket(AddressFamily.InterNetwork,
-                            SocketType.Dgram, ProtocolType.Udp);
-
-            //Debug.Log(ipEndPointToReceive);
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
-            newsock.Bind(ipep);
+            byte[] data = new byte[NetworkManager.Instance.maxTransferedDataSize];
             //IPEndPoint ipep = ipEndPointToReceive;
-            
+
+            //Socket newsock = localSocket;
+            //Socket newsock = new Socket(AddressFamily.InterNetwork,
+            //                SocketType.Dgram, ProtocolType.Udp);
+
+            //IPEndPoint ipep = ipEndPointToReceive;
+            ipEndPointToReceive = new IPEndPoint(IPAddress.Any, 9050);
+            socket.Bind(ipEndPointToReceive);
+            //IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
+            //newsock.Bind(ipep);
+            //Debug.Log(ipEndPointToReceive);
+
+
+            //IPEndPoint ipep = ipEndPointToReceive;
+
             Debug.Log("Waiting for a client...");
 
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint Remote = (EndPoint)(sender);
+            ipEndPointToSend = new IPEndPoint(IPAddress.Any, 0);
+            //IPEndPoint sender = ipEndPointToSend;
+            EndPoint Remote = (EndPoint)(ipEndPointToSend);
 
-            recv = newsock.ReceiveFrom(data, ref Remote);
+            recv = socket.ReceiveFrom(data, ref Remote);
 
             Debug.Log("Message received from: " + Remote.ToString());
             Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
 
             string welcome = "Welcome to my test server";
             data = Encoding.ASCII.GetBytes(welcome);
-            newsock.SendTo(data, data.Length, SocketFlags.None, Remote);
+            socket.SendTo(data, data.Length, SocketFlags.None, Remote);
 
             while (true)
             {
-                data = new byte[1024];
-                recv = newsock.ReceiveFrom(data, ref Remote);
+                data = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                recv = socket.ReceiveFrom(data, ref Remote);
 
-                Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
-                newsock.SendTo(data, recv, SocketFlags.None, Remote);
+                Debug.Log("Data Received: " + Encoding.ASCII.GetString(data, 0, recv));
+                socket.SendTo(data, recv, SocketFlags.None, Remote);
             }
         
                 //EndPoint Remote = (EndPoint)ipEndPointToSend;
@@ -256,23 +286,24 @@ public class ConnectionManager : MonoBehaviour
         }
         else
         {
-            byte[] data = new byte[NetworkManager.Instance.messageMaxBytes];
-            string input, stringData;
-            IPEndPoint ipep = ipEndPointToReceive;
+            byte[] data = new byte[NetworkManager.Instance.maxTransferedDataSize];
+            string stringData;
+            ipEndPointToReceive = new IPEndPoint(
+                      IPAddress.Parse("127.0.0.1"), 9050);
 
-            Socket server = new Socket(AddressFamily.InterNetwork,
-                           SocketType.Dgram, ProtocolType.Udp);
+            //Socket server = new Socket(AddressFamily.InterNetwork,
+            //               SocketType.Dgram, ProtocolType.Udp);
 
 
             string welcome = "Hello, are you there?";
             data = Encoding.ASCII.GetBytes(welcome);
-            server.SendTo(data, data.Length, SocketFlags.None, ipep);
+            socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToReceive);
 
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint Remote = (EndPoint)sender;
+            ipEndPointToSend = new IPEndPoint(IPAddress.Any, 0);
+            EndPoint Remote = (EndPoint)ipEndPointToSend;
 
-            data = new byte[1024];
-            int recv = server.ReceiveFrom(data, ref Remote);
+            data = new byte[NetworkManager.Instance.maxTransferedDataSize];
+            int recv = socket.ReceiveFrom(data, ref Remote);
 
             Debug.Log("Message received from: "+ Remote.ToString());
             Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
@@ -284,12 +315,11 @@ public class ConnectionManager : MonoBehaviour
 
             while (true)
             {
-                input = "AAA";
                 //if (input == "exit")
                 //    break;
-                server.SendTo(Encoding.ASCII.GetBytes(input), Remote);
+                socket.SendTo(Encoding.ASCII.GetBytes(inputToSend), Remote);
                 data = new byte[1024];
-                recv = server.ReceiveFrom(data, ref Remote);
+                recv = socket.ReceiveFrom(data, ref Remote);
                 stringData = Encoding.ASCII.GetString(data, 0, recv);
                 Debug.Log(stringData);
             }
@@ -307,7 +337,7 @@ public class ConnectionManager : MonoBehaviour
         {
             if (connectedClientSocket != null)
             {
-                transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
+                transferedDataBuffer = new byte[NetworkManager.Instance.maxTransferedDataSize];
                 transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
 
                 ////Blocking
@@ -585,7 +615,7 @@ public class ConnectionManager : MonoBehaviour
 
         byte[] data = stream.ToArray();
 
-        localSocket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+        socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
 
     public void SendDebugMessage()
@@ -651,7 +681,7 @@ public class ConnectionManager : MonoBehaviour
     {
         try
         {
-            localSocket.Connect(ipEndPointToSend);
+            socket.Connect(ipEndPointToSend);
         }
         catch (SocketException error)
         {
@@ -659,7 +689,7 @@ public class ConnectionManager : MonoBehaviour
             return;
         }
 
-        if (!localSocket.Connected)
+        if (!socket.Connected)
         {
             Debug.Log("Socket is not connected to server");
             return;
@@ -698,7 +728,7 @@ public class ConnectionManager : MonoBehaviour
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
             SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.defaultPort);
-            localSocket.Bind(ipEndPointToReceive);
+            socket.Bind(ipEndPointToReceive);
         }
         else
         {
@@ -734,9 +764,9 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Instance.clients.Clear();
 
         //Close to Send
-        if (localSocket != null)
+        if (socket != null)
         {
-            if (localSocket.Connected)
+            if (socket.Connected)
             {
                 //localSocket.Shutdown(SocketShutdown.Both);
                 //localSocket.Close();
