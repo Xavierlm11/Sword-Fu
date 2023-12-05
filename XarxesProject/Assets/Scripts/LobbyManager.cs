@@ -413,7 +413,7 @@ public class LobbyManager : MonoBehaviour
             
             ConnectionManager.Instance.StartConnections();
             
-            //ConnectToServer();
+            ConnectToServer();
 
             ChangeStage(stages.waitingConnection);
             titleIp.text = NetworkManager.Instance.remoteIp.ToString();
@@ -447,7 +447,10 @@ public class LobbyManager : MonoBehaviour
 
     private void ConnectToServer()
     {
-        ConnectionManager.Instance.Send_Data(ConnectionManager.Instance.ConnectionRequest);
+        //ConnectionManager.Instance.Send_Data(ConnectionManager.Instance.ConnectionRequest);
+        ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient());
+
+        ConnectionManager.Instance.SerializeToJsonAndSend(connectionRequest);
     }
 
     public void OnClick_GetLocalIPv4()

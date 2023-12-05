@@ -151,26 +151,26 @@ public class ConnectionManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.W))
-        {
-            dataToSend = Encoding.ASCII.GetBytes("W");
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            dataToSend = Encoding.ASCII.GetBytes("A");
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            dataToSend = Encoding.ASCII.GetBytes("S");
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            dataToSend = Encoding.ASCII.GetBytes("D");
-        }
-        else
-        {
-            dataToSend = null;
-        }
+        //if (Input.GetKey(KeyCode.W))
+        //{
+        //    dataToSend = Encoding.ASCII.GetBytes("W");
+        //}
+        //else if (Input.GetKey(KeyCode.A))
+        //{
+        //    dataToSend = Encoding.ASCII.GetBytes("A");
+        //}
+        //else if (Input.GetKey(KeyCode.S))
+        //{
+        //    dataToSend = Encoding.ASCII.GetBytes("S");
+        //}
+        //else if (Input.GetKey(KeyCode.D))
+        //{
+        //    dataToSend = Encoding.ASCII.GetBytes("D");
+        //}
+        //else
+        //{
+        //    dataToSend = null;
+        //}
 
         //if (isMessage)
         //{
@@ -239,8 +239,16 @@ public class ConnectionManager : MonoBehaviour
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
                 recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                Debug.Log("Data Received: " + Encoding.ASCII.GetString(receivedData, 0, recv));
-                //socket.SendTo(data, recv, SocketFlags.None, Remote);
+                Debug.Log("Data Received");
+                DeserializeJsonAndReceive(receivedData, recv);
+                receivedData = null;
+
+                if (dataToSend != null && dataToSend.Length > 0 && dataToSend.Length < NetworkManager.Instance.maxTransferedDataSize)
+                {
+                    socket.SendTo(dataToSend, dataToSend.Length, SocketFlags.None, Remote);
+                    dataToSend = null;
+                }
+
             }
         
             //EndPoint Remote = (EndPoint)ipEndPointToSend;
@@ -284,11 +292,12 @@ public class ConnectionManager : MonoBehaviour
             ipEndPointToSend = new IPEndPoint(IPAddress.Any, 0);
             EndPoint Remote = ipEndPointToSend;
 
-            data = new byte[NetworkManager.Instance.maxTransferedDataSize];
-            int recv = socket.ReceiveFrom(data, ref Remote);
-
-            Debug.Log("Message received from: "+ Remote.ToString());
-            Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
+            //data = new byte[NetworkManager.Instance.maxTransferedDataSize];
+            receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+            int recv = socket.ReceiveFrom(receivedData, ref Remote);
+            Debug.Log("Data Received");
+            //Debug.Log("Message received from: "+ Remote.ToString());
+            //Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
 
             while (true)
             {
@@ -296,7 +305,16 @@ public class ConnectionManager : MonoBehaviour
                 {
                     socket.SendTo(dataToSend, Remote);
                     dataToSend = null;
+
+                    receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                    recv = socket.ReceiveFrom(receivedData, ref Remote);
+                    Debug.Log("Data Received");
+
+                    DeserializeJsonAndReceive(receivedData, recv);
+                    receivedData = null;
                 }
+
+                
 
                 ////receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
                 ////recv = socket.ReceiveFrom(receivedData, ref Remote);
@@ -401,13 +419,15 @@ public class ConnectionManager : MonoBehaviour
         {
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             UpdateEndPointToSend();
-            Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
+            //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
+            ConnectionConfirmation(false, "A client with this IP and Port is already connected");
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             UpdateEndPointToSend();
-            Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+            //Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+            ConnectionConfirmation(false, "A client with this nickname is already connected");
         }
         else
         {
@@ -419,8 +439,9 @@ public class ConnectionManager : MonoBehaviour
             //partyObj.AddPartyPlayer();
             //AddNewPartyPlayer(connectionRequest.clientRequesting);
 
-            UpdateEndPointToSend();
-            Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
+            //UpdateEndPointToSend();
+            //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
+            ConnectionConfirmation(true, null, NetworkManager.Instance.clients);
         }
     }
 
@@ -486,13 +507,13 @@ public class ConnectionManager : MonoBehaviour
         else if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
-            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
+            //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
         }
         else
         {
             Debug.Log("Could not connect to server: " + connectionConfirmation.reasonToDeny);
-            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
-            UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
+            //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
+            //UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
     }
 
@@ -591,9 +612,11 @@ public class ConnectionManager : MonoBehaviour
         binaryWriter = new BinaryWriter(stream);
         binaryWriter.Write(json);
 
-        byte[] data = stream.ToArray();
+        dataToSend = stream.ToArray();
 
-        socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+        //byte[] data = stream.ToArray();
+
+        //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
 
     public void SendDebugMessage()
