@@ -260,9 +260,12 @@ public class ConnectionManager : MonoBehaviour
                 Remote = ipEndPointOfSender;
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
+                Socket server = new Socket(AddressFamily.InterNetwork,
+                     SocketType.Dgram, ProtocolType.Udp);
+
                 try
                 {
-                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
+                    int recv = server.ReceiveFrom(receivedData, ref Remote);
 
                     DeserializeJsonAndReceive(receivedData, recv);
                     receivedData = null;
@@ -305,6 +308,7 @@ public class ConnectionManager : MonoBehaviour
     //Finally, a function is called in each case, depending on how we want to respond after receiving that type of info
     public void DeserializeJsonAndReceive(byte[] dataReceived, int dataSize)
     {
+        //Debug.Log(NetworkManager.Instance.GetLocalClient().isHost);
         stream = new MemoryStream(dataReceived, 0, dataSize);
         binaryReader = new BinaryReader(stream);
 
@@ -356,15 +360,22 @@ public class ConnectionManager : MonoBehaviour
 
     public GenericSendClass DeserializeJsonBasic(byte[] dataReceived, int dataSize)
     {
+        //Debug.LogError("A1");
         stream = new MemoryStream(dataReceived, 0, dataSize);
+        //Debug.LogError("A2");
         binaryReader = new BinaryReader(stream);
+        //Debug.LogError("A3");
 
         stream.Seek(0, SeekOrigin.Begin);
+        //Debug.LogError("A4");
 
         string json = binaryReader.ReadString();
+        //Debug.LogError("A5");
 
         GenericSendClass sendClass = new GenericSendClass();
+        //Debug.LogError("A6");
         sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
+       // Debug.LogError("A7");
 
         return sendClass;
         //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
@@ -389,14 +400,14 @@ public class ConnectionManager : MonoBehaviour
         else if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
         {
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
-            UpdateEndPointToSend();
+            //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
             ConnectionConfirmation(connectionRequest.sender, false, "A client with this IP and Port is already connected");
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
-            UpdateEndPointToSend();
+            //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
             ConnectionConfirmation(connectionRequest.sender, false, "A client with this nickname is already connected");
         }
@@ -566,7 +577,8 @@ public class ConnectionManager : MonoBehaviour
             return;
         }
 
-        ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient());
+        Client localClient = NetworkManager.Instance.GetLocalClient();
+        ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
 
         SerializeToJsonAndSend(connectionRequest);
 
@@ -666,27 +678,42 @@ public class ConnectionManager : MonoBehaviour
 
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
-                    GenericSendClass dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
+                    //try
+                    //{
+                        GenericSendClass dataInfo = new GenericSendClass();
+                        Debug.LogError("A0");
+                        dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
+                        //Debug.LogError("A8");
+                        //Debug.LogError(dataToSendList[i].Length.ToString());
+                        //Debug.LogError("A9");
 
                     try
-                    {
-                        foreach (Client receiver in dataInfo.receivers)
                         {
-                            ipEndPointToSend = new IPEndPoint(
-                                    IPAddress.Parse(receiver.localIp), NetworkManager.Instance.defaultPort);
+                            foreach (Client receiver in dataInfo.receivers)
+                            {
+                                ipEndPointToSend = new IPEndPoint(
+                                        IPAddress.Parse(receiver.localIp), NetworkManager.Instance.defaultPort);
 
-                        
-                            socket.SendTo(dataToSendList[i], ipEndPointToSend);
 
+                                socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+
+                            }
+
+                            dataToSendList.RemoveAt(i);
                         }
+                        catch
+                        {
+                            // Manejar la excepción
+                            Debug.Log($"Error al enviar datos");
+                        }
+                    //}
+                    //catch
+                    //{
+                    //    Debug.LogError("AAAAAAAAAAAAAAA");
+                    //    Debug.LogError(dataToSendList[i].Length.ToString());
+                    //}
 
-                        dataToSendList.RemoveAt(i);
-                    }
-                    catch (SocketException ex)
-                    {
-                        // Manejar la excepción
-                        Debug.Log($"Error al enviar datos: {ex.Message}");
-                    }
+                   
                 }
             }
         }

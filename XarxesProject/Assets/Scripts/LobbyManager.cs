@@ -110,6 +110,7 @@ public class LobbyManager : MonoBehaviour
     private void Awake()
     {
         Resources.LoadAll("");
+        //Debug.LogError("Loaded resources");
         if (Instance == null)
         {
             Instance = this;

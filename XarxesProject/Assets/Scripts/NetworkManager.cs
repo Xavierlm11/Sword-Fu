@@ -24,6 +24,11 @@ public class GenericSendClass
 {
     public GenericSendClass()
     {
+
+    }
+
+    public GenericSendClass(bool isNotJsonConversion)
+    {
         sender = NetworkManager.Instance.GetLocalClient();
     }
 
@@ -37,7 +42,8 @@ public class DebugMessage : GenericSendClass
     {
         
     }
-    public DebugMessage(string ip, string nickname, string message)
+
+    public DebugMessage(string ip, string nickname, string message) : base(true)
     {
         senderIp = ip;
         senderNickname = nickname;
@@ -55,7 +61,8 @@ public class ConnectionRequest : GenericSendClass
     {
 
     }
-    public ConnectionRequest(Client client)
+
+    public ConnectionRequest(Client client) : base(true)
     {
         clientRequesting = client;
         sendCode = SendCode.ConnectionRequest;
@@ -69,7 +76,8 @@ public class ConnectionConfirmation : GenericSendClass
     {
 
     }
-    public ConnectionConfirmation(bool accepted, string reason, List<Client> clients)
+
+    public ConnectionConfirmation(bool accepted, string reason, List<Client> clients) : base(true)
     {
         acceptedConnection = accepted;
         clientList = clients;
@@ -110,7 +118,8 @@ public class SendTransPlayer : GenericSendClass
     {
 
     }
-    public SendTransPlayer(ConnectionManager.PlayerPositionsInfo ppi)
+
+    public SendTransPlayer(ConnectionManager.PlayerPositionsInfo ppi) : base(true)
     {
         ConnectionManager.PlayerPosition newPos = ppi.playerPositions;
         pos = new Vector3(newPos.positionX,newPos.positionY,newPos.positionZ);
