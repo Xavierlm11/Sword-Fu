@@ -109,7 +109,8 @@ public class LobbyManager : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
+        Resources.LoadAll("");
+        if (Instance == null)
         {
             Instance = this;
         }

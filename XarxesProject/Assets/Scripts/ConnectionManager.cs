@@ -584,7 +584,8 @@ public class ConnectionManager : MonoBehaviour
         binaryWriter = new BinaryWriter(stream);
         binaryWriter.Write(json);
 
-        dataToSendList.Add(stream.ToArray());
+        byte[] data = stream.ToArray();
+        dataToSendList.Add(data);
 
         //byte[] data = stream.ToArray();
 
@@ -694,6 +695,9 @@ public class ConnectionManager : MonoBehaviour
             ipEndPointToSend = new IPEndPoint(
                             IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
 
+            Socket server = new Socket(AddressFamily.InterNetwork,
+                     SocketType.Dgram, ProtocolType.Udp);
+
             while (!NetworkManager.Instance.appIsQuitting)
             {
                 Debug.Log("Sending Data...");
@@ -706,14 +710,20 @@ public class ConnectionManager : MonoBehaviour
                         //string welcome = "Hello, are you there?";
                         //data = Encoding.ASCII.GetBytes(welcome);
                         //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
-                        socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+                        server.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
                     }
-                    catch (SocketException ex)
+                    catch
                     {
                         // Manejar la excepción
-                        Debug.Log($"Error al enviar datos: {ex.Message}");
+                        Debug.Log($"Error al enviar datos");
                     }
+                    //catch (SocketException ex)
+                    //{
+                    //    // Manejar la excepción
+                    //    Debug.Log($"Error al enviar datos: {ex.Message}");
+                    //}
+                    
                 }
             }
         }
