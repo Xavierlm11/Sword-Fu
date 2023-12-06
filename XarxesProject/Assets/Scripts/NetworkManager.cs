@@ -34,6 +34,8 @@ public class GenericSendClass
 
     public SendCode sendCode;
     public Client sender;
+    public string remoteIP;
+    public int remotePort;
     public List<Client> receivers = new List<Client>();
 }
 public class DebugMessage : GenericSendClass

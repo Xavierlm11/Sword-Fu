@@ -450,7 +450,8 @@ public class LobbyManager : MonoBehaviour
     private void ConnectToServer()
     {
         //ConnectionManager.Instance.Send_Data(ConnectionManager.Instance.ConnectionRequest);
-        ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient());
+        Client localClient = NetworkManager.Instance.GetLocalClient();
+        ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
 
         ConnectionManager.Instance.SerializeToJsonAndSend(connectionRequest);
     }

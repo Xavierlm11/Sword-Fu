@@ -204,12 +204,12 @@ public class ConnectionManager : MonoBehaviour
                 break;
 
             case TransportType.TCP:
-                socket.Listen(10);
-                networkThreadToReceiveConnections = new Thread(WaitForClient);
-                networkThreadToReceiveConnections.Start();
+                //socket.Listen(10);
+                //networkThreadToReceiveConnections = new Thread(WaitForClient);
+                //networkThreadToReceiveConnections.Start();
 
-                networkThreadToReceiveData = new Thread(ReceiveData_TCP);
-                networkThreadToReceiveData.Start();
+                //networkThreadToReceiveData = new Thread(ReceiveData_TCP);
+                //networkThreadToReceiveData.Start();
                 break;
         }
     }
@@ -237,8 +237,18 @@ public class ConnectionManager : MonoBehaviour
                 try
                 {
                     int recv = socket.ReceiveFrom(receivedData, ref Remote);
-                
-                    DeserializeJsonAndReceive(receivedData, recv);
+
+                    if (Remote is IPEndPoint remoteEndPoint)
+                    {
+                        // Accede a la información de la IP y el puerto remotos
+                        IPAddress remoteIPAdress = remoteEndPoint.Address;
+                        int remotePort = remoteEndPoint.Port;
+
+                        string remoteIP = remoteIPAdress.ToString();
+
+                        DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort);
+                    }
+
                     receivedData = null;
                 }
                 catch (SocketException ex)
@@ -260,14 +270,24 @@ public class ConnectionManager : MonoBehaviour
                 Remote = ipEndPointOfSender;
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
-                Socket server = new Socket(AddressFamily.InterNetwork,
-                     SocketType.Dgram, ProtocolType.Udp);
+                //Socket server = new Socket(AddressFamily.InterNetwork,
+                //     SocketType.Dgram, ProtocolType.Udp);
 
                 try
                 {
-                    int recv = server.ReceiveFrom(receivedData, ref Remote);
+                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                    DeserializeJsonAndReceive(receivedData, recv);
+                    if (Remote is IPEndPoint remoteEndPoint)
+                    {
+                        // Accede a la información de la IP y el puerto remotos
+                        IPAddress remoteIPAdress = remoteEndPoint.Address;
+                        int remotePort = remoteEndPoint.Port;
+
+                        string remoteIP = remoteIPAdress.ToString();
+
+                        DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort);
+                    }
+                    
                     receivedData = null;
                 }
                 catch (SocketException ex)
@@ -282,31 +302,31 @@ public class ConnectionManager : MonoBehaviour
 
     
 
-    public void ReceiveData_TCP()
-    {
-        while (true)
-        {
-            if (connectedClientSocket != null)
-            {
-                transferedDataBuffer = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
+    //public void ReceiveData_TCP()
+    //{
+    //    while (true)
+    //    {
+    //        if (connectedClientSocket != null)
+    //        {
+    //            transferedDataBuffer = new byte[NetworkManager.Instance.maxTransferedDataSize];
+    //            transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
 
-                ////Blocking
-                //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
+    //            ////Blocking
+    //            //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
 
-                if (transferedDataSize != 0)
-                {
-                    DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-                }
-            }
-        }
-    }
+    //            if (transferedDataSize != 0)
+    //            {
+    //                DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
+    //            }
+    //        }
+    //    }
+    //}
 
     //The deserialization gets the base class of the transfered data first.
     //This base class only contains a code, which indicates what is the child class
     //Depending of this code, we deserialize the info into the corresponding child class
     //Finally, a function is called in each case, depending on how we want to respond after receiving that type of info
-    public void DeserializeJsonAndReceive(byte[] dataReceived, int dataSize)
+    public void DeserializeJsonAndReceive(byte[] dataReceived, int dataSize, string remoteIP, int remotePort)
     {
         //Debug.Log(NetworkManager.Instance.GetLocalClient().isHost);
         stream = new MemoryStream(dataReceived, 0, dataSize);
@@ -326,6 +346,8 @@ public class ConnectionManager : MonoBehaviour
             case SendCode.ConnectionRequest:
                 ConnectionRequest connectionRequest = new ConnectionRequest();
                 connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
+                connectionRequest.remoteIP = remoteIP;
+                connectionRequest.remotePort = remotePort;
                 Receive_ConnectionRequest(connectionRequest);
                 break;
 
@@ -399,23 +421,23 @@ public class ConnectionManager : MonoBehaviour
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
         {
-            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
-            ConnectionConfirmation(connectionRequest.sender, false, "A client with this IP and Port is already connected");
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this IP and Port is already connected");
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
-            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
-            ConnectionConfirmation(connectionRequest.sender, false, "A client with this nickname is already connected");
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this nickname is already connected");
         }
         else
         {
             NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
 
-            NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
+            //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
 
             //partyObj.AddPartyPlayer();
@@ -423,7 +445,7 @@ public class ConnectionManager : MonoBehaviour
 
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
-            ConnectionConfirmation(connectionRequest.sender, true, null, NetworkManager.Instance.clients);
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null, NetworkManager.Instance.clients);
         }
     }
 
@@ -472,12 +494,14 @@ public class ConnectionManager : MonoBehaviour
 
     //}
 
-    public void ConnectionConfirmation(Client sender, bool confirmation, string reason = null, List<Client> clientList = null)
+    public void ConnectionConfirmation(string remoteIP, int remotePort, Client sender, bool confirmation, string reason = null, List<Client> clientList = null)
     {
-        ConnectionConfirmation connectionRequest = new ConnectionConfirmation(confirmation, reason, clientList);
-        connectionRequest.receivers.Add(sender);
+        ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation(confirmation, reason, clientList);
+        connectionConfirmation.receivers.Add(sender);
+        connectionConfirmation.remoteIP = remoteIP;
+        connectionConfirmation.remotePort = remotePort;
 
-        SerializeToJsonAndSend(connectionRequest);
+        SerializeToJsonAndSend(connectionConfirmation);
 
     }
 
@@ -539,7 +563,7 @@ public class ConnectionManager : MonoBehaviour
     //    networkThreadToSendData.Start();
     //}
 
-    public void ConnectionRequest()
+    public void DoConnectionRequest()
     {
         switch (NetworkManager.Instance.transportType)
         {
@@ -692,7 +716,7 @@ public class ConnectionManager : MonoBehaviour
                             foreach (Client receiver in dataInfo.receivers)
                             {
                                 ipEndPointToSend = new IPEndPoint(
-                                        IPAddress.Parse(receiver.localIp), NetworkManager.Instance.defaultPort);
+                                        IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
 
 
                                 socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
@@ -722,8 +746,8 @@ public class ConnectionManager : MonoBehaviour
             ipEndPointToSend = new IPEndPoint(
                             IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
 
-            Socket server = new Socket(AddressFamily.InterNetwork,
-                     SocketType.Dgram, ProtocolType.Udp);
+            //Socket server = new Socket(AddressFamily.InterNetwork,
+            //         SocketType.Dgram, ProtocolType.Udp);
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
@@ -737,7 +761,7 @@ public class ConnectionManager : MonoBehaviour
                         //string welcome = "Hello, are you there?";
                         //data = Encoding.ASCII.GetBytes(welcome);
                         //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
-                        server.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+                        socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
                     }
                     catch
