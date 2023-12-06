@@ -514,7 +514,7 @@ public class ConnectionManager : MonoBehaviour
         else if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
-            //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
+            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
         }
         else
         {
