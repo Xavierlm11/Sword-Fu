@@ -22,7 +22,14 @@ public class Server
 #region send classes
 public class GenericSendClass
 {
+    public GenericSendClass()
+    {
+        sender = NetworkManager.Instance.GetLocalClient();
+    }
+
     public SendCode sendCode;
+    public Client sender;
+    public List<Client> receivers = new List<Client>();
 }
 public class DebugMessage : GenericSendClass
 {

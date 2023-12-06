@@ -23,6 +23,9 @@ public class ConnectionManager : MonoBehaviour
     public IPEndPoint ipEndPointToSend;
 
     [SerializeField]
+    public IPEndPoint ipEndPointOfSender;
+
+    [SerializeField]
     private Thread networkThreadToSendData;
     [SerializeField]
     private Thread networkThreadToReceiveConnections;
@@ -87,6 +90,8 @@ public class ConnectionManager : MonoBehaviour
     private BinaryWriter binaryWriter;
     private BinaryReader binaryReader;
 
+    public List<byte[]> dataToSendList = new List<byte[]>();
+
     public byte[] dataToSend;
     public byte[] receivedData;
     #endregion
@@ -124,7 +129,7 @@ public class ConnectionManager : MonoBehaviour
         OpenNewThreat_Receive();
 
         ////Starts being able to send data
-        //OpenNewThreat_Send();
+        OpenNewThreat_Send();
 
     }
 
@@ -186,6 +191,7 @@ public class ConnectionManager : MonoBehaviour
     private void OpenNewThreat_Send()
     {
         networkThreadToSendData = new Thread(SendNetworkData);
+        networkThreadToSendData.Start();
     }
 
     private void OpenNewThreat_Receive()
@@ -213,113 +219,59 @@ public class ConnectionManager : MonoBehaviour
     {
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
-            int recv;
-            byte[] data = new byte[NetworkManager.Instance.maxTransferedDataSize];
-
             ipEndPointToReceive = new IPEndPoint(IPAddress.Any, NetworkManager.Instance.defaultPort);
             socket.Bind(ipEndPointToReceive);
 
             Debug.Log("Waiting for a client...");
 
-            ipEndPointToSend = new IPEndPoint(IPAddress.Any, 0);
+            ipEndPointOfSender = new IPEndPoint(IPAddress.Any, 0);
+            EndPoint Remote = ipEndPointOfSender;
 
-            EndPoint Remote = ipEndPointToSend;
-
-            recv = socket.ReceiveFrom(data, ref Remote);
-
-            Debug.Log("Message received from: " + Remote.ToString());
-            Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
-
-            string welcome = "Welcome to my test server";
-            data = Encoding.ASCII.GetBytes(welcome);
-            socket.SendTo(data, data.Length, SocketFlags.None, Remote);
-
-            while (true)
+            while (!NetworkManager.Instance.appIsQuitting)
             {
+                Debug.Log("Receiving data...");
+
+                Remote = ipEndPointOfSender;
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                Debug.Log("Data Received");
-                DeserializeJsonAndReceive(receivedData, recv);
-                receivedData = null;
-
-                if (dataToSend != null && dataToSend.Length > 0 && dataToSend.Length < NetworkManager.Instance.maxTransferedDataSize)
+                try
                 {
-                    socket.SendTo(dataToSend, dataToSend.Length, SocketFlags.None, Remote);
-                    dataToSend = null;
+                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
+                
+                    DeserializeJsonAndReceive(receivedData, recv);
+                    receivedData = null;
                 }
-
+                catch (SocketException ex)
+                {
+                    Debug.Log($"Error al recibir datos: {ex.Message}");
+                }
             }
-        
-            //EndPoint Remote = (EndPoint)ipEndPointToSend;
-
-            //transferedDataBuffer = new byte[NetworkManager.Instance.messageMaxBytes];
-
-            //transferedDataSize = localSocket.ReceiveFrom(transferedDataBuffer, ref Remote);
-
-            //try
-            //{
-            //    transferedDataSize = socket.ReceiveFrom(transferedDataBuffer, ref Remote);
-            //}
-            //catch
-            //{
-            //    transferedDataSize = 0;
-            //    if(!NetworkManager.Instance.appIsQuitting)
-            //    {
-            //        Debug.Log("Could not connect to server: Host not found");
-            //        UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
-            //        UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
-            //    }
-            //}
-
-
-            //if (transferedDataSize != 0)
-            //{
-            //    DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-            //}
         }
         else
         {
-            byte[] data = new byte[NetworkManager.Instance.maxTransferedDataSize];
-            string stringData;
-            ipEndPointToReceive = new IPEndPoint(
-                      IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
+            ipEndPointOfSender = new IPEndPoint(IPAddress.Any, 0);
+            EndPoint Remote = ipEndPointOfSender;
 
-            string welcome = "Hello, are you there?";
-            data = Encoding.ASCII.GetBytes(welcome);
-            socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToReceive);
-
-            ipEndPointToSend = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint Remote = ipEndPointToSend;
-
-            //data = new byte[NetworkManager.Instance.maxTransferedDataSize];
-            receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-            int recv = socket.ReceiveFrom(receivedData, ref Remote);
-            Debug.Log("Data Received");
-            //Debug.Log("Message received from: "+ Remote.ToString());
-            //Debug.Log(Encoding.ASCII.GetString(data, 0, recv));
-
-            while (true)
+            //Por hacer
+            while (!NetworkManager.Instance.appIsQuitting)
             {
-                if (dataToSend != null && dataToSend.Length > 0 && dataToSend.Length < NetworkManager.Instance.maxTransferedDataSize)
-                {
-                    socket.SendTo(dataToSend, Remote);
-                    dataToSend = null;
+                Debug.Log("Receiving data...");
 
-                    receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                    recv = socket.ReceiveFrom(receivedData, ref Remote);
-                    Debug.Log("Data Received");
+                Remote = ipEndPointOfSender;
+                receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+
+                try
+                {
+                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
                     DeserializeJsonAndReceive(receivedData, recv);
                     receivedData = null;
                 }
-
+                catch (SocketException ex)
+                {
+                    Debug.Log($"Error al recibir datos: {ex.Message}");
+                }
                 
-
-                ////receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                ////recv = socket.ReceiveFrom(receivedData, ref Remote);
-                //////stringData = Encoding.ASCII.GetString(data, 0, recv);
-                ////Debug.Log("Data received");
             }
         }
         
@@ -363,6 +315,8 @@ public class ConnectionManager : MonoBehaviour
         GenericSendClass sendClass = new GenericSendClass();
         sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
+        Debug.Log("Data Received: " + sendClass.sendCode.ToString());
+
         switch (sendClass.sendCode)
         {
             case SendCode.ConnectionRequest:
@@ -400,6 +354,23 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
+    public GenericSendClass DeserializeJsonBasic(byte[] dataReceived, int dataSize)
+    {
+        stream = new MemoryStream(dataReceived, 0, dataSize);
+        binaryReader = new BinaryReader(stream);
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        string json = binaryReader.ReadString();
+
+        GenericSendClass sendClass = new GenericSendClass();
+        sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
+
+        return sendClass;
+        //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
+
+    }
+
     private void Receive_SendIdPlayer(SendIdPlayer sIP)
     {
         if (!NetworkManager.Instance.GetLocalClient().isHost)
@@ -420,14 +391,14 @@ public class ConnectionManager : MonoBehaviour
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
-            ConnectionConfirmation(false, "A client with this IP and Port is already connected");
+            ConnectionConfirmation(connectionRequest.sender, false, "A client with this IP and Port is already connected");
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
             NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
-            ConnectionConfirmation(false, "A client with this nickname is already connected");
+            ConnectionConfirmation(connectionRequest.sender, false, "A client with this nickname is already connected");
         }
         else
         {
@@ -441,7 +412,7 @@ public class ConnectionManager : MonoBehaviour
 
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
-            ConnectionConfirmation(true, null, NetworkManager.Instance.clients);
+            ConnectionConfirmation(connectionRequest.sender, true, null, NetworkManager.Instance.clients);
         }
     }
 
@@ -490,9 +461,10 @@ public class ConnectionManager : MonoBehaviour
 
     }
 
-    public void ConnectionConfirmation(bool confirmation, string reason = null, List<Client> clientList = null)
+    public void ConnectionConfirmation(Client sender, bool confirmation, string reason = null, List<Client> clientList = null)
     {
         ConnectionConfirmation connectionRequest = new ConnectionConfirmation(confirmation, reason, clientList);
+        connectionRequest.receivers.Add(sender);
 
         SerializeToJsonAndSend(connectionRequest);
 
@@ -529,14 +501,14 @@ public class ConnectionManager : MonoBehaviour
     //The method usually consists con creating a custom class, serialize it and send it.
     public void Send_Data(Action method)
     {
-        if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
-        {
-            OpenNewThreat_Send();
-        }
+        //if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
+        //{
+        //    OpenNewThreat_Send();
+        //}
 
-        dataMethod = method;
+        //dataMethod = method;
 
-        networkThreadToSendData.Start();
+        //networkThreadToSendData.Start();
     }
 
     public void Receive_PartyPlayersInfo(PartyPlayersInfo ppi)
@@ -612,12 +584,23 @@ public class ConnectionManager : MonoBehaviour
         binaryWriter = new BinaryWriter(stream);
         binaryWriter.Write(json);
 
-        dataToSend = stream.ToArray();
+        dataToSendList.Add(stream.ToArray());
 
         //byte[] data = stream.ToArray();
 
         //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
+
+    //public void SerializeToJson<T>(T objectToSerialize)
+    //{
+
+    //    string json = JsonConvert.SerializeObject(objectToSerialize);
+
+    //    stream = new MemoryStream();
+    //    binaryWriter = new BinaryWriter(stream);
+    //    binaryWriter.Write(json);
+
+    //}
 
     public void SendDebugMessage()
     {
@@ -674,8 +657,62 @@ public class ConnectionManager : MonoBehaviour
 
     public void SendNetworkData_UDP()
     {
-        dataMethod();
-        networkThreadToSendData.Interrupt();
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            while (!NetworkManager.Instance.appIsQuitting)
+            {
+                Debug.Log("Sending Data...");
+
+                for (int i = dataToSendList.Count - 1; i >= 0; i--)
+                {
+                    GenericSendClass dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
+
+                    try
+                    {
+                        foreach (Client receiver in dataInfo.receivers)
+                        {
+                            ipEndPointToSend = new IPEndPoint(
+                                    IPAddress.Parse(receiver.localIp), NetworkManager.Instance.defaultPort);
+
+                        
+                            socket.SendTo(dataToSendList[i], ipEndPointToSend);
+
+                        }
+
+                        dataToSendList.RemoveAt(i);
+                    }
+                    catch (SocketException ex)
+                    {
+                        // Manejar la excepción
+                        Debug.Log($"Error al enviar datos: {ex.Message}");
+                    }
+                }
+            }
+        }
+        else
+        {
+            ipEndPointToSend = new IPEndPoint(
+                            IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
+
+            while (!NetworkManager.Instance.appIsQuitting)
+            {
+                Debug.Log("Sending Data...");
+
+                for(int i = dataToSendList.Count - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        socket.SendTo(dataToSendList[i], ipEndPointToSend);
+                        dataToSendList.RemoveAt(i);
+                    }
+                    catch (SocketException ex)
+                    {
+                        // Manejar la excepción
+                        Debug.Log($"Error al enviar datos: {ex.Message}");
+                    }
+                }
+            }
+        }
     }
 
     public void SendNetworkData_TCP()
@@ -783,6 +820,11 @@ public class ConnectionManager : MonoBehaviour
         if (networkThreadToReceiveData != null)
         {
             networkThreadToReceiveData.Abort();
+        }
+
+        if (networkThreadToSendData != null)
+        {
+            networkThreadToSendData.Abort();
         }
 
     }
