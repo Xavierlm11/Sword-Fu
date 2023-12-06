@@ -36,19 +36,19 @@ public class PlayerManager : MonoBehaviour
         partyManagerObj = GameObject.FindGameObjectWithTag("PartyManager").GetComponent<PartyManager>();
 
 
-        foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
-        {
-            if (item.playerID == partyManagerObj.playerID)
-            {
+        //foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
+        //{
+        //    if (item.playerID == partyManagerObj.playerID)
+        //    {
 
-                AddPlayer(item.playerName, true);
-            }
-            else
-            {
-                AddPlayer(item.playerName);
+        //        AddPlayer(item.playerName, true);
+        //    }
+        //    else
+        //    {
+        //        AddPlayer(item.playerName);
 
-            }
-        }
+        //    }
+        //}
         //for (int i = 0; i < numberOfPlayers; i++)
         //{
         //    AddPlayer("Player " + (i + 1));
@@ -61,14 +61,14 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
-        foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
-        {
-            if (item.playerID != partyManagerObj.playerID)
-            {
+        //foreach (ConnectionManager.PartyPlayersInfo item in partyManagerObj.partyPlayersList)
+        //{
+        //    if (item.playerID != partyManagerObj.playerID)
+        //    {
 
 
-            }
-        }
+        //    }
+        //}
     }
 
     public void UpdatePlayers(ConnectionManager.PlayerPositionsInfo ppi)

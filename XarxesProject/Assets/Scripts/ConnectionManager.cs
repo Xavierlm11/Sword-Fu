@@ -72,16 +72,16 @@ public class ConnectionManager : MonoBehaviour
         public int playerId;
     }
 
-    [SerializeField]
-    public class PartyPlayersInfo
-    {
-        public string playerName;
-        public int playerID;
-        public int playersConected;
+    //[SerializeField]
+    //public class PartyPlayersInfo
+    //{
+    //    public string playerName;
+    //    public int playerID;
+    //    public int playersConected;
 
-        public PlayerPositionsInfo playerInfo;
+    //    public PlayerPositionsInfo playerInfo;
 
-    }
+    //}
 
     private Action dataMethod;
 
@@ -342,15 +342,15 @@ public class ConnectionManager : MonoBehaviour
                 Receive_PlayerPositions(PlayerPositionsInfo);
                 break;
 
-            case SendCode.PartyManager:
-                PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
-                Receive_PartyPlayersInfo(PPI);
-                break;
+            //case SendCode.PartyManager:
+            //    PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
+            //    Receive_PartyPlayersInfo(PPI);
+            //    break;
 
-            case SendCode.SendIdPlayer:
-                SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
-                Receive_SendIdPlayer(sIP);
-                break;
+            //case SendCode.SendIdPlayer:
+            //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
+            //    Receive_SendIdPlayer(sIP);
+            //    break;
         }
     }
 
@@ -371,14 +371,14 @@ public class ConnectionManager : MonoBehaviour
 
     }
 
-    private void Receive_SendIdPlayer(SendIdPlayer sIP)
-    {
-        if (!NetworkManager.Instance.GetLocalClient().isHost)
-        {
-            partyObj.playerID=sIP.playerId;
+    //private void Receive_SendIdPlayer(SendIdPlayer sIP)
+    //{
+    //    if (!NetworkManager.Instance.GetLocalClient().isHost)
+    //    {
+    //        partyObj.playerID=sIP.playerId;
 
-        }
-    }
+    //    }
+    //}
 
     public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     {
@@ -416,25 +416,25 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
-    public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
-    {
-        PartyPlayersInfo newplayer = new PartyPlayersInfo();
-        int newID = 0;
-        foreach (PartyPlayersInfo item in partyObj.partyPlayersList)
-        {
-            if (item.playerID >= newID)
-            {
-                newID = item.playerID + 1;
-            }
-        }
-        newplayer.playerID = newID;
-        newplayer.playerInfo.playerIp = cl.localIp;
-        newplayer.playerName = cl.nickname;
-        partyObj.partyPlayersList.Add(newplayer);
-        SendIdToPlayer(newplayer);
-        //aqui falta que le devuelva al player o al host su player id
+    //public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
+    //{
+    //    PartyPlayersInfo newplayer = new PartyPlayersInfo();
+    //    int newID = 0;
+    //    foreach (PartyPlayersInfo item in partyObj.partyPlayersList)
+    //    {
+    //        if (item.playerID >= newID)
+    //        {
+    //            newID = item.playerID + 1;
+    //        }
+    //    }
+    //    newplayer.playerID = newID;
+    //    newplayer.playerInfo.playerIp = cl.localIp;
+    //    newplayer.playerName = cl.nickname;
+    //    partyObj.partyPlayersList.Add(newplayer);
+    //    SendIdToPlayer(newplayer);
+    //    //aqui falta que le devuelva al player o al host su player id
 
-    }
+    //}
 
     //public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     //{
@@ -453,13 +453,13 @@ public class ConnectionManager : MonoBehaviour
     //    }
     //}
 
-    public void SendIdToPlayer(PartyPlayersInfo playersInfo)
-    {
-        SendIdPlayer sendId = new SendIdPlayer(playersInfo);
+    //public void SendIdToPlayer(PartyPlayersInfo playersInfo)
+    //{
+    //    SendIdPlayer sendId = new SendIdPlayer(playersInfo);
 
-        SerializeToJsonAndSend(sendId);
+    //    SerializeToJsonAndSend(sendId);
 
-    }
+    //}
 
     public void ConnectionConfirmation(Client sender, bool confirmation, string reason = null, List<Client> clientList = null)
     {
@@ -511,12 +511,12 @@ public class ConnectionManager : MonoBehaviour
         //networkThreadToSendData.Start();
     }
 
-    public void Receive_PartyPlayersInfo(PartyPlayersInfo ppi)
-    {
+    //public void Receive_PartyPlayersInfo(PartyPlayersInfo ppi)
+    //{
 
-        // partyObj.partyPlayersList.Add(ppi);
+    //    // partyObj.partyPlayersList.Add(ppi);
 
-    }
+    //}
     //public void Send_ConnectionRequest()
     //{
     //    if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
@@ -702,7 +702,11 @@ public class ConnectionManager : MonoBehaviour
                 {
                     try
                     {
-                        socket.SendTo(dataToSendList[i], ipEndPointToSend);
+                        //byte[] data = new byte[1024];
+                        //string welcome = "Hello, are you there?";
+                        //data = Encoding.ASCII.GetBytes(welcome);
+                        //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+                        socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
                     }
                     catch (SocketException ex)

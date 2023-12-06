@@ -9,7 +9,7 @@ public class PartyManager : MonoBehaviour
     //private int partyCapacity = 4;
 
     //public List<ConnectionManager.PartyPlayersInfo> partyPlayersList = new List<ConnectionManager.PartyPlayersInfo>();
-    public List<ConnectionManager.PartyPlayersInfo> partyPlayersList = new List<ConnectionManager.PartyPlayersInfo>();
+    //public List<ConnectionManager.PartyPlayersInfo> partyPlayersList = new List<ConnectionManager.PartyPlayersInfo>();
 
     //public GameObject player1;
 
@@ -30,19 +30,19 @@ public class PartyManager : MonoBehaviour
 
     }
 
-    public void AddPartyPlayer(ConnectionManager.PartyPlayersInfo partyPlayer)
-    {
-        int newID = 0;
-        //partyPlayersList.Sort();
-        foreach (ConnectionManager.PartyPlayersInfo item in partyPlayersList)
-        {
-            if (item.playerID >= newID)
-            {
-                newID += 1;
-            }
-        }
+    //public void AddPartyPlayer(ConnectionManager.PartyPlayersInfo partyPlayer)
+    //{
+    //    int newID = 0;
+    //    //partyPlayersList.Sort();
+    //    foreach (ConnectionManager.PartyPlayersInfo item in partyPlayersList)
+    //    {
+    //        if (item.playerID >= newID)
+    //        {
+    //            newID += 1;
+    //        }
+    //    }
 
-        partyPlayer.playerID = newID;
-        partyPlayersList.Add(partyPlayer);
-    }
+    //    partyPlayer.playerID = newID;
+    //    partyPlayersList.Add(partyPlayer);
+    //}
 }

@@ -83,22 +83,22 @@ public class ConnectionConfirmation : GenericSendClass
 }
 
 
-public class SendIdPlayer : GenericSendClass
-{
-    public int playerId =2;
-   // public string playerIp;
-    public SendIdPlayer()
-    {
+//public class SendIdPlayer : GenericSendClass
+//{
+//    public int playerId =2;
+//   // public string playerIp;
+//    public SendIdPlayer()
+//    {
 
-    }
-    public SendIdPlayer(ConnectionManager.PartyPlayersInfo ppi)
-    {
-        playerId = ppi.playerID;
-        sendCode = SendCode.SendIdPlayer;
-        //playerIp = ppi.playerInfo.playerIp;
-    }
+//    }
+//    public SendIdPlayer(ConnectionManager.PartyPlayersInfo ppi)
+//    {
+//        playerId = ppi.playerID;
+//        sendCode = SendCode.SendIdPlayer;
+//        //playerIp = ppi.playerInfo.playerIp;
+//    }
     
-}
+//}
 
 public class SendTransPlayer : GenericSendClass
 {
