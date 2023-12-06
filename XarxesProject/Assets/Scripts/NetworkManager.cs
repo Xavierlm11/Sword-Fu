@@ -222,6 +222,8 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public bool appIsQuitting;
 
+    public bool allowSameIPInRoom;
+
     #endregion
 
     //__________________________________________________________________________

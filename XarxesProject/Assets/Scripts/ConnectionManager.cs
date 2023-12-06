@@ -419,12 +419,12 @@ public class ConnectionManager : MonoBehaviour
         {
             Debug.Log("Received Message but is not host");
         }
-        else if (NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp && x.localPort == connectionRequest.clientRequesting.localPort))
+        else if (!NetworkManager.Instance.allowSameIPInRoom && NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp))
         {
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
-            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this IP and Port is already connected");
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this IP is already connected");
         }
         else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
@@ -705,11 +705,16 @@ public class ConnectionManager : MonoBehaviour
                     //try
                     //{
                         GenericSendClass dataInfo = new GenericSendClass();
-                        Debug.LogError("A0");
+                       // Debug.LogError("A0");
+                    if (dataToSendList[i] != null)
+                    {
                         dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
                         //Debug.LogError("A8");
                         //Debug.LogError(dataToSendList[i].Length.ToString());
                         //Debug.LogError("A9");
+
+                    }
+
 
                     try
                         {

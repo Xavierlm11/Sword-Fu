@@ -29,3 +29,4 @@ MonoBehaviour:
   maxTransferedDataSize: 1024
   hasInitialized: 1
   appIsQuitting: 1
+  allowSameIPInRoom: 1
