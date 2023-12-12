@@ -229,7 +229,7 @@ public class ConnectionManager : MonoBehaviour
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                Debug.Log("Receiving data...");
+                
 
                 Remote = ipEndPointOfSender;
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
@@ -265,7 +265,6 @@ public class ConnectionManager : MonoBehaviour
             //Por hacer
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                Debug.Log("Receiving data...");
 
                 Remote = ipEndPointOfSender;
                 receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
@@ -685,10 +684,6 @@ public class ConnectionManager : MonoBehaviour
             case TransportType.UDP:
                 SendNetworkData_UDP();
                 break;
-
-            case TransportType.TCP:
-                SendNetworkData_TCP();
-                break;
         }
     }
 
@@ -698,7 +693,7 @@ public class ConnectionManager : MonoBehaviour
         {
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                Debug.Log("Sending Data...");
+                //
 
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
@@ -712,6 +707,7 @@ public class ConnectionManager : MonoBehaviour
                         //Debug.LogError("A8");
                         //Debug.LogError(dataToSendList[i].Length.ToString());
                         //Debug.LogError("A9");
+                        Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
                     }
 
@@ -729,7 +725,8 @@ public class ConnectionManager : MonoBehaviour
                             }
 
                             dataToSendList.RemoveAt(i);
-                        }
+                            
+                    }
                         catch
                         {
                             // Manejar la excepción
@@ -756,16 +753,25 @@ public class ConnectionManager : MonoBehaviour
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                Debug.Log("Sending Data...");
+                
 
                 for(int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
+                    GenericSendClass dataInfo = new GenericSendClass();
+
+                    if (dataToSendList[i] != null)
+                    {
+                        Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+
+                    }
+
                     try
                     {
                         //byte[] data = new byte[1024];
                         //string welcome = "Hello, are you there?";
                         //data = Encoding.ASCII.GetBytes(welcome);
                         //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+
                         socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
                     }
@@ -783,27 +789,6 @@ public class ConnectionManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    public void SendNetworkData_TCP()
-    {
-        try
-        {
-            socket.Connect(ipEndPointToSend);
-        }
-        catch (SocketException error)
-        {
-            Debug.Log("Unable to connect to server. Error: " + error.ToString());
-            return;
-        }
-
-        if (!socket.Connected)
-        {
-            Debug.Log("Socket is not connected to server");
-            return;
-        }
-
-        dataMethod();
     }
 
     //Gets the local IP of this computer. Useful for testing the application on

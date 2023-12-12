@@ -25,7 +25,7 @@ MonoBehaviour:
   localPort: 0
   remotePort: 0
   localIp: 26.145.90.77
-  remoteIp: 26.145.90.77
+  remoteIp: 10.0.103.21
   maxTransferedDataSize: 1024
   hasInitialized: 1
   appIsQuitting: 1
