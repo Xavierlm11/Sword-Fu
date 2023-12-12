@@ -79,17 +79,30 @@ public class ConnectionConfirmation : GenericSendClass
 
     }
 
-    public ConnectionConfirmation(bool accepted, string reason, List<Client> clients) : base(true)
+    public ConnectionConfirmation(bool accepted, string reason) : base(true)
     {
         acceptedConnection = accepted;
-        clientList = clients;
         reasonToDeny = reason;
         sendCode = SendCode.ConnectionConfirmation;
     }
 
     public bool acceptedConnection;
-    public List<Client> clientList;
     public string reasonToDeny;
+}
+
+public class ClientListUpdate : GenericSendClass
+{
+    public ClientListUpdate()
+    {
+
+    }
+
+    public ClientListUpdate(List<Client> clients) : base(true)
+    {
+        clientList = clients;
+    }
+
+    public List<Client> clientList;
 }
 
 
@@ -107,7 +120,7 @@ public class ConnectionConfirmation : GenericSendClass
 //        sendCode = SendCode.SendIdPlayer;
 //        //playerIp = ppi.playerInfo.playerIp;
 //    }
-    
+
 //}
 
 public class SendTransPlayer : GenericSendClass

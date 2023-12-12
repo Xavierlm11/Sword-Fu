@@ -251,7 +251,7 @@ public class ConnectionManager : MonoBehaviour
 
                     receivedData = null;
                 }
-                catch (SocketException ex)
+                catch
                 {
                     //Debug.Log($"Error al recibir datos: {ex.Message}");
                 }
@@ -289,7 +289,7 @@ public class ConnectionManager : MonoBehaviour
                     
                     receivedData = null;
                 }
-                catch (SocketException ex)
+                catch
                 {
                     //Debug.Log($"Error al recibir datos: {ex.Message}");
                 }
@@ -444,10 +444,16 @@ public class ConnectionManager : MonoBehaviour
 
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
-            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null, NetworkManager.Instance.clients);
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null );
+            UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
         }
     }
 
+    public void SendClientListUpdate()
+    {
+        ClientListUpdate clientListUpdate = new ClientListUpdate(NetworkManager.Instance.clients);
+        SerializeToJsonAndSend(clientListUpdate);
+    }
     //public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
     //{
     //    PartyPlayersInfo newplayer = new PartyPlayersInfo();
@@ -493,9 +499,9 @@ public class ConnectionManager : MonoBehaviour
 
     //}
 
-    public void ConnectionConfirmation(string remoteIP, int remotePort, Client sender, bool confirmation, string reason = null, List<Client> clientList = null)
+    public void ConnectionConfirmation(string remoteIP, int remotePort, Client sender, bool confirmation, string reason = null)
     {
-        ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation(confirmation, reason, clientList);
+        ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation(confirmation, reason);
         connectionConfirmation.receivers.Add(sender);
         connectionConfirmation.remoteIP = remoteIP;
         connectionConfirmation.remotePort = remotePort;
@@ -514,7 +520,6 @@ public class ConnectionManager : MonoBehaviour
         {
             Debug.Log("You are connected to the Server!");
             UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
-            UnityMainThreadDispatcher.Instance().Enqueue(() => UpdateClientList(connectionConfirmation.clientList));
         }
         else
         {
@@ -647,16 +652,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void SendDebugMessage()
     {
-        switch (NetworkManager.Instance.transportType)
-        {
-            case TransportType.UDP:
-                SendDebugMessage_UDP();
-                break;
-
-            case TransportType.TCP:
-                SendDebugMessage_TCP();
-                break;
-        }
+        SendDebugMessage_UDP();
     }
 
     private void SendDebugMessage_UDP()
