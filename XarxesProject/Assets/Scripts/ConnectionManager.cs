@@ -749,7 +749,7 @@ public class ConnectionManager : MonoBehaviour
         else
         {
             ipEndPointToSend = new IPEndPoint(
-                            IPAddress.Parse("127.0.0.1"), NetworkManager.Instance.defaultPort);
+                            IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
 
             //Socket server = new Socket(AddressFamily.InterNetwork,
             //         SocketType.Dgram, ProtocolType.Udp);
