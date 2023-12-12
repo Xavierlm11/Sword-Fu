@@ -514,6 +514,7 @@ public class ConnectionManager : MonoBehaviour
         {
             Debug.Log("You are connected to the Server!");
             UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
+            UnityMainThreadDispatcher.Instance().Enqueue(() => UpdateClientList(connectionConfirmation.clientList));
         }
         else
         {
@@ -521,6 +522,12 @@ public class ConnectionManager : MonoBehaviour
             //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
             //UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
+    }
+
+    public void UpdateClientList(List<Client> newClientList)
+    {
+        NetworkManager.Instance.clients.Clear();
+        NetworkManager.Instance.clients = newClientList;
     }
 
     public void Receive_DebugMessage(DebugMessage debugMessage)
@@ -699,7 +706,7 @@ public class ConnectionManager : MonoBehaviour
                 {
                     //try
                     //{
-                        GenericSendClass dataInfo = new GenericSendClass();
+                    GenericSendClass dataInfo = new GenericSendClass();
                        // Debug.LogError("A0");
                     if (dataToSendList[i] != null)
                     {
@@ -713,7 +720,7 @@ public class ConnectionManager : MonoBehaviour
 
 
                     try
-                        {
+                    {
                             foreach (Client receiver in dataInfo.receivers)
                             {
                                 ipEndPointToSend = new IPEndPoint(
