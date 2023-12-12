@@ -253,7 +253,7 @@ public class ConnectionManager : MonoBehaviour
                 }
                 catch (SocketException ex)
                 {
-                    Debug.Log($"Error al recibir datos: {ex.Message}");
+                    //Debug.Log($"Error al recibir datos: {ex.Message}");
                 }
             }
         }
@@ -291,7 +291,7 @@ public class ConnectionManager : MonoBehaviour
                 }
                 catch (SocketException ex)
                 {
-                    Debug.Log($"Error al recibir datos: {ex.Message}");
+                    //Debug.Log($"Error al recibir datos: {ex.Message}");
                 }
                 
             }
@@ -730,7 +730,7 @@ public class ConnectionManager : MonoBehaviour
                         catch
                         {
                             // Manejar la excepción
-                            Debug.Log($"Error al enviar datos");
+                            //Debug.Log($"Error al enviar datos");
                         }
                     //}
                     //catch
@@ -778,7 +778,7 @@ public class ConnectionManager : MonoBehaviour
                     catch
                     {
                         // Manejar la excepción
-                        Debug.Log($"Error al enviar datos");
+                        //Debug.Log($"Error al enviar datos");
                     }
                     //catch (SocketException ex)
                     //{
