@@ -100,6 +100,7 @@ public class ClientListUpdate : GenericSendClass
     public ClientListUpdate(List<Client> clients) : base(true)
     {
         clientList = clients;
+        sendCode = SendCode.ClientListUpdate;
     }
 
     public List<Client> clientList;
@@ -181,7 +182,8 @@ public enum SendCode
     DebugMessage,
     PlayerPositions,
     PartyManager,
-    SendIdPlayer
+    SendIdPlayer,
+    ClientListUpdate
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]

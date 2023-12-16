@@ -93,7 +93,7 @@ public class ConnectionManager : MonoBehaviour
     public List<byte[]> dataToSendList = new List<byte[]>();
 
     public byte[] dataToSend;
-    public byte[] receivedData;
+    //public byte[] receivedData;
     #endregion
 
     //______________________________________________________________________________________________
@@ -232,7 +232,7 @@ public class ConnectionManager : MonoBehaviour
                 
 
                 Remote = ipEndPointOfSender;
-                receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
                 try
                 {
@@ -246,10 +246,10 @@ public class ConnectionManager : MonoBehaviour
 
                         string remoteIP = remoteIPAdress.ToString();
 
-                        DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort);
+                        UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
                     }
 
-                    receivedData = null;
+                    //receivedData = null;
                 }
                 catch
                 {
@@ -267,7 +267,7 @@ public class ConnectionManager : MonoBehaviour
             {
 
                 Remote = ipEndPointOfSender;
-                receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
                 //Socket server = new Socket(AddressFamily.InterNetwork,
                 //     SocketType.Dgram, ProtocolType.Udp);
@@ -284,10 +284,10 @@ public class ConnectionManager : MonoBehaviour
 
                         string remoteIP = remoteIPAdress.ToString();
 
-                        DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort);
+                        UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
                     }
                     
-                    receivedData = null;
+                    //receivedData = null;
                 }
                 catch
                 {
@@ -376,6 +376,11 @@ public class ConnectionManager : MonoBehaviour
             //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
             //    Receive_SendIdPlayer(sIP);
             //    break;
+            case SendCode.ClientListUpdate:
+                ClientListUpdate clientListUpdate = new ClientListUpdate();
+                clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
+                UpdateClientList(clientListUpdate.clientList);
+                break;
         }
     }
 
@@ -445,7 +450,8 @@ public class ConnectionManager : MonoBehaviour
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null );
-            UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
+            //UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
+            SendClientListUpdate();
         }
     }
 
@@ -519,7 +525,7 @@ public class ConnectionManager : MonoBehaviour
         else if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
-            UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient));
+            LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient);
         }
         else
         {
@@ -717,17 +723,17 @@ public class ConnectionManager : MonoBehaviour
 
                     try
                     {
-                            foreach (Client receiver in dataInfo.receivers)
-                            {
-                                ipEndPointToSend = new IPEndPoint(
-                                        IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
+                        foreach (Client receiver in dataInfo.receivers)
+                        {
+                            ipEndPointToSend = new IPEndPoint(
+                                    IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
 
 
-                                socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+                            socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
 
-                            }
+                        }
 
-                            dataToSendList.RemoveAt(i);
+                        dataToSendList.RemoveAt(i);
                             
                     }
                         catch
