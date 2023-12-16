@@ -2177,7 +2177,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &443527870
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2478,7 +2478,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -6.999878, y: 0}
+  m_AnchoredPosition: {x: -7, y: 0}
   m_SizeDelta: {x: -988.1611, y: -643.2847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &511325073
@@ -5951,7 +5951,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -6.999878, y: 0}
+  m_AnchoredPosition: {x: -7, y: 0}
   m_SizeDelta: {x: -988.1611, y: -643.2847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1228302760
@@ -6809,7 +6809,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -6.999878, y: 0}
+  m_AnchoredPosition: {x: -7, y: 0}
   m_SizeDelta: {x: -988.1611, y: -643.2847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1374513326
@@ -7942,7 +7942,7 @@ MonoBehaviour:
   client_nicknameField: {fileID: 1326997858}
   host_nicknameField: {fileID: 624812690}
   remoteIpField: {fileID: 924945687}
-  titleIp: {fileID: 0}
+  titleIp: {fileID: 358850241}
   titlePort: {fileID: 0}
   temp_nickname: 
   temp_ip: 
@@ -8561,7 +8561,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1718703264
 RectTransform:
   m_ObjectHideFlags: 0

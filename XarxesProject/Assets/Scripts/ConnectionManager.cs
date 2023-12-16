@@ -188,11 +188,15 @@ public class ConnectionManager : MonoBehaviour
                 {
                     int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
+                    
+
                     if (Remote is IPEndPoint remoteEndPoint)
                     {
                         // Accede a la información de la IP y el puerto remotos
                         IPAddress remoteIPAdress = remoteEndPoint.Address;
                         int remotePort = remoteEndPoint.Port;
+
+                        //Debug.LogError("Server receiving using " + remoteEndPoint.Port.ToString());
 
                         string remoteIP = remoteIPAdress.ToString();
 
@@ -231,6 +235,8 @@ public class ConnectionManager : MonoBehaviour
                         // Accede a la información de la IP y el puerto remotos
                         IPAddress remoteIPAdress = remoteEndPoint.Address;
                         int remotePort = remoteEndPoint.Port;
+
+                        //Debug.LogError("Client receiving using " + remoteEndPoint.Port.ToString());
 
                         string remoteIP = remoteIPAdress.ToString();
 
@@ -275,6 +281,11 @@ public class ConnectionManager : MonoBehaviour
                 connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
                 connectionRequest.remoteIP = remoteIP;
                 connectionRequest.remotePort = remotePort;
+
+                //if(connectionRequest.sender.globalPort == 0)
+                //{
+                //    connectionRequest.sender.globalPort = remotePort;
+                //}
                 Receive_ConnectionRequest(connectionRequest);
                 break;
 
@@ -364,6 +375,8 @@ public class ConnectionManager : MonoBehaviour
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
+            connectionRequest.sender.globalIP = connectionRequest.remoteIP;
+            connectionRequest.sender.globalPort = connectionRequest.remotePort;
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this IP is already connected");
         }
         else if (NetworkManager.Instance.activeRoom.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
@@ -371,11 +384,13 @@ public class ConnectionManager : MonoBehaviour
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this nickname is already connected"));
+            connectionRequest.sender.globalIP = connectionRequest.remoteIP;
+            connectionRequest.sender.globalPort = connectionRequest.remotePort;
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this nickname is already connected");
         }
         else
         {
-            NetworkManager.Instance.activeRoom.clients.Add(connectionRequest.clientRequesting);
+            //NetworkManager.Instance.activeRoom.clients.Add(connectionRequest.clientRequesting);
 
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
@@ -385,6 +400,10 @@ public class ConnectionManager : MonoBehaviour
 
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
+
+            connectionRequest.sender.globalIP = connectionRequest.remoteIP;
+            connectionRequest.sender.globalPort = connectionRequest.remotePort;
+            NetworkManager.Instance.activeRoom.clients.Add(connectionRequest.sender);
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null );
             //UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
 
@@ -400,9 +419,15 @@ public class ConnectionManager : MonoBehaviour
     }
     public void SendRoomInfoUpdate()
     {
-        RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate(NetworkManager.Instance.activeRoom);
-        SerializeToJsonAndSend(roomInfoUpdate);
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate(NetworkManager.Instance.activeRoom);
+
+            roomInfoUpdate.transferType = TransferType.OnlyClients;
+            //SerializeToJsonAndSend(roomInfoUpdate);
+        }
     }
+    
     //public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
     //{
     //    PartyPlayersInfo newplayer = new PartyPlayersInfo();
@@ -451,10 +476,11 @@ public class ConnectionManager : MonoBehaviour
     public void ConnectionConfirmation(string remoteIP, int remotePort, Client sender, bool confirmation, string reason = null)
     {
         ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation(confirmation, reason);
+        connectionConfirmation.transferType = TransferType.Custom;
         connectionConfirmation.receivers.Add(sender);
-        connectionConfirmation.remoteIP = remoteIP;
-        connectionConfirmation.remotePort = remotePort;
-
+        //connectionConfirmation.remoteIP = remoteIP;
+        //connectionConfirmation.remotePort = remotePort;
+        //connectionConfirmation.sender.globalPort = remotePort;
         SerializeToJsonAndSend(connectionConfirmation);
 
     }
@@ -477,6 +503,13 @@ public class ConnectionManager : MonoBehaviour
             //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.MenuStage.settingClient));
             //UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
+
+        Client localClient = NetworkManager.Instance.GetLocalClient();
+        localClient.globalPort = connectionConfirmation.sender.globalPort;
+        
+        ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
+
+        ConnectionManager.Instance.SerializeToJsonAndSend(connectionRequest);
     }
 
     //public void UpdateClientList(List<Client> newClientList)
@@ -567,18 +600,61 @@ public class ConnectionManager : MonoBehaviour
 
                     try
                     {
+                        
+
+                        switch (dataInfo.transferType)
+                        {
+                            case TransferType.OnlyClients:
+                                dataInfo.receivers.Clear();
+                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                {
+                                    if (!cl.isHost)
+                                    {
+                                        dataInfo.receivers.Add(cl);
+                                    }
+                                }
+                                break;
+                            case TransferType.Custom:
+
+                                break;
+                            default:
+                                dataInfo.receivers.Clear();
+                                break;
+                        }
+
+
+
+                        //if (dataInfo.sender.globalPort == 0)
+                        //{
+                        //    dataInfo.sender.globalPort = dataInfo.remotePort;
+                        //    ipEndPointToSend = new IPEndPoint(
+                        //            IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
+                        //    Debug.LogError("Server sending using " + dataInfo.remotePort.ToString());
+
+                        //    socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+
+                        //    //}
+
+                        //    dataToSendList.RemoveAt(i);
+                        //}
+                        //else
+                        //{
                         foreach (Client receiver in dataInfo.receivers)
                         {
                             ipEndPointToSend = new IPEndPoint(
-                                    IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
-
+                                    IPAddress.Parse(receiver.globalIP), receiver.globalPort);
+                            //Debug.LogError("Server sending using " + receiver.globalPort);
 
                             socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
 
-                        }
+                            //}
 
-                        dataToSendList.RemoveAt(i);
+                            dataToSendList.RemoveAt(i);
+                        }
+                        //}
+
                             
+
                     }
                     catch
                     {
@@ -586,7 +662,7 @@ public class ConnectionManager : MonoBehaviour
                         //Debug.Log($"Error al enviar datos");
                     }
 
-                   
+
                 }
             }
         }
@@ -594,6 +670,8 @@ public class ConnectionManager : MonoBehaviour
         {
             ipEndPointToSend = new IPEndPoint(
                             IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
+
+            //Debug.LogError(ipEndPointToSend.Port.ToString());
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
@@ -613,6 +691,7 @@ public class ConnectionManager : MonoBehaviour
                     {
                         socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
+                        //Debug.LogError("Client sending using " + NetworkManager.Instance.defaultPort.ToString());
                     }
                     catch
                     {

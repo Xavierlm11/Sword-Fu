@@ -37,6 +37,22 @@ public class GenericSendClass
     public string remoteIP;
     public int remotePort;
     public List<Client> receivers = new List<Client>();
+    public TransferType transferType;
+
+    public void SetReceivers(TransferType transferType)
+    {
+        switch (transferType)
+        {
+            case TransferType.AllClients:
+                break;
+            case TransferType.OnlyClients:
+                break;
+            case TransferType.Host:
+                break;
+            case TransferType.Custom:
+                break;
+        }
+    }
 }
 public class DebugMessage : GenericSendClass
 {
@@ -171,10 +187,15 @@ public class Client
     public string nickname;
     public string localIp;
     public int localPort;
+
+    public string globalIP;
+    public int globalPort;
+
     public Client()
     {
 
     }
+
     public Client(string ip, string nick, int port, bool host = false)
     {
         nickname = nick;
@@ -202,8 +223,21 @@ public enum SendCode
     RoomInfoUpdate
 }
 
+public enum TransferType
+{
+    AllClients,
+    OnlyClients,
+    Host,
+    Custom
+}
+
 public class Room
 {
+    public Room()
+    {
+
+    }
+
     public Client host;
     public List<Client> clients = new List<Client>();
 }

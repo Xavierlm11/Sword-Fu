@@ -437,7 +437,9 @@ public class LobbyManager : MonoBehaviour
         NetworkManager.Instance.hasInitialized = false;
 
         Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort);
+        cl.globalPort = 0;
         NetworkManager.Instance.SetLocalClient(cl);
+
 
         Debug.Log("You are a client");
     }
