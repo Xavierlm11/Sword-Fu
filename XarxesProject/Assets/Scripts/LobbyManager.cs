@@ -35,7 +35,7 @@ public class LobbyManager : MonoBehaviour
     public TMP_InputField remoteIpField;
 
     [SerializeField]
-    public TMP_Text titleIp;
+    private TMP_Text titleIp;
 
     [SerializeField]
     private TMP_Text titlePort;
@@ -75,7 +75,7 @@ public class LobbyManager : MonoBehaviour
     private GameObject noIpPopUp;
 
     [SerializeField]
-    private TextMeshProUGUI ipText;
+    public TextMeshProUGUI ipText;
 
     [SerializeField]
     private TMP_InputField host_serverPortField;
@@ -195,7 +195,7 @@ public class LobbyManager : MonoBehaviour
                 {
                     if (item == settingHostMenu)
                     {
-                        titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
+                        //ipText.text = ConnectionManager.Instance.GetLocalIPv4();
                         item.SetActive(true);
                     }
                     else
@@ -291,8 +291,8 @@ public class LobbyManager : MonoBehaviour
     public void OnClick_BeTheServer()
     {
         ChangeStage(MenuStage.settingHost);
-        OnClick_GetLocalIPv4();
-
+        //OnClick_GetLocalIPv4();
+        ipText.text = ConnectionManager.Instance.GetLocalIPv4();
         UpdateLocalIp();
     }
 
@@ -321,11 +321,11 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_CreateRoom()
     {
-        if (RemoteIpIsEmpty())
-        {
-            PopUpNoIp();
-        }
-        else if (Host_NicknameIsEmpty())
+        //if (RemoteIpIsEmpty())
+        //{
+        //    PopUpNoIp();
+        //}
+        if (Host_NicknameIsEmpty())
         {
             PopUpNoName();
         }
@@ -345,7 +345,7 @@ public class LobbyManager : MonoBehaviour
             ConnectionManager.Instance.CreateRoom();
 
             ChangeStage(MenuStage.waitingRoom);
-            titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
+            ipText.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }
@@ -383,7 +383,7 @@ public class LobbyManager : MonoBehaviour
             ConnectToServer();
 
             ChangeStage(MenuStage.waitingConnection);
-            titleIp.text = NetworkManager.Instance.remoteIp.ToString();
+            //titleIp.text = NetworkManager.Instance.remoteIp.ToString();
             //titlePort.text = NetworkManager.Instance.remotePort.ToString();
         }
     }

@@ -392,12 +392,15 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public void DeleteClients()
     {
-        for(int i = activeRoom.clients.Count -1; i>= 0; i--)
+        if (activeRoom != null)
         {
-            activeRoom.clients[i] = null;
-        }
+            for (int i = activeRoom.clients.Count - 1; i >= 0; i--)
+            {
+                activeRoom.clients[i] = null;
+            }
 
-        activeRoom.clients.Clear();
+            activeRoom.clients.Clear();
+        }
 
         localClient = null;
     }
