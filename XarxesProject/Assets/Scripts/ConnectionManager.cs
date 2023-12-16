@@ -871,7 +871,9 @@ public class ConnectionManager : MonoBehaviour
             if (socket.Connected)
             {
                 //localSocket.Shutdown(SocketShutdown.Both);
-                //localSocket.Close();
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                socket.Dispose();
             }
         }
 
