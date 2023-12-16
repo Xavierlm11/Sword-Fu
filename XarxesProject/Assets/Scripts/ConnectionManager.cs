@@ -306,9 +306,14 @@ public class ConnectionManager : MonoBehaviour
             //    break;
 
             case SendCode.ClientListUpdate:
-                ClientListUpdate clientListUpdate = new ClientListUpdate();
-                clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
-                UpdateClientList(clientListUpdate.clientList);
+                //ClientListUpdate clientListUpdate = new ClientListUpdate();
+                //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
+                ////UpdateClientList(clientListUpdate.clientList);
+                break;
+            case SendCode.RoomInfoUpdate:
+                RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
+                roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
+                UpdateRoomInfo(roomInfoUpdate.room);
                 break;
         }
     }
@@ -341,20 +346,27 @@ public class ConnectionManager : MonoBehaviour
     //    }
     //}
 
+    public void CreateRoom()
+    {
+        NetworkManager.Instance.activeRoom = new Room();
+        NetworkManager.Instance.activeRoom.clients.Add(NetworkManager.Instance.GetLocalClient());
+        NetworkManager.Instance.activeRoom.host = NetworkManager.Instance.GetLocalClient();
+    }
+
     public void Receive_ConnectionRequest(ConnectionRequest connectionRequest)
     {
         if (NetworkManager.Instance.GetLocalClient() == null || !NetworkManager.Instance.GetLocalClient().isHost)
         {
             Debug.Log("Received Message but is not host");
         }
-        else if (!NetworkManager.Instance.allowSameIPInRoom && NetworkManager.Instance.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp))
+        else if (!NetworkManager.Instance.allowSameIPInRoom && NetworkManager.Instance.activeRoom.clients.Exists(x => x.localIp == connectionRequest.clientRequesting.localIp))
         {
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
             //Send_Data(() => ConnectionConfirmation(false, "A client with this IP and Port is already connected"));
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, false, "A client with this IP is already connected");
         }
-        else if (NetworkManager.Instance.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
+        else if (NetworkManager.Instance.activeRoom.clients.Exists(x => x.nickname == connectionRequest.clientRequesting.nickname))
         {
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //UpdateEndPointToSend();
@@ -363,7 +375,7 @@ public class ConnectionManager : MonoBehaviour
         }
         else
         {
-            NetworkManager.Instance.clients.Add(connectionRequest.clientRequesting);
+            NetworkManager.Instance.activeRoom.clients.Add(connectionRequest.clientRequesting);
 
             //NetworkManager.Instance.UpdateRemoteIP(connectionRequest.clientRequesting.localIp);
             //NetworkManager.Instance.UpdateRemotePort(connectionRequest.clientRequesting.localPort);
@@ -375,14 +387,21 @@ public class ConnectionManager : MonoBehaviour
             //Send_Data(() => ConnectionConfirmation(true, null, NetworkManager.Instance.clients));
             ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null );
             //UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
-            SendClientListUpdate();
+
+            //SendClientListUpdate();
+            SendRoomInfoUpdate();
         }
     }
 
     public void SendClientListUpdate()
     {
-        ClientListUpdate clientListUpdate = new ClientListUpdate(NetworkManager.Instance.clients);
+        ClientListUpdate clientListUpdate = new ClientListUpdate(NetworkManager.Instance.activeRoom.clients);
         SerializeToJsonAndSend(clientListUpdate);
+    }
+    public void SendRoomInfoUpdate()
+    {
+        RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate(NetworkManager.Instance.activeRoom);
+        SerializeToJsonAndSend(roomInfoUpdate);
     }
     //public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
     //{
@@ -450,6 +469,7 @@ public class ConnectionManager : MonoBehaviour
         {
             Debug.Log("You are connected to the Server!");
             LobbyManager.Instance.ChangeStage(MenuStage.waitingRoom);
+            LobbyManager.Instance.titleIp.text = NetworkManager.Instance.remoteIp.ToString();
         }
         else
         {
@@ -459,10 +479,22 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
-    public void UpdateClientList(List<Client> newClientList)
+    //public void UpdateClientList(List<Client> newClientList)
+    //{
+    //    if(NetworkManager.Instance.activeRoom == null)
+    //    {
+    //        NetworkManager.Instance.activeRoom = new Room();
+    //    }
+
+    //    NetworkManager.Instance.activeRoom.clients.Clear();
+    //    NetworkManager.Instance.activeRoom.clients = newClientList;
+    //}
+
+    public void UpdateRoomInfo(Room newRoomInfo)
     {
-        NetworkManager.Instance.clients.Clear();
-        NetworkManager.Instance.clients = newClientList;
+        NetworkManager.Instance.activeRoom = null;
+        NetworkManager.Instance.activeRoom = newRoomInfo;
+        LobbyManager.Instance.titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
     }
 
     public void Receive_DebugMessage(DebugMessage debugMessage)
@@ -470,22 +502,6 @@ public class ConnectionManager : MonoBehaviour
         Debug.Log("IP: " + debugMessage.senderIp.ToString() + ". Nickname: " + debugMessage.senderNickname.ToString() + ". Message: " + debugMessage.debugMessageText.ToString());
     }
 
-    //This is the main function to send data. 
-    //You call this function when you want to interact with other clients.
-    //This interaction depends on the method that you pass as a parameter,
-    //which will be called in another threat. 
-    //The method usually consists con creating a custom class, serialize it and send it.
-    public void Send_Data(Action method)
-    {
-        //if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
-        //{
-        //    OpenNewThreat_Send();
-        //}
-
-        //dataMethod = method;
-
-        //networkThreadToSendData.Start();
-    }
 
     //public void Receive_PartyPlayersInfo(PartyPlayersInfo ppi)
     //{
@@ -493,16 +509,7 @@ public class ConnectionManager : MonoBehaviour
     //    // partyObj.partyPlayersList.Add(ppi);
 
     //}
-    //public void Send_ConnectionRequest()
-    //{
-    //    if (networkThreadToSendData.ThreadState != ThreadState.Unstarted)
-    //    {
-    //        OpenNewThreat_Send();
-    //    }
 
-    //    dataMethod = ConnectionConfirmationRequest;
-    //    networkThreadToSendData.Start();
-    //}
 
     //This method creates a custom class that, when arriving to the server,
     //tells them that a client wants to connect to them.

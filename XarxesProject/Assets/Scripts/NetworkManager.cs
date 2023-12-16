@@ -106,6 +106,21 @@ public class ClientListUpdate : GenericSendClass
     public List<Client> clientList;
 }
 
+public class RoomInfoUpdate : GenericSendClass
+{
+    public RoomInfoUpdate()
+    {
+
+    }
+
+    public RoomInfoUpdate(Room roomToUpdate) : base(true)
+    {
+        room = roomToUpdate;
+        sendCode = SendCode.RoomInfoUpdate;
+    }
+
+    public Room room;
+}
 
 //public class SendIdPlayer : GenericSendClass
 //{
@@ -183,7 +198,14 @@ public enum SendCode
     PlayerPositions,
     PartyManager,
     SendIdPlayer,
-    ClientListUpdate
+    ClientListUpdate,
+    RoomInfoUpdate
+}
+
+public class Room
+{
+    public Client host;
+    public List<Client> clients = new List<Client>();
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]
@@ -232,8 +254,10 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     [SerializeField]
     private Client localClient;
 
-    [SerializeField]
-    public List<Client> clients = new List<Client>();
+    public Room activeRoom;
+
+    //[SerializeField]
+    //public List<Client> clients = new List<Client>();
 
     public bool appIsQuitting;
 
@@ -368,12 +392,12 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public void DeleteClients()
     {
-        for(int i = clients.Count -1; i>= 0; i--)
+        for(int i = activeRoom.clients.Count -1; i>= 0; i--)
         {
-            clients[i] = null;
+            activeRoom.clients[i] = null;
         }
 
-        clients.Clear();
+        activeRoom.clients.Clear();
 
         localClient = null;
     }

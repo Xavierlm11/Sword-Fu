@@ -35,7 +35,7 @@ public class LobbyManager : MonoBehaviour
     public TMP_InputField remoteIpField;
 
     [SerializeField]
-    private TMP_Text titleIp;
+    public TMP_Text titleIp;
 
     [SerializeField]
     private TMP_Text titlePort;
@@ -112,7 +112,7 @@ public class LobbyManager : MonoBehaviour
     private void Awake()
     {
         Resources.LoadAll("");
-        //Debug.LogError("Loaded resources");
+
         if (Instance == null)
         {
             Instance = this;
@@ -146,11 +146,6 @@ public class LobbyManager : MonoBehaviour
     }
     private void Update()
     {
-        //if (serverHasConfirmedConnection)
-        //{
-        //    serverHasConfirmedConnection = false;
-        //    BeTheClient();
-        //}
 
         if (isNoName || isNoIp)
         {
@@ -215,7 +210,6 @@ public class LobbyManager : MonoBehaviour
                 {
                     if (item == waitingRoomMenu)
                     {
-                        //titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
                         item.SetActive(true);
                     }
                     else
@@ -298,33 +292,16 @@ public class LobbyManager : MonoBehaviour
     {
         ChangeStage(MenuStage.settingHost);
         OnClick_GetLocalIPv4();
-        //host_clientPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
-        //host_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
+
         UpdateLocalIp();
     }
 
     public void OnClick_BeTheClient()
     {
         ChangeStage(MenuStage.settingClient);
-        //client_localPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
-        //client_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
+
         UpdateLocalIp();
     }
-
-    //public void SetLocalPort()
-    //{
-    //    host_clientPortField.text = NetworkManager.Instance.localPort.ToString();
-    //    host_serverPortField.text = NetworkManager.Instance.localPort.ToString();
-    //    client_localPortField.text = NetworkManager.Instance.localPort.ToString();
-    //}
-
-    //public void OnClick_LocalDefaultPort()
-    //{
-    //    int defPort = NetworkManager.Instance.defaultPort;
-    //    host_localPortField.text = defPort.ToString();
-    //    client_localPortField.text = defPort.ToString();
-    //    NetworkManager.Instance.UpdateLocalPort(defPort);
-    //}
 
     public void OnClick_ClientDefaultPort()
     {
@@ -365,10 +342,10 @@ public class LobbyManager : MonoBehaviour
 
             ConnectionManager.Instance.StartConnections();
 
-
+            ConnectionManager.Instance.CreateRoom();
 
             ChangeStage(MenuStage.waitingRoom);
-            titleIp.text = NetworkManager.Instance.localIp.ToString();
+            titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }
@@ -432,11 +409,12 @@ public class LobbyManager : MonoBehaviour
                 {
                     ChangeStage(MenuStage.settingClient);
                 }
-                
+                ConnectionManager.Instance.EndConnections();
                 break;
 
             case MenuStage.waitingConnection:
                 ChangeStage(MenuStage.settingClient);
+                ConnectionManager.Instance.EndConnections();
                 break;
         }
     }
@@ -447,7 +425,8 @@ public class LobbyManager : MonoBehaviour
         NetworkManager.Instance.hasInitialized = false;
         Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort, true);
         NetworkManager.Instance.SetLocalClient(cl);
-        NetworkManager.Instance.clients.Add(cl);
+
+        //NetworkManager.Instance.activeRoom.clients.Add(cl);
 
         Debug.Log("You are the server");
     }
@@ -465,7 +444,6 @@ public class LobbyManager : MonoBehaviour
 
     private void ConnectToServer()
     {
-        //ConnectionManager.Instance.Send_Data(ConnectionManager.Instance.ConnectionRequest);
         Client localClient = NetworkManager.Instance.GetLocalClient();
         ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
 
