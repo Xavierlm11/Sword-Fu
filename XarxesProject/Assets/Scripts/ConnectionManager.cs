@@ -281,11 +281,6 @@ public class ConnectionManager : MonoBehaviour
                 connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
                 connectionRequest.remoteIP = remoteIP;
                 connectionRequest.remotePort = remotePort;
-
-                //if(connectionRequest.sender.globalPort == 0)
-                //{
-                //    connectionRequest.sender.globalPort = remotePort;
-                //}
                 Receive_ConnectionRequest(connectionRequest);
                 break;
 
@@ -504,12 +499,8 @@ public class ConnectionManager : MonoBehaviour
             //UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
 
-        Client localClient = NetworkManager.Instance.GetLocalClient();
-        localClient.globalPort = connectionConfirmation.sender.globalPort;
-        
-        ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
-
-        ConnectionManager.Instance.SerializeToJsonAndSend(connectionRequest);
+        //Client localClient = NetworkManager.Instance.GetLocalClient();
+        //localClient.globalPort = connectionConfirmation.sender.globalPort;
     }
 
     //public void UpdateClientList(List<Client> newClientList)
