@@ -6,6 +6,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[Serializable]
+public enum MenuStage
+{
+    lobby,
+    settingHost,
+    settingClient,
+    waitingConnection,
+    waitingRoom,
+}
+
 public class LobbyManager : MonoBehaviour
 {
     #region variables
@@ -92,16 +102,8 @@ public class LobbyManager : MonoBehaviour
     private float popUpMessageDt = 0.0f;
 
     public List<GameObject> stagesList;
-    private stages stage = stages.lobby;
-    public enum stages
-    {
-        lobby,
-        settingHost,
-        waitingHost,
-        settingClient,
-        waitingClient,
-        waitingConnection,
-    }
+    private MenuStage stage = MenuStage.lobby;
+   
 
     #endregion
 
@@ -139,7 +141,7 @@ public class LobbyManager : MonoBehaviour
         stagesList.Add(waitingRoomMenu);
         stagesList.Add(startGameButton);
         stagesList.Add(waitingForConnection);
-        ChangeStage(stages.lobby);
+        ChangeStage(MenuStage.lobby);
         
     }
     private void Update()
@@ -172,13 +174,13 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    public void ChangeStage(stages newStage)
+    public void ChangeStage(MenuStage newStage)
     {
         stage = newStage;
 
         switch (stage)
         {
-            case stages.lobby:
+            case MenuStage.lobby:
                 
                 foreach (GameObject item in stagesList)
                 {
@@ -193,7 +195,7 @@ public class LobbyManager : MonoBehaviour
                 }
                 break;
 
-            case stages.settingHost:
+            case MenuStage.settingHost:
                 foreach (GameObject item in stagesList)
                 {
                     if (item == settingHostMenu)
@@ -208,10 +210,10 @@ public class LobbyManager : MonoBehaviour
                 }
                 break;
 
-            case stages.waitingHost:
+            case MenuStage.waitingRoom:
                 foreach (GameObject item in stagesList)
                 {
-                    if (item == waitingRoomMenu || item==startGameButton)
+                    if (item == waitingRoomMenu)
                     {
                         //titleIp.text = ConnectionManager.Instance.GetLocalIPv4();
                         item.SetActive(true);
@@ -222,7 +224,7 @@ public class LobbyManager : MonoBehaviour
                     }
                 }
                 break;
-            case stages.settingClient:
+            case MenuStage.settingClient:
                 foreach (GameObject item in stagesList)
                 {
                     if (item == settingClientMenu)
@@ -235,22 +237,8 @@ public class LobbyManager : MonoBehaviour
                     }
                 }
                 break;
-            case stages.waitingClient:
-                foreach (GameObject item in stagesList)
-                {
-                    if (item == waitingRoomMenu)
-                    {
-                        //titleIp.text = remoteIpField.text;
-                        item.SetActive(true);
-                    }
-                    else
-                    {
-                        item.SetActive(false);
-                    }
-                }
-                break;
 
-            case stages.waitingConnection:
+            case MenuStage.waitingConnection:
                 foreach (GameObject item in stagesList)
                 {
                     if (item == waitingForConnection)
@@ -308,7 +296,7 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_BeTheServer()
     {
-        ChangeStage(stages.settingHost);
+        ChangeStage(MenuStage.settingHost);
         OnClick_GetLocalIPv4();
         //host_clientPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
         //host_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
@@ -317,7 +305,7 @@ public class LobbyManager : MonoBehaviour
 
     public void OnClick_BeTheClient()
     {
-        ChangeStage(stages.settingClient);
+        ChangeStage(MenuStage.settingClient);
         //client_localPortField.text = NetworkManager.Instance.defaultClientPort.ToString();
         //client_serverPortField.text = NetworkManager.Instance.defaultServerPort.ToString();
         UpdateLocalIp();
@@ -379,18 +367,18 @@ public class LobbyManager : MonoBehaviour
 
 
 
-            ChangeStage(stages.waitingHost);
+            ChangeStage(MenuStage.waitingRoom);
             titleIp.text = NetworkManager.Instance.localIp.ToString();
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }
 
-    public void OnClick_AutoPort()
-    {
-        NetworkManager.Instance.localPort = 0;
-        ConnectionManager.Instance.SetSocket();
-        ConnectionManager.Instance.StartReceivingMessages();
-    }
+    //public void OnClick_AutoPort()
+    //{
+    //    NetworkManager.Instance.localPort = 0;
+    //    ConnectionManager.Instance.SetSocket();
+    //    ConnectionManager.Instance.SetTransferedDataSize();
+    //}
 
     public void OnClick_JoinHost()
     {
@@ -417,12 +405,40 @@ public class LobbyManager : MonoBehaviour
             
             ConnectToServer();
 
-            ChangeStage(stages.waitingConnection);
+            ChangeStage(MenuStage.waitingConnection);
             titleIp.text = NetworkManager.Instance.remoteIp.ToString();
             //titlePort.text = NetworkManager.Instance.remotePort.ToString();
         }
+    }
 
+    public void OnClick_BackFrom(StageComponent activeStage)
+    {
+        switch (activeStage.stage)
+        {
+            case MenuStage.settingHost:
+                ChangeStage(MenuStage.lobby);
+                break;
 
+            case MenuStage.settingClient:
+                ChangeStage(MenuStage.lobby);
+                break;
+
+            case MenuStage.waitingRoom:
+                if (NetworkManager.Instance.GetLocalClient().isHost)
+                {
+                    ChangeStage(MenuStage.settingHost);
+                }
+                else
+                {
+                    ChangeStage(MenuStage.settingClient);
+                }
+                
+                break;
+
+            case MenuStage.waitingConnection:
+                ChangeStage(MenuStage.settingClient);
+                break;
+        }
     }
 
     //Creates a client as a host

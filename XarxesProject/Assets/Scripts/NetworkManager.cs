@@ -372,6 +372,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         {
             clients[i] = null;
         }
+
         clients.Clear();
 
         localClient = null;

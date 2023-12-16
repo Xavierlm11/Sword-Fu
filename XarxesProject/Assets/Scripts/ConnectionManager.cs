@@ -27,8 +27,7 @@ public class ConnectionManager : MonoBehaviour
 
     [SerializeField]
     private Thread networkThreadToSendData;
-    [SerializeField]
-    private Thread networkThreadToReceiveConnections;
+
     [SerializeField]
     private Thread networkThreadToReceiveData;
 
@@ -123,7 +122,7 @@ public class ConnectionManager : MonoBehaviour
     public void StartConnections()
     {
         //Sets the maximum transfered data size
-        StartReceivingMessages();
+        SetTransferedDataSize();
 
         //Starts being able to receive data
         OpenNewThreat_Receive();
@@ -139,53 +138,14 @@ public class ConnectionManager : MonoBehaviour
         socket = NetworkManager.StartNetwork();
     }
 
-    public void StartReceivingMessages()
+    public void SetTransferedDataSize()
     {
         transferedDataSize = NetworkManager.Instance.maxTransferedDataSize;
-
-        //Debug.Log("EndPoint set and socket binded");
-    }
-
-    private void WaitForClient()
-    {
-        //Blocking
-        connectedClientSocket = socket.Accept();
-        IPEndPoint clientIpEndPoint = (IPEndPoint)connectedClientSocket.RemoteEndPoint;
-        Debug.Log("Connected with [" + clientIpEndPoint.Address.ToString() + "] at port [" + clientIpEndPoint.Port.ToString() + "]");
     }
 
     private void Update()
     {
-        //if (Input.GetKey(KeyCode.W))
-        //{
-        //    dataToSend = Encoding.ASCII.GetBytes("W");
-        //}
-        //else if (Input.GetKey(KeyCode.A))
-        //{
-        //    dataToSend = Encoding.ASCII.GetBytes("A");
-        //}
-        //else if (Input.GetKey(KeyCode.S))
-        //{
-        //    dataToSend = Encoding.ASCII.GetBytes("S");
-        //}
-        //else if (Input.GetKey(KeyCode.D))
-        //{
-        //    dataToSend = Encoding.ASCII.GetBytes("D");
-        //}
-        //else
-        //{
-        //    dataToSend = null;
-        //}
 
-        //if (isMessage)
-        //{
-        //    CallToChat();
-        //}
-    }
-
-    private void CallToChat()
-    {
-        isMessage = false;
     }
 
     private void OpenNewThreat_Send()
@@ -201,15 +161,6 @@ public class ConnectionManager : MonoBehaviour
             case TransportType.UDP:
                 networkThreadToReceiveData = new Thread(ReceiveData_UDP);
                 networkThreadToReceiveData.Start();
-                break;
-
-            case TransportType.TCP:
-                //socket.Listen(10);
-                //networkThreadToReceiveConnections = new Thread(WaitForClient);
-                //networkThreadToReceiveConnections.Start();
-
-                //networkThreadToReceiveData = new Thread(ReceiveData_TCP);
-                //networkThreadToReceiveData.Start();
                 break;
         }
     }
@@ -230,7 +181,6 @@ public class ConnectionManager : MonoBehaviour
             while (!NetworkManager.Instance.appIsQuitting)
             {
                 
-
                 Remote = ipEndPointOfSender;
                 byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
@@ -299,28 +249,6 @@ public class ConnectionManager : MonoBehaviour
         
     }
 
-    
-
-    //public void ReceiveData_TCP()
-    //{
-    //    while (true)
-    //    {
-    //        if (connectedClientSocket != null)
-    //        {
-    //            transferedDataBuffer = new byte[NetworkManager.Instance.maxTransferedDataSize];
-    //            transferedDataSize = connectedClientSocket.Receive(transferedDataBuffer);
-
-    //            ////Blocking
-    //            //string message = Encoding.ASCII.GetString(transferedDataBuffer, 0, transferedDataSize);
-
-    //            if (transferedDataSize != 0)
-    //            {
-    //                DeserializeJsonAndReceive(transferedDataBuffer, transferedDataSize);
-    //            }
-    //        }
-    //    }
-    //}
-
     //The deserialization gets the base class of the transfered data first.
     //This base class only contains a code, which indicates what is the child class
     //Depending of this code, we deserialize the info into the corresponding child class
@@ -376,6 +304,7 @@ public class ConnectionManager : MonoBehaviour
             //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
             //    Receive_SendIdPlayer(sIP);
             //    break;
+
             case SendCode.ClientListUpdate:
                 ClientListUpdate clientListUpdate = new ClientListUpdate();
                 clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
@@ -386,25 +315,20 @@ public class ConnectionManager : MonoBehaviour
 
     public GenericSendClass DeserializeJsonBasic(byte[] dataReceived, int dataSize)
     {
-        //Debug.LogError("A1");
+
         stream = new MemoryStream(dataReceived, 0, dataSize);
-        //Debug.LogError("A2");
+
         binaryReader = new BinaryReader(stream);
-        //Debug.LogError("A3");
 
         stream.Seek(0, SeekOrigin.Begin);
-        //Debug.LogError("A4");
 
         string json = binaryReader.ReadString();
-        //Debug.LogError("A5");
 
         GenericSendClass sendClass = new GenericSendClass();
-        //Debug.LogError("A6");
+
         sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
-       // Debug.LogError("A7");
 
         return sendClass;
-        //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
 
     }
 
@@ -525,12 +449,12 @@ public class ConnectionManager : MonoBehaviour
         else if (connectionConfirmation.acceptedConnection)
         {
             Debug.Log("You are connected to the Server!");
-            LobbyManager.Instance.ChangeStage(LobbyManager.stages.waitingClient);
+            LobbyManager.Instance.ChangeStage(MenuStage.waitingRoom);
         }
         else
         {
             Debug.Log("Could not connect to server: " + connectionConfirmation.reasonToDeny);
-            //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.stages.settingClient));
+            //UnityMainThreadDispatcher.Instance().Enqueue(() => LobbyManager.Instance.ChangeStage(LobbyManager.MenuStage.settingClient));
             //UnityMainThreadDispatcher.Instance().Enqueue(() => EndConnections());
         }
     }
@@ -580,51 +504,10 @@ public class ConnectionManager : MonoBehaviour
     //    networkThreadToSendData.Start();
     //}
 
-    public void DoConnectionRequest()
-    {
-        switch (NetworkManager.Instance.transportType)
-        {
-            case TransportType.UDP:
-                ConnectionRequest_UDP();
-                break;
-
-            case TransportType.TCP:
-                ConnectionRequest_TCP();
-                break;
-        }
-    }
-
-
     //This method creates a custom class that, when arriving to the server,
     //tells them that a client wants to connect to them.
     //After the server checks if the same IP and port is already connected or
     //the nickname is already taken, it sends back a confirmation or denial.
-    private void ConnectionRequest_UDP()
-    {
-        Debug.Log("Sending request");
-
-        //DebugMessage debugMessage = new DebugMessage(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname, "Testing");
-
-        //Client client = new Client(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
-
-        //ConnectionRequest connectionRequest = new ConnectionRequest(NetworkManager.Instance.GetLocalClient().localIp, NetworkManager.Instance.GetLocalClient().nickname);
-
-
-
-
-        if (NetworkManager.Instance.GetLocalClient() == null)
-        {
-            Debug.Log("There is no local client");
-            return;
-        }
-
-        Client localClient = NetworkManager.Instance.GetLocalClient();
-        ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
-
-        SerializeToJsonAndSend(connectionRequest);
-
-        Debug.Log("Sent request");
-    }
 
     //The main function that gets custom classes depending on the
     //information you want to send, serialize them and send them.
@@ -645,47 +528,6 @@ public class ConnectionManager : MonoBehaviour
         //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
     }
 
-    //public void SerializeToJson<T>(T objectToSerialize)
-    //{
-
-    //    string json = JsonConvert.SerializeObject(objectToSerialize);
-
-    //    stream = new MemoryStream();
-    //    binaryWriter = new BinaryWriter(stream);
-    //    binaryWriter.Write(json);
-
-    //}
-
-    public void SendDebugMessage()
-    {
-        SendDebugMessage_UDP();
-    }
-
-    private void SendDebugMessage_UDP()
-    {
-        //byte[] data = Encoding.ASCII.GetBytes(debugMessage);
-
-        //ConnectionManager.Instance.socket.SendTo(data, data.Length, SocketFlags.None, ConnectionManager.Instance.ipEndPointToSend);
-        //Debug.Log("Sended via UDP: " + debugMessage);
-        //ConnectionManager.Instance.isMessage = true;
-    }
-
-    private void SendDebugMessage_TCP()
-    {
-        //byte[] data = Encoding.ASCII.GetBytes(debugMessage);
-
-        //ConnectionManager.Instance.socket.Send(data, data.Length, SocketFlags.None);
-
-        //Debug.Log("Sended via TCP: " + debugMessage);
-
-        //ConnectionManager.Instance.isMessage = true;
-    }
-
-    private void ConnectionRequest_TCP()
-    {
-        LobbyManager.Instance.serverHasConfirmedConnection = true;
-    }
-
     public void SendNetworkData()
     {
         switch (NetworkManager.Instance.transportType)
@@ -702,24 +544,19 @@ public class ConnectionManager : MonoBehaviour
         {
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                //
 
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
-                    //try
-                    //{
+
                     GenericSendClass dataInfo = new GenericSendClass();
-                       // Debug.LogError("A0");
+
                     if (dataToSendList[i] != null)
                     {
                         dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
-                        //Debug.LogError("A8");
-                        //Debug.LogError(dataToSendList[i].Length.ToString());
-                        //Debug.LogError("A9");
+
                         Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
                     }
-
 
                     try
                     {
@@ -736,17 +573,11 @@ public class ConnectionManager : MonoBehaviour
                         dataToSendList.RemoveAt(i);
                             
                     }
-                        catch
-                        {
-                            // Manejar la excepción
-                            //Debug.Log($"Error al enviar datos");
-                        }
-                    //}
-                    //catch
-                    //{
-                    //    Debug.LogError("AAAAAAAAAAAAAAA");
-                    //    Debug.LogError(dataToSendList[i].Length.ToString());
-                    //}
+                    catch
+                    {
+                        // Manejar la excepción
+                        //Debug.Log($"Error al enviar datos");
+                    }
 
                    
                 }
@@ -756,9 +587,6 @@ public class ConnectionManager : MonoBehaviour
         {
             ipEndPointToSend = new IPEndPoint(
                             IPAddress.Parse(NetworkManager.Instance.remoteIp), NetworkManager.Instance.defaultPort);
-
-            //Socket server = new Socket(AddressFamily.InterNetwork,
-            //         SocketType.Dgram, ProtocolType.Udp);
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
@@ -776,11 +604,6 @@ public class ConnectionManager : MonoBehaviour
 
                     try
                     {
-                        //byte[] data = new byte[1024];
-                        //string welcome = "Hello, are you there?";
-                        //data = Encoding.ASCII.GetBytes(welcome);
-                        //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
-
                         socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
                         dataToSendList.RemoveAt(i);
                     }
@@ -789,11 +612,6 @@ public class ConnectionManager : MonoBehaviour
                         // Manejar la excepción
                         //Debug.Log($"Error al enviar datos");
                     }
-                    //catch (SocketException ex)
-                    //{
-                    //    // Manejar la excepción
-                    //    Debug.Log($"Error al enviar datos: {ex.Message}");
-                    //}
                     
                 }
             }
@@ -856,31 +674,14 @@ public class ConnectionManager : MonoBehaviour
     {
         NetworkManager.Instance.DeleteClients();
 
-        networkThreadToReceiveData.Abort();
-        networkThreadToSendData.Abort();
-    }
-
-    private void OnDisable()
-    {
-        //Reset info
-        NetworkManager.Instance.clients.Clear();
-
-        //Close to Send
         if (socket != null)
         {
             if (socket.Connected)
             {
-                //localSocket.Shutdown(SocketShutdown.Both);
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
                 socket.Dispose();
             }
-        }
-
-        //Close to Receive
-        if (networkThreadToReceiveConnections != null)
-        {
-            networkThreadToReceiveConnections.Abort();
         }
 
         if (networkThreadToReceiveData != null)
@@ -892,7 +693,11 @@ public class ConnectionManager : MonoBehaviour
         {
             networkThreadToSendData.Abort();
         }
+    }
 
+    private void OnDisable()
+    {
+        EndConnections();
     }
 
     public void Receive_PlayerPositions(PlayerPositionsInfo PlayerPositionsInfo)
