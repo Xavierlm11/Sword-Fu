@@ -272,12 +272,12 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         }
     }
 
-    public int defaultServerPort;
-    public int defaultClientPort;
+    //public int defaultServerPort;
+    //public int defaultClientPort;
 
     public int defaultPort;
     public int localPort;
-    public int remotePort;
+    //public int remotePort;
 
     public string localIp;
     public string remoteIp;
@@ -313,15 +313,15 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
         return localClient;
     }
 
-    public void UpdateLocalPort(int newPort)
-    {
-        localPort = newPort;
-    }
+    //public void UpdateLocalPort(int newPort)
+    //{
+    //    localPort = newPort;
+    //}
 
-    public void UpdateRemotePort(int newPort)
-    {
-        remotePort = newPort;
-    }
+    //public void UpdateRemotePort(int newPort)
+    //{
+    //    remotePort = newPort;
+    //}
 
     public void UpdateRemoteIP(string newIp)
     {

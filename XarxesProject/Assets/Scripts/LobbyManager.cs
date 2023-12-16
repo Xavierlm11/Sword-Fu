@@ -303,21 +303,21 @@ public class LobbyManager : MonoBehaviour
         UpdateLocalIp();
     }
 
-    public void OnClick_ClientDefaultPort()
-    {
-        int defPort = NetworkManager.Instance.defaultClientPort;
-        host_clientPortField.text = defPort.ToString();
-        client_localPortField.text = defPort.ToString();
-        NetworkManager.Instance.UpdateLocalPort(defPort);
-    }
+    //public void OnClick_ClientDefaultPort()
+    //{
+    //    int defPort = NetworkManager.Instance.defaultClientPort;
+    //    host_clientPortField.text = defPort.ToString();
+    //    client_localPortField.text = defPort.ToString();
+    //    NetworkManager.Instance.UpdateLocalPort(defPort);
+    //}
 
-    public void OnClick_ServerDefaultPort()
-    {
-        int defPort = NetworkManager.Instance.defaultServerPort;
-        host_serverPortField.text = defPort.ToString();
-        client_serverPortField.text = defPort.ToString();
-        NetworkManager.Instance.UpdateRemotePort(defPort);
-    }
+    //public void OnClick_ServerDefaultPort()
+    //{
+    //    int defPort = NetworkManager.Instance.defaultServerPort;
+    //    host_serverPortField.text = defPort.ToString();
+    //    client_serverPortField.text = defPort.ToString();
+    //    NetworkManager.Instance.UpdateRemotePort(defPort);
+    //}
 
     public void OnClick_CreateRoom()
     {
@@ -426,6 +426,8 @@ public class LobbyManager : MonoBehaviour
         Client cl = NetworkManager.Instance.CreateClient(host_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort, true);
         NetworkManager.Instance.SetLocalClient(cl);
 
+        cl.globalPort = NetworkManager.Instance.defaultPort; ;
+        cl.globalIP = ConnectionManager.Instance.GetLocalIPv4();
         //NetworkManager.Instance.activeRoom.clients.Add(cl);
 
         Debug.Log("You are the server");
@@ -438,6 +440,7 @@ public class LobbyManager : MonoBehaviour
 
         Client cl = NetworkManager.Instance.CreateClient(client_nicknameField.text, NetworkManager.Instance.localIp, NetworkManager.Instance.defaultPort);
         cl.globalPort = 0;
+        cl.globalIP = "";
         NetworkManager.Instance.SetLocalClient(cl);
 
 

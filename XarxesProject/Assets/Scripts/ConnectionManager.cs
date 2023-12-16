@@ -419,7 +419,7 @@ public class ConnectionManager : MonoBehaviour
             RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate(NetworkManager.Instance.activeRoom);
 
             roomInfoUpdate.transferType = TransferType.OnlyClients;
-            //SerializeToJsonAndSend(roomInfoUpdate);
+            SerializeToJsonAndSend(roomInfoUpdate);
         }
     }
     
