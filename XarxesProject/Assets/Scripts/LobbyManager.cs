@@ -35,7 +35,7 @@ public class LobbyManager : MonoBehaviour
     public TMP_InputField remoteIpField;
 
     [SerializeField]
-    private TMP_Text titleIp;
+    public TMP_Text titleIp;
 
     [SerializeField]
     private TMP_Text titlePort;
@@ -75,7 +75,7 @@ public class LobbyManager : MonoBehaviour
     private GameObject noIpPopUp;
 
     [SerializeField]
-    public TextMeshProUGUI ipText;
+    private TextMeshProUGUI ipText;
 
     [SerializeField]
     private TMP_InputField host_serverPortField;
@@ -345,7 +345,7 @@ public class LobbyManager : MonoBehaviour
             ConnectionManager.Instance.CreateRoom();
 
             ChangeStage(MenuStage.waitingRoom);
-            ipText.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
+            titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }

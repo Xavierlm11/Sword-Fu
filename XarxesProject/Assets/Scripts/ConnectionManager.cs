@@ -490,7 +490,7 @@ public class ConnectionManager : MonoBehaviour
         {
             Debug.Log("You are connected to the Server!");
             LobbyManager.Instance.ChangeStage(MenuStage.waitingRoom);
-            LobbyManager.Instance.ipText.text = NetworkManager.Instance.remoteIp.ToString();
+            LobbyManager.Instance.titleIp.text = NetworkManager.Instance.remoteIp.ToString();
         }
         else
         {
@@ -518,7 +518,7 @@ public class ConnectionManager : MonoBehaviour
     {
         NetworkManager.Instance.activeRoom = null;
         NetworkManager.Instance.activeRoom = newRoomInfo;
-        LobbyManager.Instance.ipText.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
+        LobbyManager.Instance.titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
     }
 
     public void Receive_DebugMessage(DebugMessage debugMessage)
