@@ -30,6 +30,7 @@ public class GenericSendClass
     public GenericSendClass(bool isNotJsonConversion)
     {
         sender = NetworkManager.Instance.GetLocalClient();
+        hasToCheckTargets = true;
     }
 
     public SendCode sendCode;
@@ -38,6 +39,7 @@ public class GenericSendClass
     public int remotePort;
     public List<Client> receivers = new List<Client>();
     public TransferType transferType;
+    public bool hasToCheckTargets;
 
     public void SetReceivers(TransferType transferType)
     {
@@ -52,6 +54,11 @@ public class GenericSendClass
             case TransferType.Custom:
                 break;
         }
+    }
+    
+    public void CheckTargets()
+    {
+        hasToCheckTargets = false;
     }
 }
 public class DebugMessage : GenericSendClass
@@ -138,6 +145,20 @@ public class RoomInfoUpdate : GenericSendClass
     public Room room;
 }
 
+public class StartGame : GenericSendClass
+{
+    public StartGame()
+    {
+
+    }
+
+    public StartGame(bool isNotJsonConversion) : base(true)
+    {
+        sendCode = SendCode.StartGame;
+    }
+
+}
+
 //public class SendIdPlayer : GenericSendClass
 //{
 //    public int playerId =2;
@@ -220,7 +241,8 @@ public enum SendCode
     PartyManager,
     SendIdPlayer,
     ClientListUpdate,
-    RoomInfoUpdate
+    RoomInfoUpdate,
+    StartGame,
 }
 
 public enum TransferType

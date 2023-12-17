@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.SceneManagement;
 
 public class ConnectionManager : MonoBehaviour
 {
@@ -188,8 +189,6 @@ public class ConnectionManager : MonoBehaviour
                 {
                     int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                    
-
                     if (Remote is IPEndPoint remoteEndPoint)
                     {
                         // Accede a la información de la IP y el puerto remotos
@@ -274,54 +273,115 @@ public class ConnectionManager : MonoBehaviour
 
         Debug.Log("Data Received: " + sendClass.sendCode.ToString());
 
+        if (sendClass.hasToCheckTargets)
+        {
+            SetTargetsAsChecked(sendClass, json);
+
+            return;
+        }
+        else
+        {
+            switch (sendClass.sendCode)
+            {
+                case SendCode.ConnectionRequest:
+                    ConnectionRequest connectionRequest = new ConnectionRequest();
+                    connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
+                    connectionRequest.remoteIP = remoteIP;
+                    connectionRequest.remotePort = remotePort;
+                    Receive_ConnectionRequest(connectionRequest);
+                    break;
+
+                case SendCode.ConnectionConfirmation:
+                    ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
+                    connectionConfirmation = JsonConvert.DeserializeObject<ConnectionConfirmation>(json);
+                    Receive_ConnectionConfirmation(connectionConfirmation);
+                    break;
+
+                case SendCode.DebugMessage:
+                    DebugMessage debugMessage = new DebugMessage();
+                    debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
+                    Receive_DebugMessage(debugMessage);
+                    break;
+
+                case SendCode.PlayerPositions:
+                    PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
+                    Receive_PlayerPositions(PlayerPositionsInfo);
+                    break;
+
+                //case SendCode.PartyManager:
+                //    PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
+                //    Receive_PartyPlayersInfo(PPI);
+                //    break;
+
+                //case SendCode.SendIdPlayer:
+                //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
+                //    Receive_SendIdPlayer(sIP);
+                //    break;
+
+                case SendCode.ClientListUpdate:
+                    //ClientListUpdate clientListUpdate = new ClientListUpdate();
+                    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
+                    ////UpdateClientList(clientListUpdate.clientList);
+                    break;
+                case SendCode.RoomInfoUpdate:
+                    RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
+                    roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
+                    UpdateRoomInfo(roomInfoUpdate.room);
+                    break;
+
+                case SendCode.StartGame:
+                    StartGame startGame = new StartGame();
+                    startGame = JsonConvert.DeserializeObject<StartGame>(json);
+                    StartGame();
+                    break;
+            }
+        }
+    }
+
+    public void SetTargetsAsChecked(GenericSendClass sendClass, string json)
+    {
         switch (sendClass.sendCode)
         {
             case SendCode.ConnectionRequest:
                 ConnectionRequest connectionRequest = new ConnectionRequest();
                 connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
-                connectionRequest.remoteIP = remoteIP;
-                connectionRequest.remotePort = remotePort;
-                Receive_ConnectionRequest(connectionRequest);
+                connectionRequest.CheckTargets();
+                SerializeToJsonAndSend(connectionRequest);
                 break;
 
             case SendCode.ConnectionConfirmation:
                 ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
                 connectionConfirmation = JsonConvert.DeserializeObject<ConnectionConfirmation>(json);
-                Receive_ConnectionConfirmation(connectionConfirmation);
+                connectionConfirmation.CheckTargets();
+                SerializeToJsonAndSend(connectionConfirmation);
                 break;
 
             case SendCode.DebugMessage:
                 DebugMessage debugMessage = new DebugMessage();
                 debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
-                Receive_DebugMessage(debugMessage);
+                debugMessage.CheckTargets();
+                SerializeToJsonAndSend(debugMessage);
                 break;
 
-            case SendCode.PlayerPositions:
-                PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
-                Receive_PlayerPositions(PlayerPositionsInfo);
-                break;
-
-            //case SendCode.PartyManager:
-            //    PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
-            //    Receive_PartyPlayersInfo(PPI);
-            //    break;
-
-            //case SendCode.SendIdPlayer:
-            //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
-            //    Receive_SendIdPlayer(sIP);
-            //    break;
-
-            case SendCode.ClientListUpdate:
-                //ClientListUpdate clientListUpdate = new ClientListUpdate();
-                //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
-                ////UpdateClientList(clientListUpdate.clientList);
-                break;
             case SendCode.RoomInfoUpdate:
                 RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
                 roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
-                UpdateRoomInfo(roomInfoUpdate.room);
+                roomInfoUpdate.CheckTargets();
+                SerializeToJsonAndSend(roomInfoUpdate);
+                break;
+
+            case SendCode.StartGame:
+                StartGame startGame = new StartGame();
+                startGame = JsonConvert.DeserializeObject<StartGame>(json);
+                startGame.CheckTargets();
+                SerializeToJsonAndSend(startGame);
                 break;
         }
+    }
+
+    public void StartGame()
+    {
+        SceneManager.LoadScene("Game");
     }
 
     public GenericSendClass DeserializeJsonBasic(byte[] dataReceived, int dataSize)
@@ -476,6 +536,7 @@ public class ConnectionManager : MonoBehaviour
         //connectionConfirmation.remoteIP = remoteIP;
         //connectionConfirmation.remotePort = remotePort;
         //connectionConfirmation.sender.globalPort = remotePort;
+        connectionConfirmation.hasToCheckTargets = false;
         SerializeToJsonAndSend(connectionConfirmation);
 
     }
@@ -578,23 +639,40 @@ public class ConnectionManager : MonoBehaviour
 
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
+                    //Checking the info to send
+
+                    stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
+                    binaryReader = new BinaryReader(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    string json = binaryReader.ReadString();
 
                     GenericSendClass dataInfo = new GenericSendClass();
+                    dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
-                    if (dataToSendList[i] != null)
+                    if (dataInfo.hasToCheckTargets)
                     {
-                        dataInfo = DeserializeJsonBasic(dataToSendList[i], dataToSendList[i].Length);
-
-                        Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
-
+                        SetTargetsAsChecked(dataInfo, json);
+                        Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
+                        dataToSendList.RemoveAt(i);
+                        break;
                     }
+
+
+                    Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+
 
                     try
                     {
-                        
-
                         switch (dataInfo.transferType)
                         {
+                            case TransferType.AllClients:
+                                dataInfo.receivers.Clear();
+                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                {
+                                    dataInfo.receivers.Add(cl);
+                                }
+                                break;
+
                             case TransferType.OnlyClients:
                                 dataInfo.receivers.Clear();
                                 foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
@@ -607,6 +685,10 @@ public class ConnectionManager : MonoBehaviour
                                 break;
                             case TransferType.Custom:
 
+                                break;
+                            case TransferType.Host:
+                                dataInfo.receivers.Clear();
+                                dataInfo.receivers.Add(NetworkManager.Instance.activeRoom.host);
                                 break;
                             default:
                                 dataInfo.receivers.Clear();
@@ -640,11 +722,11 @@ public class ConnectionManager : MonoBehaviour
 
                             //}
 
-                            dataToSendList.RemoveAt(i);
+                            
                         }
                         //}
 
-                            
+                        dataToSendList.RemoveAt(i);
 
                     }
                     catch

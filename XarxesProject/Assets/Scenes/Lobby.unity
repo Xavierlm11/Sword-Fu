@@ -5656,7 +5656,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1582657407}
         m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
-        m_MethodName: OnClick_GetLocalIPv4
+        m_MethodName: OnClick_StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

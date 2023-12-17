@@ -65,8 +65,8 @@ public class LobbyManager : MonoBehaviour
     [SerializeField]
     private GameObject waitingRoomMenu;
 
-    [SerializeField]
-    private GameObject startGameButton;
+    //[SerializeField]
+    //private GameObject startGameButton;
 
     [SerializeField]
     private GameObject noNicknamePopUp;
@@ -139,7 +139,7 @@ public class LobbyManager : MonoBehaviour
         stagesList.Add(settingHostMenu);
         stagesList.Add(offlineMenu);
         stagesList.Add(waitingRoomMenu);
-        stagesList.Add(startGameButton);
+        //stagesList.Add(startGameButton);
         stagesList.Add(waitingForConnection);
         ChangeStage(MenuStage.lobby);
         
@@ -303,22 +303,6 @@ public class LobbyManager : MonoBehaviour
         UpdateLocalIp();
     }
 
-    //public void OnClick_ClientDefaultPort()
-    //{
-    //    int defPort = NetworkManager.Instance.defaultClientPort;
-    //    host_clientPortField.text = defPort.ToString();
-    //    client_localPortField.text = defPort.ToString();
-    //    NetworkManager.Instance.UpdateLocalPort(defPort);
-    //}
-
-    //public void OnClick_ServerDefaultPort()
-    //{
-    //    int defPort = NetworkManager.Instance.defaultServerPort;
-    //    host_serverPortField.text = defPort.ToString();
-    //    client_serverPortField.text = defPort.ToString();
-    //    NetworkManager.Instance.UpdateRemotePort(defPort);
-    //}
-
     public void OnClick_CreateRoom()
     {
         //if (RemoteIpIsEmpty())
@@ -349,13 +333,6 @@ public class LobbyManager : MonoBehaviour
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
     }
-
-    //public void OnClick_AutoPort()
-    //{
-    //    NetworkManager.Instance.localPort = 0;
-    //    ConnectionManager.Instance.SetSocket();
-    //    ConnectionManager.Instance.SetTransferedDataSize();
-    //}
 
     public void OnClick_JoinHost()
     {
@@ -451,7 +428,7 @@ public class LobbyManager : MonoBehaviour
     {
         Client localClient = NetworkManager.Instance.GetLocalClient();
         ConnectionRequest connectionRequest = new ConnectionRequest(localClient);
-
+        connectionRequest.hasToCheckTargets = false;
         ConnectionManager.Instance.SerializeToJsonAndSend(connectionRequest);
     }
 
@@ -461,10 +438,13 @@ public class LobbyManager : MonoBehaviour
         ipText.text = ConnectionManager.Instance.GetLocalIPv4();
     }
 
-    public void OnClick_LoadGame()
+    public void OnClick_StartGame()
     {
-        SceneManager.LoadScene("Game");
+        StartGame startGame = new StartGame(true);
+        startGame.transferType = TransferType.AllClients;
+        ConnectionManager.Instance.SerializeToJsonAndSend(startGame);
     }
+
     private void SetInitialValues()
     {
         client_nicknameField.text = temp_nickname;
