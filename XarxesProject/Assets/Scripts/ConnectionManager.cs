@@ -639,30 +639,36 @@ public class ConnectionManager : MonoBehaviour
 
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
-                    //Checking the info to send
-
-                    stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
-                    binaryReader = new BinaryReader(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
-                    string json = binaryReader.ReadString();
-
-                    GenericSendClass dataInfo = new GenericSendClass();
-                    dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
-
-                    if (dataInfo.hasToCheckTargets)
-                    {
-                        SetTargetsAsChecked(dataInfo, json);
-                        Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
-                        dataToSendList.RemoveAt(i);
-                        break;
-                    }
-
-
-                    Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
-
-
                     try
                     {
+                        //Checking the info to send
+
+                        //Debug.Log(stream.ToString());
+                        //Debug.LogError(i.ToString());
+                        //Debug.LogError(dataToSendList[i].ToString());
+                        //Debug.LogError(dataToSendList[i].Length.ToString());
+
+                        stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
+                        binaryReader = new BinaryReader(stream);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        string json = binaryReader.ReadString();
+
+                        GenericSendClass dataInfo = new GenericSendClass();
+                        dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
+
+                        if (dataInfo.hasToCheckTargets)
+                        {
+                            SetTargetsAsChecked(dataInfo, json);
+                            Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
+                            dataToSendList.RemoveAt(i);
+                            break;
+                        }
+
+
+                        Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+
+
+                    
                         switch (dataInfo.transferType)
                         {
                             case TransferType.AllClients:
