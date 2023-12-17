@@ -199,6 +199,23 @@ public class SendTransPlayer : GenericSendClass
     
 }
 
+public class UpdateParty : GenericSendClass
+{
+    public Party party;
+
+    public UpdateParty()
+    {
+
+    }
+
+    public UpdateParty(Party updatedParty) : base(true)
+    {
+        party = updatedParty;
+        sendCode = SendCode.UpdateParty;
+    }
+
+}
+
 
 #endregion
 
@@ -211,6 +228,8 @@ public class Client
 
     public string globalIP;
     public int globalPort;
+
+    //public int networkID;
 
     public Client()
     {
@@ -243,6 +262,7 @@ public enum SendCode
     ClientListUpdate,
     RoomInfoUpdate,
     StartGame,
+    UpdateParty,
 }
 
 public enum TransferType
@@ -262,6 +282,33 @@ public class Room
 
     public Client host;
     public List<Client> clients = new List<Client>();
+    public Party party;
+}
+
+public class PlayerInfo
+{
+    public PlayerInfo()
+    {
+
+    }
+
+    public PlayerInfo(Client cl)
+    {
+        client = cl;
+    }
+
+    public Client client;
+}
+
+public class Party
+{
+    public Party()
+    {
+
+    }
+
+
+    public List<PlayerInfo> players = new List<PlayerInfo>();
 }
 
 [CreateAssetMenu(fileName = "NetworkManager", menuName = "ScriptableObjects/NetworkManager")]
@@ -319,6 +366,9 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public bool allowSameIPInRoom;
 
+    public bool useNetworkUpdateInterval;
+    public float netrorkUpdateInterval;
+
     #endregion
 
     //__________________________________________________________________________
@@ -333,6 +383,21 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public Client GetLocalClient()
     {
         return localClient;
+    }
+
+    public PlayerInfo GetLocalPlayer()
+    {
+        if (activeRoom != null && activeRoom.party != null && activeRoom.party.players != null)
+        {
+            foreach (PlayerInfo pl in activeRoom.party.players)
+            {
+                if (pl.client.nickname == GetLocalClient().nickname)
+                {
+                    return pl;
+                }
+            }
+        }
+        return null;
     }
 
     //public void UpdateLocalPort(int newPort)

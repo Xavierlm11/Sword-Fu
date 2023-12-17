@@ -31,7 +31,7 @@ public class PlayerManager : MonoBehaviour
         // connectionManager = FindObjectOfType<ConnectionManager>();
 
 
-        //Llama ala funcion de crear un nuevo player segun el numero de players que le hayas asignado
+        //Llama a la funcion de crear un nuevo player segun el numero de players que le hayas asignado
 
         partyManagerObj = GameObject.FindGameObjectWithTag("PartyManager").GetComponent<PartyManager>();
 
@@ -54,7 +54,7 @@ public class PlayerManager : MonoBehaviour
         //    AddPlayer("Player " + (i + 1));
         //}
 
-        AssignSpawnPoints();
+        //AssignSpawnPoints();
 
 
     }
@@ -83,31 +83,34 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
+
     private void FixedUpdate()
     {
 
     }
 
-
-    void AddPlayer(string playerName, bool isLocal = false)
-    //Funcion que añade un player
-
+    //Funcion to spawn players
+    public void AddPlayer(string playerName, bool isLocal = false)
     {
-        if (players.Count < numberOfPlayers)
-        {
+        //if (players.Count < numberOfPlayers)
+        //{
             GameObject newPlayer = Instantiate(playerPrefab);
             newPlayer.name = playerName;
             newPlayer.GetComponent<PlayerMovement>().isLocal = isLocal;
-            if (isLocal) newPlayer.GetComponent<PlayerMovement>().playerId = partyManagerObj.playerID;
+        //if (isLocal)
+        //{
+        //    //newPlayer.GetComponent<PlayerMovement>().playerId = partyManagerObj.playerID;
+        //}
 
-            players.Add(newPlayer);
-            Debug.Log($"{playerName} se ha unido al juego.");
-        }
-        else
-        {
-            Debug.Log("¡Ya hay suficientes jugadores en el juego!");
-        }
+        players.Add(newPlayer);
+        Debug.Log($"{playerName} has Spawned");
+        //}
+        //else
+        //{
+        //    Debug.Log("¡Ya hay suficientes jugadores en el juego!");
+        //}
     }
+
     //Hace que aparezcan los players en los puntos de spawn por orden
     void AssignSpawnPoints()
     {

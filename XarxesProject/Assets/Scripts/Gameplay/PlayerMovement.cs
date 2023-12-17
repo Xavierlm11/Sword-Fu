@@ -22,10 +22,10 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        if (isLocal)
-        {
-            StartCoroutine(SendPlayerPositionsToServer());
-        }
+        //if (isLocal)
+        //{
+        //    StartCoroutine(SendPlayerPositionsToServer());
+        //}
     }
 
     void Update()
@@ -88,6 +88,7 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+
     IEnumerator SendPlayerPositionsToServer()
     {
         while (true)

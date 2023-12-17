@@ -1,0 +1,8 @@
+To declare a new data transfer class:
+- Declare a new enum sendCode in NetworkManager.cs
+- Declare the class in NetworkManager.cs
+- It has to have a default Constructor (empty) to be able to be serialized and deserialized
+- It has to have another constructor (custom parameters or simply a bool to be different) with the assignation of the sendCode
+- Declare a new case in the switch of SetTargetsAsChecked() in ConnectionManager.cs
+- Declare a new case in the switch of DeserializeJsonAndReceive() in ConnectionManager.cs with response
+- Usually, you need to declare a new function for doing the response when the message arrives (receive_XXX())

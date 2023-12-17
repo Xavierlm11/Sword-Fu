@@ -334,6 +334,12 @@ public class ConnectionManager : MonoBehaviour
                     startGame = JsonConvert.DeserializeObject<StartGame>(json);
                     StartGame();
                     break;
+
+                case SendCode.UpdateParty:
+                    UpdateParty updateParty = new UpdateParty();
+                    updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
+                    Receive_UpdateParty(updateParty);
+                    break;
             }
         }
     }
@@ -376,7 +382,19 @@ public class ConnectionManager : MonoBehaviour
                 startGame.CheckTargets();
                 SerializeToJsonAndSend(startGame);
                 break;
+            case SendCode.UpdateParty:
+                UpdateParty updateParty = new UpdateParty();
+                updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
+                updateParty.CheckTargets();
+                SerializeToJsonAndSend(updateParty);
+                break;
         }
+    }
+
+    public void Receive_UpdateParty(UpdateParty updateParty)
+    {
+        NetworkManager.Instance.activeRoom.party = updateParty.party;
+        GameManager.Instance.SpawnPlayers();
     }
 
     public void StartGame()
