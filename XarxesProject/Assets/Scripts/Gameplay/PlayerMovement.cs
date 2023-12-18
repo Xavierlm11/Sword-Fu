@@ -30,30 +30,34 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (!isLocal)
+        {
+            return;
+        }
         //if (isLocal)
         //{
 
 
-            //Detecta los imputs
-            float horizontal = Input.GetAxis("Horizontal");
+        //Detecta los imputs
+        float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
         // El movimiento de los jugadores hecho de forma que gire de forma suave
         direction = new Vector3(horizontal, 0f, vertical).normalized;
 
 
-            if (direction != Vector3.zero)
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
-            }
+        if (direction != Vector3.zero)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
+        }
 
-            //Al hacer click izquierdo del raton actiba la funcion de disparo
-            if (Input.GetButtonDown("Fire1"))
-            {
+        //Al hacer click izquierdo del raton actiba la funcion de disparo
+        if (Input.GetButtonDown("Fire1"))
+        {
 
-                Disparar();
+            Disparar();
 
-            }
+        }
 
         //}
 
@@ -61,6 +65,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!isLocal)
+        {
+            return;
+        }
+
         rb.velocity = direction * speed;
     }
 

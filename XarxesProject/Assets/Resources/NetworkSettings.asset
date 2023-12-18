@@ -19,14 +19,13 @@ MonoBehaviour:
   clientSceneName: Client
   chatSceneName: 
   _transportType: 0
-  defaultServerPort: 5000
-  defaultClientPort: 6000
   defaultPort: 9050
   localPort: 0
-  remotePort: 0
   localIp: 26.145.90.77
-  remoteIp: 10.0.103.21
+  remoteIp: 26.145.90.77
   maxTransferedDataSize: 1024
   hasInitialized: 1
   appIsQuitting: 1
   allowSameIPInRoom: 1
+  useNetworkUpdateInterval: 0
+  netrorkUpdateInterval: 0

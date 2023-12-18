@@ -71,7 +71,20 @@ public class PlayerManager : MonoBehaviour
         //}
     }
 
-    public void UpdatePlayers(ConnectionManager.PlayerPositionsInfo ppi)
+    //public void UpdatePlayerPositions(ConnectionManager.PlayerPositionsInfo ppi)
+    //{
+    //    foreach (GameObject item in players)
+    //    {
+    //        if (ppi.playerPositions.playerId == item.GetComponent<PlayerMovement>().playerId)
+    //        {
+    //            Vector3 newpos = new Vector3(ppi.playerPositions.positionX, ppi.playerPositions.positionY, ppi.playerPositions.positionZ);
+    //            item.transform.position = newpos;
+    //            //item.transform.rotation.eulerAngles.y = ppi.playerPositions.rotY;
+    //        }
+    //    }
+    //}
+
+    public void UpdatePlayerPosition(ConnectionManager.PlayerPositionsInfo ppi)
     {
         foreach (GameObject item in players)
         {

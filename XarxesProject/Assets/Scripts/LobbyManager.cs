@@ -435,6 +435,7 @@ public class LobbyManager : MonoBehaviour
     public void OnClick_GetLocalIPv4()
     {
         remoteIpField.text = ConnectionManager.Instance.GetLocalIPv4();
+        UpdateRemoteIp();
         ipText.text = ConnectionManager.Instance.GetLocalIPv4();
     }
 

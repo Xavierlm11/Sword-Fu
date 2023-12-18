@@ -883,7 +883,7 @@ public class ConnectionManager : MonoBehaviour
     {
         //Aquí puedes procesar la información de las posiciones de los jugadores
 
-        PlayerManager.Instance.UpdatePlayers(PlayerPositionsInfo);
+       // PlayerManager.Instance.UpdatePlayers(PlayerPositionsInfo);
         //foreach (PlayerPositionsInfo playerPosition in PlayerPositionsInfo)
         //{
            

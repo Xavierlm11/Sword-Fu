@@ -3116,7 +3116,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &593810700
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7951,7 +7951,6 @@ MonoBehaviour:
   settingHostMenu: {fileID: 443527869}
   offlineMenu: {fileID: 1037423403}
   waitingRoomMenu: {fileID: 1718703263}
-  startGameButton: {fileID: 1110012210}
   noNicknamePopUp: {fileID: 1365081185}
   noIpPopUp: {fileID: 1228302758}
   ipText: {fileID: 358850241}
@@ -8561,7 +8560,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1718703264
 RectTransform:
   m_ObjectHideFlags: 0

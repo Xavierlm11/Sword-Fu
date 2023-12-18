@@ -187,15 +187,15 @@ public class SendTransPlayer : GenericSendClass
 
     }
 
-    public SendTransPlayer(ConnectionManager.PlayerPositionsInfo ppi) : base(true)
-    {
-        ConnectionManager.PlayerPosition newPos = ppi.playerPositions;
-        pos = new Vector3(newPos.positionX,newPos.positionY,newPos.positionZ);
-        angRot = newPos.rotY;
-        playerId = newPos.playerId;
-        sendCode = SendCode.PlayerPositions;
-        //playerIp = ppi.playerInfo.playerIp;
-    }
+    //public SendTransPlayer(PlayerPosition ppi) : base(true)
+    //{
+    //    ConnectionManager.PlayerPosition newPos = ppi.playerPositions;
+    //    pos = new Vector3(newPos.positionX,newPos.positionY,newPos.positionZ);
+    //    angRot = newPos.rotY;
+    //    playerId = newPos.playerId;
+    //    sendCode = SendCode.PlayerPositions;
+    //    //playerIp = ppi.playerInfo.playerIp;
+    //}
     
 }
 
@@ -218,6 +218,8 @@ public class UpdateParty : GenericSendClass
 
 
 #endregion
+
+
 
 public class Client
 {
