@@ -95,6 +95,11 @@ public class LobbyManager : MonoBehaviour
     [SerializeField]
     private GameObject waitingForConnection;
 
+    [SerializeField]
+    private List<GameObject> listPlayerText = new List<GameObject>();
+
+    [SerializeField]
+    private GameObject startBut;
     #endregion
 
     [SerializeField]
@@ -103,7 +108,7 @@ public class LobbyManager : MonoBehaviour
 
     public List<GameObject> stagesList;
     private MenuStage stage = MenuStage.lobby;
-   
+
 
     #endregion
 
@@ -142,7 +147,7 @@ public class LobbyManager : MonoBehaviour
         //stagesList.Add(startGameButton);
         stagesList.Add(waitingForConnection);
         ChangeStage(MenuStage.lobby);
-        
+
     }
     private void Update()
     {
@@ -157,9 +162,9 @@ public class LobbyManager : MonoBehaviour
                 if (isNoName)
                 {
                     isNoName = false;
-                    noNicknamePopUp.SetActive(false); 
+                    noNicknamePopUp.SetActive(false);
                 }
-                else if(isNoIp)
+                else if (isNoIp)
                 {
                     isNoIp = false;
                     noIpPopUp.SetActive(false);
@@ -167,6 +172,28 @@ public class LobbyManager : MonoBehaviour
                 popUpMessageDt = 0.0f;
             }
         }
+        if (stage == MenuStage.waitingRoom)
+        {
+            if (!NetworkManager.Instance.GetLocalClient().isHost)
+            {
+                startBut.SetActive(false);
+            }
+
+
+            if (NetworkManager.Instance.activeRoom.clients!=null)
+            {
+                for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
+                {
+                    if (listPlayerText[i]!=null && NetworkManager.Instance.activeRoom.clients[i]!=null)
+                    {
+                        listPlayerText[i].SetActive(true);
+                        listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname; 
+                    }
+
+                } 
+            }
+        }
+
     }
 
     public void ChangeStage(MenuStage newStage)
@@ -176,7 +203,7 @@ public class LobbyManager : MonoBehaviour
         switch (stage)
         {
             case MenuStage.lobby:
-                
+
                 foreach (GameObject item in stagesList)
                 {
                     if (item == offlineMenu)
@@ -354,9 +381,9 @@ public class LobbyManager : MonoBehaviour
             BeTheClient();
 
             //ConnectionManager.Instance.UpdateEndPoints();
-            
+
             ConnectionManager.Instance.StartConnections();
-            
+
             ConnectToServer();
 
             ChangeStage(MenuStage.waitingConnection);
