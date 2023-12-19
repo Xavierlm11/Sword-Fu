@@ -745,6 +745,16 @@ public class ConnectionManager : MonoBehaviour
                                 dataInfo.receivers.Clear();
                                 dataInfo.receivers.Add(NetworkManager.Instance.activeRoom.host);
                                 break;
+                            case TransferType.AllExceptLocal:
+                                dataInfo.receivers.Clear();
+                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                {
+                                    if(cl.nickname != dataInfo.sender.nickname)
+                                    {
+                                        dataInfo.receivers.Add(cl);
+                                    }
+                                }
+                                break;
                             default:
                                 dataInfo.receivers.Clear();
                                 break;

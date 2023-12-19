@@ -49,10 +49,10 @@ public class PartyManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!NetworkManager.Instance.GetLocalClient().isHost)
-        {
-            return;
-        }
+        //if (!NetworkManager.Instance.GetLocalClient().isHost)
+        //{
+        //    return;
+        //}
 
         foreach(PlayerCharacterLink link in playerCharacterLinks)
         {
@@ -75,7 +75,7 @@ public class PartyManager : MonoBehaviour
 
                 playerTransform.rotY = link.playerCharacter.characterObject.transform.rotation.y;
 
-                playerTransform.transferType = TransferType.AllClients;
+                playerTransform.transferType = TransferType.AllExceptLocal;
 
                 ConnectionManager.Instance.SerializeToJsonAndSend(playerTransform);
             }
