@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     public GameObject balaPrefab;
+    public GameObject ataquePrefab;
     public Transform puntoDeDisparo;
     public float velocidadBala = 10f;
     public float shootRate = 1f;
@@ -59,6 +60,13 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
+        if (Input.GetButtonDown("Fire2"))
+        {
+
+            Ataque();
+
+        }
+
         //}
 
     }
@@ -94,6 +102,30 @@ public class PlayerMovement : MonoBehaviour
 
             //Destruye la bala 5 segundos despues de ser creada
             Destroy(bala, 5f);
+
+        }
+    }
+    void Ataque()
+    {
+        //El if es para controlar el fire-rate
+        if (Time.time > nextFireRate)
+        {
+
+            //Crea una bala en el punto de disparo
+
+            GameObject ataque = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
+            Rigidbody rbAtaque = ataque.GetComponent<Rigidbody>();
+
+            nextFireRate = Time.time + shootRate;
+
+
+            if (rbAtaque != null)
+            {
+                rbAtaque.velocity = ataque.transform.forward * velocidadBala;
+            }
+
+            //Destruye la bala 5 segundos despues de ser creada
+            Destroy(ataque, 5f);
 
         }
     }
