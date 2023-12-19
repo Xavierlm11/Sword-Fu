@@ -1,6 +1,10 @@
 - If server has to do some action, do it instead of sending it to itself and then doing it.
 - Manage lost packets
+- Manage packets order
 - Interpolation
 - Check if go back goes well
 - Manage if clients or host disconnect
 - Limit to 4 max players per match
+- Not send info evry frame
+- partida -> lobby
+- Ready player on lobby

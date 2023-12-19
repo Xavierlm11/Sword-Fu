@@ -470,6 +470,7 @@ public class LobbyManager : MonoBehaviour
     {
         StartGame startGame = new StartGame(true);
         startGame.transferType = TransferType.AllClients;
+        
         ConnectionManager.Instance.SerializeToJsonAndSend(startGame);
     }
 

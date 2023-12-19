@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public int playerId = 0;
     public float speed = 5f;
     public float rotationSpeed = 40f;
+    public bool isAlive = true;
     private Rigidbody rb;
     public Vector3 direction;
 
