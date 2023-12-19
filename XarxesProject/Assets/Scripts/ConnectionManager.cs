@@ -54,23 +54,14 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField]
     private PartyManager partyObj;
 
-    [Serializable]
-    public class PlayerPositionsInfo
-    {
-        public string playerIp;
-        public PlayerPosition playerPositions;
-    }
+    //[Serializable]
+    //public class PlayerPositionsInfo
+    //{
+    //    //public string playerIp;
+    //    //public PlayerPosition playerPositions;
+    //}
 
-    [Serializable]
-    public class PlayerPosition
-    {
-        public string playerName;
-        public float positionX;
-        public float positionY;
-        public float positionZ;
-        public float rotY;
-        public int playerId;
-    }
+
 
     //[SerializeField]
     //public class PartyPlayersInfo
@@ -303,9 +294,10 @@ public class ConnectionManager : MonoBehaviour
                     Receive_DebugMessage(debugMessage);
                     break;
 
-                case SendCode.PlayerPositions:
-                    PlayerPositionsInfo PlayerPositionsInfo = JsonConvert.DeserializeObject<PlayerPositionsInfo>(json);
-                    Receive_PlayerPositions(PlayerPositionsInfo);
+                case SendCode.PlayerTransform:
+                    PlayerTransform playerTransform = new PlayerTransform();
+                    playerTransform = JsonConvert.DeserializeObject<PlayerTransform>(json);
+                    Receive_PlayerTransform(playerTransform);
                     break;
 
                 //case SendCode.PartyManager:
@@ -340,6 +332,17 @@ public class ConnectionManager : MonoBehaviour
                     updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
                     Receive_UpdateParty(updateParty);
                     break;
+            }
+        }
+    }
+
+    public void Receive_PlayerTransform(PlayerTransform playerTransform)
+    {
+        foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
+        {
+            if(pl.client.nickname == playerTransform.player.client.nickname)
+            {
+                
             }
         }
     }
@@ -877,18 +880,6 @@ public class ConnectionManager : MonoBehaviour
     private void OnDisable()
     {
         EndConnections();
-    }
-
-    public void Receive_PlayerPositions(PlayerPositionsInfo PlayerPositionsInfo)
-    {
-        //Aquí puedes procesar la información de las posiciones de los jugadores
-
-       // PlayerManager.Instance.UpdatePlayers(PlayerPositionsInfo);
-        //foreach (PlayerPositionsInfo playerPosition in PlayerPositionsInfo)
-        //{
-           
-            
-        //}
     }
 
     #endregion

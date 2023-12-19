@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    // Start is called before the first frame update
+    //public bool isLocal;
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         

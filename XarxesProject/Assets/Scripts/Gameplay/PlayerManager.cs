@@ -9,7 +9,6 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance;
     public GameObject playerPrefab;
     public List<GameObject> spawnPoints = new List<GameObject>();
-    private List<GameObject> players = new List<GameObject>();
 
     public int numberOfPlayers = 2;
 
@@ -84,17 +83,17 @@ public class PlayerManager : MonoBehaviour
     //    }
     //}
 
-    public void UpdatePlayerPosition(ConnectionManager.PlayerPositionsInfo ppi)
+    public void UpdatePlayerPosition(PlayerTransform ppi)
     {
-        foreach (GameObject item in players)
-        {
-            if (ppi.playerPositions.playerId == item.GetComponent<PlayerMovement>().playerId)
-            {
-                Vector3 newpos = new Vector3(ppi.playerPositions.positionX, ppi.playerPositions.positionY, ppi.playerPositions.positionZ);
-                item.transform.position = newpos;
-                //item.transform.rotation.eulerAngles.y = ppi.playerPositions.rotY;
-            }
-        }
+        //foreach (GameObject item in players)
+        //{
+        //    if (ppi.playerPositions.playerId == item.GetComponent<PlayerMovement>().playerId)
+        //    {
+        //        Vector3 newpos = new Vector3(ppi.playerPositions.positionX, ppi.playerPositions.positionY, ppi.playerPositions.positionZ);
+        //        item.transform.position = newpos;
+        //        //item.transform.rotation.eulerAngles.y = ppi.playerPositions.rotY;
+        //    }
+        //}
     }
 
     private void FixedUpdate()
@@ -109,13 +108,13 @@ public class PlayerManager : MonoBehaviour
         //{
             GameObject newPlayer = Instantiate(playerPrefab);
             newPlayer.name = playerName;
-            newPlayer.GetComponent<PlayerMovement>().isLocal = isLocal;
+            //////////newPlayer.GetComponent<PlayerMovement>().isLocal = isLocal;
         //if (isLocal)
         //{
         //    //newPlayer.GetComponent<PlayerMovement>().playerId = partyManagerObj.playerID;
         //}
 
-        players.Add(newPlayer);
+        ///////////////players.Add(newPlayer);
         Debug.Log($"{playerName} has Spawned");
         //}
         //else
@@ -125,21 +124,21 @@ public class PlayerManager : MonoBehaviour
     }
 
     //Hace que aparezcan los players en los puntos de spawn por orden
-    void AssignSpawnPoints()
-    {
-        for (int i = 0; i < players.Count; i++)
-        {
-            if (i < spawnPoints.Count)
-            {
-                players[i].transform.position = spawnPoints[i].transform.position;
-                Debug.Log($"{players[i].name} aparece en el punto {spawnPoints[i].name}.");
-            }
-            else
-            {
-                Debug.Log($"No hay suficientes puntos de reaparición para {players[i].name}.");
-            }
-        }
-    }
+    //void AssignSpawnPoints()
+    //{
+    //    for (int i = 0; i < players.Count; i++)
+    //    {
+    //        if (i < spawnPoints.Count)
+    //        {
+    //            players[i].transform.position = spawnPoints[i].transform.position;
+    //            Debug.Log($"{players[i].name} aparece en el punto {spawnPoints[i].name}.");
+    //        }
+    //        else
+    //        {
+    //            Debug.Log($"No hay suficientes puntos de reaparición para {players[i].name}.");
+    //        }
+    //    }
+    //}
 
 
 }

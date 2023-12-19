@@ -159,6 +159,28 @@ public class StartGame : GenericSendClass
 
 }
 
+public class PlayerTransform : GenericSendClass
+{
+
+    public PlayerTransform()
+    {
+
+    }
+
+    public PlayerTransform(bool isNotJsonConversion) : base(true)
+    {
+        sendCode = SendCode.PlayerTransform;
+    }
+
+    public float positionX;
+    public float positionY;
+    public float positionZ;
+    public float rotY;
+
+    public PlayerInfo player;
+
+}
+
 //public class SendIdPlayer : GenericSendClass
 //{
 //    public int playerId =2;
@@ -258,7 +280,7 @@ public enum SendCode
     ConnectionRequest,
     ConnectionConfirmation,
     DebugMessage,
-    PlayerPositions,
+    PlayerTransform,
     PartyManager,
     SendIdPlayer,
     ClientListUpdate,
@@ -286,6 +308,23 @@ public class Room
     public List<Client> clients = new List<Client>();
     public Party party;
 }
+
+//public class PlayerTransformInfo
+//{
+//    public PlayerTransformInfo()
+//    {
+
+//    }
+
+//    public float positionX;
+//    public float positionY;
+//    public float positionZ;
+//    public float rotY;
+
+//    public PlayerInfo player;
+
+//}
+
 
 public class PlayerInfo
 {
