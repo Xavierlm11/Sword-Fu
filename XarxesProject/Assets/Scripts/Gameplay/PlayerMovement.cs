@@ -18,6 +18,8 @@ public class PlayerMovement : MonoBehaviour
     public float shootRate = 1f;
     float nextFireRate;
 
+    public PlayerCharacter playerCharacter;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -26,11 +28,12 @@ public class PlayerMovement : MonoBehaviour
         //{
         //    StartCoroutine(SendPlayerPositionsToServer());
         //}
+        playerCharacter = gameObject.GetComponent<PlayerCharacter>();
     }
 
     void Update()
     {
-        if (!isLocal)
+        if (playerCharacter != null && !playerCharacter.isLocal)
         {
             return;
         }
@@ -65,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isLocal)
+        if (playerCharacter != null && !playerCharacter.isLocal)
         {
             return;
         }

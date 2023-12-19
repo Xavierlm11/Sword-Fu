@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    //public bool isLocal;
+    public bool isLocal;
+    public PlayerMovement playerMovement;
+    public GameObject characterObject;
 
     void Start()
     {

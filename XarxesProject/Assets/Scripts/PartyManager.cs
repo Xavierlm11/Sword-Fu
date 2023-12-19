@@ -23,9 +23,24 @@ public class PartyManager : MonoBehaviour
 
     // public GameObject player2;
 
-    private List<PlayerCharacterLink> playerCharacterLinks = new List<PlayerCharacterLink>();
+    public List<PlayerCharacterLink> playerCharacterLinks = new List<PlayerCharacterLink>();
 
-    // Start is called before the first frame update
+
+    public static PartyManager Instance;
+
+    private void OnEnable()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         //DontDestroyOnLoad(gameObject);
