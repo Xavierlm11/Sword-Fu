@@ -102,24 +102,30 @@ public class PlayerManager : MonoBehaviour
     }
 
     //Function to spawn players
-    public void AddPlayer(string playerName, bool isLocal = false)
+    public void AddPlayer(PlayerInfo playerInfo, bool isLocal = false)
     {
         //if (players.Count < numberOfPlayers)
         //{
-            GameObject newPlayer = Instantiate(playerPrefab);
-            newPlayer.name = playerName;
-            
-            newPlayer.GetComponent<PlayerCharacter>().isLocal = isLocal;
+
+        PlayerCharacterLink newLink = new PlayerCharacterLink();
+       
+
+        GameObject newPlayerCharacterObj = Instantiate(playerPrefab);
+        newPlayerCharacterObj.name = playerInfo.client.nickname;
+
+        newPlayerCharacterObj.GetComponent<PlayerCharacter>().isLocal = isLocal;
+        newLink.playerCharacter = newPlayerCharacterObj.GetComponent<PlayerCharacter>();
+        newLink.playerInfo = playerInfo;
 
         //if (isLocal)
         //{
         //    //newPlayer.GetComponent<PlayerMovement>().playerId = partyManagerObj.playerID;
         //}
-        PlayerCharacterLink newLink = new PlayerCharacterLink();
-        newLink.playerCharacter = newPlayer.GetComponent<PlayerCharacter>();
+
 
         PartyManager.Instance.playerCharacterLinks.Add(newLink);
-        Debug.Log($"{playerName} has Spawned");
+
+        Debug.Log($"{playerInfo.client.nickname} has Spawned");
         //}
         //else
         //{
