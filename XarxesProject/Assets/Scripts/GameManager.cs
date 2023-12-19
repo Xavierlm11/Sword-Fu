@@ -50,11 +50,11 @@ public class GameManager : MonoBehaviour
         {
             if (pl.client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
             {
-                PlayerManager.Instance.AddPlayer(pl.client, true);
+                PlayerManager.Instance.AddPlayer(pl, true);
             }
             else
             {
-                PlayerManager.Instance.AddPlayer(pl.client);
+                PlayerManager.Instance.AddPlayer(pl);
             }
             
         }
