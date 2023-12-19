@@ -35,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (playerCharacter != null && !playerCharacter.isLocal)
+        if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
         {
             return;
         }
@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (playerCharacter != null && !playerCharacter.isLocal)
+        if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
         {
             return;
         }

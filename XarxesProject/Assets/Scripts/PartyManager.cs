@@ -49,7 +49,37 @@ public class PartyManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            return;
+        }
 
+        foreach(PlayerCharacterLink link in playerCharacterLinks)
+        {
+            if (link.isLocal && link.playerCharacter.characterObject != null)
+            {
+                PlayerTransform playerTransform = new PlayerTransform(true);
+                playerTransform.player = link.playerInfo;
+
+                //playerTransform.position = new float[]
+                //{
+                //link.playerCharacter.characterObject.transform.position.x,
+                //link.playerCharacter.characterObject.transform.position.y,
+                //link.playerCharacter.characterObject.transform.position.z
+                //};
+
+                playerTransform.positionX = link.playerCharacter.characterObject.transform.position.x;
+                playerTransform.positionY = link.playerCharacter.characterObject.transform.position.y;
+                playerTransform.positionZ = link.playerCharacter.characterObject.transform.position.z;
+
+
+                playerTransform.rotY = link.playerCharacter.characterObject.transform.rotation.y;
+
+                playerTransform.transferType = TransferType.AllClients;
+
+                ConnectionManager.Instance.SerializeToJsonAndSend(playerTransform);
+            }
+        }
     }
 
     public PlayerInfo GetLocalPlayerCharacter()

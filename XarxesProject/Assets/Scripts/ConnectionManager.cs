@@ -173,11 +173,14 @@ public class ConnectionManager : MonoBehaviour
             while (!NetworkManager.Instance.appIsQuitting)
             {
                 
-                Remote = ipEndPointOfSender;
-                byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                ////Remote = ipEndPointOfSender;
+                ////byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
                 try
                 {
+                    Remote = ipEndPointOfSender;
+                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+
                     int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
                     if (Remote is IPEndPoint remoteEndPoint)
@@ -191,6 +194,8 @@ public class ConnectionManager : MonoBehaviour
                         string remoteIP = remoteIPAdress.ToString();
 
                         UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
+
+                        //recv = 0;
                     }
 
                     //receivedData = null;
@@ -210,14 +215,17 @@ public class ConnectionManager : MonoBehaviour
             while (!NetworkManager.Instance.appIsQuitting)
             {
 
-                Remote = ipEndPointOfSender;
-                byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                ////Remote = ipEndPointOfSender;
+                ////byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
                 //Socket server = new Socket(AddressFamily.InterNetwork,
                 //     SocketType.Dgram, ProtocolType.Udp);
 
                 try
                 {
+                    Remote = ipEndPointOfSender;
+                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+
                     int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
                     if (Remote is IPEndPoint remoteEndPoint)
@@ -310,11 +318,11 @@ public class ConnectionManager : MonoBehaviour
                 //    Receive_SendIdPlayer(sIP);
                 //    break;
 
-                case SendCode.ClientListUpdate:
-                    //ClientListUpdate clientListUpdate = new ClientListUpdate();
-                    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
-                    ////UpdateClientList(clientListUpdate.clientList);
-                    break;
+                //case SendCode.ClientListUpdate:
+                //    //ClientListUpdate clientListUpdate = new ClientListUpdate();
+                //    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
+                //    ////UpdateClientList(clientListUpdate.clientList);
+                //    break;
                 case SendCode.RoomInfoUpdate:
                     RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
                     roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
@@ -338,13 +346,26 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_PlayerTransform(PlayerTransform playerTransform)
     {
-        foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
+        for(int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
-            if(pl.client.nickname == playerTransform.player.client.nickname)
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == playerTransform.player.client.nickname)
             {
-                
+                //PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.position = 
+                //    new Vector3(playerTransform.position[0], playerTransform.position[1], playerTransform.position[2]);
+
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.position =
+                    new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
+
+                Vector3 rot = PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.rotation.eulerAngles;
+                rot.y = playerTransform.rotY;
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.eulerAngles = rot;
             }
+            //foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
+            //{
+                
+            //}
         }
+       
     }
 
     public void SetTargetsAsChecked(GenericSendClass sendClass, string json)
@@ -390,6 +411,13 @@ public class ConnectionManager : MonoBehaviour
                 updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
                 updateParty.CheckTargets();
                 SerializeToJsonAndSend(updateParty);
+                break;
+
+            case SendCode.PlayerTransform:
+                PlayerTransform playerTransform = new PlayerTransform();
+                playerTransform = JsonConvert.DeserializeObject<PlayerTransform>(json);
+                playerTransform.CheckTargets();
+                SerializeToJsonAndSend(playerTransform);
                 break;
         }
     }
@@ -680,13 +708,13 @@ public class ConnectionManager : MonoBehaviour
                         if (dataInfo.hasToCheckTargets)
                         {
                             SetTargetsAsChecked(dataInfo, json);
-                            Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
+                            //Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
                             dataToSendList.RemoveAt(i);
                             break;
                         }
 
 
-                        Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+                        //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
 
                     

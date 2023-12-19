@@ -113,8 +113,9 @@ public class PlayerManager : MonoBehaviour
         GameObject newPlayerCharacterObj = Instantiate(playerPrefab);
         newPlayerCharacterObj.name = playerInfo.client.nickname;
 
-        newPlayerCharacterObj.GetComponent<PlayerCharacter>().isLocal = isLocal;
+        newLink.isLocal = isLocal;
         newLink.playerCharacter = newPlayerCharacterObj.GetComponent<PlayerCharacter>();
+        newLink.playerCharacter.characterLink = newLink;
         newLink.playerInfo = playerInfo;
 
         //if (isLocal)

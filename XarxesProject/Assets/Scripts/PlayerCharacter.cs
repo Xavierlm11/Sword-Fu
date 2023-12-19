@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    public bool isLocal;
+    public PlayerCharacterLink characterLink;
     public PlayerMovement playerMovement;
     public GameObject characterObject;
 
     void Start()
     {
-        
+        characterObject = gameObject;
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     void Update()

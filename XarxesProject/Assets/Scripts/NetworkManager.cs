@@ -172,9 +172,12 @@ public class PlayerTransform : GenericSendClass
         sendCode = SendCode.PlayerTransform;
     }
 
+    //public float[] position;
+
     public float positionX;
     public float positionY;
     public float positionZ;
+
     public float rotY;
 
     public PlayerInfo player;
@@ -294,6 +297,7 @@ public enum TransferType
     AllClients,
     OnlyClients,
     Host,
+    AllExceptLocal,
     Custom
 }
 

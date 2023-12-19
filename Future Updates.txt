@@ -1,3 +1,6 @@
+- Optimize lobby nicknames (not in update)
+- Game UI (your nickname and other menus)
+- Pause
 - If server has to do some action, do it instead of sending it to itself and then doing it.
 - Manage lost packets
 - Manage packets order
@@ -5,6 +8,7 @@
 - Check if go back goes well
 - Manage if clients or host disconnect
 - Limit to 4 max players per match
-- Not send info evry frame
-- partida -> lobby
+- Not send info every frame
+- Go back to lobby from a game
 - Ready player on lobby
+- Lobby Chat

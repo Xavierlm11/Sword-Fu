@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5176822434549698482}
   - component: {fileID: 3483341707917087924}
   - component: {fileID: 5567037439167127164}
+  - component: {fileID: 5646234533599425373}
   - component: {fileID: 3896134259602796263}
   m_Layer: 0
   m_Name: TestPlayer
@@ -139,6 +140,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &5646234533599425373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945753006552530396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0f37f3310b32754885765f84cef1117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 0}
+  characterObject: {fileID: 0}
 --- !u!114 &3896134259602796263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,12 +170,14 @@ MonoBehaviour:
   playerId: 0
   speed: 5
   rotationSpeed: 5
+  isAlive: 1
   direction: {x: 0, y: 0, z: 0}
   balaPrefab: {fileID: 889169457289343228, guid: f161da97794c07647b082cf094200d35, type: 3}
   ataquePrefab: {fileID: 0}
   puntoDeDisparo: {fileID: 8507261900318837598}
   velocidadBala: 10
   shootRate: 1
+  playerCharacter: {fileID: 0}
 --- !u!1 &2129575338492736122
 GameObject:
   m_ObjectHideFlags: 0

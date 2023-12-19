@@ -172,6 +172,7 @@ public class LobbyManager : MonoBehaviour
                 popUpMessageDt = 0.0f;
             }
         }
+
         if (stage == MenuStage.waitingRoom)
         {
             if (!NetworkManager.Instance.GetLocalClient().isHost)
@@ -180,17 +181,20 @@ public class LobbyManager : MonoBehaviour
             }
 
 
-            if (NetworkManager.Instance.activeRoom.clients!=null)
+            if(NetworkManager.Instance.activeRoom != null)
             {
-                for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
+                if (NetworkManager.Instance.activeRoom.clients != null)
                 {
-                    if (listPlayerText[i]!=null && NetworkManager.Instance.activeRoom.clients[i]!=null)
+                    for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
                     {
-                        listPlayerText[i].SetActive(true);
-                        listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname; 
-                    }
+                        if (listPlayerText[i] != null && NetworkManager.Instance.activeRoom.clients[i] != null)
+                        {
+                            listPlayerText[i].SetActive(true);
+                            listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname;
+                        }
 
-                } 
+                    }
+                }
             }
         }
 
