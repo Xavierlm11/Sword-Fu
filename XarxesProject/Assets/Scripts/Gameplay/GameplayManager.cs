@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -16,9 +17,17 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     private GameObject winScreen;
+    [SerializeField]
+    private TMP_Text WinnerText;
 
     [SerializeField]
     private bool isEndOfRound=false;
+
+    [SerializeField]
+    private float timeWinScreen = 5.0f;
+    [SerializeField]
+    private float dtWinScreen = 0f;
+
     #endregion
     // Start is called before the first frame update
     void Start()
@@ -30,6 +39,18 @@ public class GameplayManager : MonoBehaviour
     void Update()
     {
 
+        if(isEndOfRound)
+        {
+            dtWinScreen = Time.deltaTime;
+            if(dtWinScreen >= timeWinScreen)
+            {
+                dtWinScreen = 0f;
+                winScreen.SetActive(false);
+                LoadNewRound();
+                isEndOfRound = false;
+            }
+        }
+
     }
     public void LoadNewRound()
     {
@@ -38,9 +59,30 @@ public class GameplayManager : MonoBehaviour
     public void CheckEndOfRound()
     {
         if(CountPlayerAlive() <=1) 
-        { 
+        {
+            winScreen.SetActive(true);
+            WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
             isEndOfRound = true;
         }
+    }
+    private PlayerCharacterLink GetWinner()
+    {
+        PlayerCharacterLink link = null;
+
+
+        foreach (PlayerCharacterLink item in PartyManager.Instance.playerCharacterLinks)
+        {
+            if (item != null)
+            {
+
+                if (item.playerCharacter.playerMovement.isAlive)
+                {
+                    return item;
+                }
+            }
+        }
+
+        return link;
     }
     private int CountPlayerAlive()
     {
@@ -48,7 +90,6 @@ public class GameplayManager : MonoBehaviour
 
         foreach (PlayerCharacterLink item in PartyManager.Instance.playerCharacterLinks)
         {
-
             if (item != null)
             {
 
@@ -56,12 +97,8 @@ public class GameplayManager : MonoBehaviour
                 {
                     count++;
                 }
-
-
             }
-
         }
-
         return count;
     }
 }
