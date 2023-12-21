@@ -12,12 +12,16 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     public Vector3 direction;
 
-
+    public int health = 100;
     public GameObject balaPrefab;
     public GameObject ataquePrefab;
+    private Animator animator;
+    private bool isAttacking = false;
+    private bool canRotate = true;
     public Transform puntoDeDisparo;
+    public Transform puntoDeAtaque;
     public float velocidadBala = 10f;
-    public float shootRate = 1f;
+    public float shootRate = 0.5f;
     float nextFireRate;
 
     public PlayerCharacter playerCharacter;
@@ -25,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-
+        animator = GetComponentInChildren<Animator>();
         //if (isLocal)
         //{
         //    StartCoroutine(SendPlayerPositionsToServer());
@@ -35,10 +39,10 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
-        {
-            return;
-        }
+        //if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
+        //{
+        //    return;
+        //}
         //if (isLocal)
         //{
 
@@ -51,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
         direction = new Vector3(horizontal, 0f, vertical).normalized;
 
 
-        if (direction != Vector3.zero)
+        if (direction != Vector3.zero && canRotate && !isAttacking)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
         }
@@ -68,21 +72,43 @@ public class PlayerMovement : MonoBehaviour
         {
 
             Ataque();
-
+           
         }
 
         //}
 
     }
-
-    private void FixedUpdate()
+    public void ReceiveDamage(int damage)
     {
-        if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
+        
+        if (isAlive)
         {
-            return;
+            health -= damage;
+            
+            if (health <= 0)
+            {
+                
+                Die();
+            }
         }
+    }
 
-        rb.velocity = direction * speed;
+    public void Die()
+    {
+        isAlive = false;
+        gameObject.SetActive(false);
+    }
+
+    void FixedUpdate()
+    {
+        if (!isAttacking)
+        {
+            rb.velocity = direction * speed;
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+        }
     }
 
     void Disparar()
@@ -114,24 +140,33 @@ public class PlayerMovement : MonoBehaviour
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
-
-            //Crea una bala en el punto de disparo
-
-            GameObject ataque = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
-            Rigidbody rbAtaque = ataque.GetComponent<Rigidbody>();
-
+            GameObject ataque = Instantiate(ataquePrefab, puntoDeAtaque.position, puntoDeAtaque.rotation);
+            
             nextFireRate = Time.time + shootRate;
 
-
-            if (rbAtaque != null)
+            if (!isAttacking)
             {
-                rbAtaque.velocity = ataque.transform.forward * velocidadBala;
+                StartCoroutine(AttackAnimation());
             }
+           
+            Destroy(ataque, 0.5f);
 
-            //Destruye la bala 5 segundos despues de ser creada
-            Destroy(ataque, 5f);
+            AtaqueDamage ataqueDamage = ataque.AddComponent<AtaqueDamage>();
+            ataqueDamage.SetOwner(gameObject);
 
         }
+    }
+    IEnumerator AttackAnimation()
+    {
+        isAttacking = true;
+        canRotate = false;
+        animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(0.45f);
+
+        isAttacking = false;
+        canRotate = true;
+        animator.SetTrigger("Idle");
     }
 
     IEnumerator SendPlayerPositionsToServer()
