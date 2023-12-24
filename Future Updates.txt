@@ -12,3 +12,9 @@
 - Go back to lobby from a game
 - Ready player on lobby
 - Lobby Chat
+
+
+----- Tasks
+xavi l - gestion de partidas, menus, pausa, nicknames
+xavi c - interpolacion, package management
+albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
