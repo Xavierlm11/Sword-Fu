@@ -125,10 +125,10 @@ public class PlayerMovement : MonoBehaviour
             nextFireRate = Time.time + shootRate;
 
 
-            if (rbBala != null)
-            {
-                rbBala.velocity = bala.transform.forward * velocidadBala;
-            }
+            //if (rbBala != null)
+            //{
+            //    rbBala.velocity = bala.transform.forward * velocidadBala;
+            //}
 
             //Destruye la bala 5 segundos despues de ser creada
             Destroy(bala, 5f);
