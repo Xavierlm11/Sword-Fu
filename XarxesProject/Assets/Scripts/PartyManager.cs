@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum InterpolationMode
+{
+    None,
+    Lerp,
+    Slerp,
+    SmoothStep,
+}
 
 public class PlayerCharacterLink
 {
@@ -29,6 +36,8 @@ public class PartyManager : MonoBehaviour
     public static PartyManager Instance;
 
     public float sendTimer;
+
+    public InterpolationMode movementInterpolation;
 
     private void OnEnable()
     {

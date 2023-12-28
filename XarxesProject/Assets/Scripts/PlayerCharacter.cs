@@ -10,7 +10,6 @@ public class PlayerCharacter : MonoBehaviour
 
     void Start()
     {
-        characterObject = gameObject;
         playerMovement = GetComponent<PlayerMovement>();
     }
 

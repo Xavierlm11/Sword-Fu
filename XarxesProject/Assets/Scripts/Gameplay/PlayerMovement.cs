@@ -26,6 +26,9 @@ public class PlayerMovement : MonoBehaviour
 
     public PlayerCharacter playerCharacter;
 
+    public Vector3 positionToSet;
+    public float startInterpolationTime;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -41,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
         {
+            CheckTransformInterpolation();
             return;
         }
 
@@ -79,6 +83,56 @@ public class PlayerMovement : MonoBehaviour
        // }
 
     }
+
+    public void SetTransformInterpolation(Vector3 newPos)
+    {
+        positionToSet = newPos;
+        startInterpolationTime = Time.time;
+        CheckTransformInterpolation();
+    }
+
+    public void CheckTransformInterpolation()
+    {
+        float elapsed_time = Time.time - startInterpolationTime;
+
+        switch (PartyManager.Instance.movementInterpolation)
+        {
+            case InterpolationMode.None:
+                {
+                    transform.position = positionToSet;
+                }
+                break;
+
+            case InterpolationMode.Lerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+                    transform.position = Vector3.Lerp(transform.position, positionToSet, t);
+                }
+                break;
+
+            case InterpolationMode.Slerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+                    transform.position = Vector3.Slerp(transform.position, positionToSet, t);
+                }
+                break;
+
+            case InterpolationMode.SmoothStep:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+
+                    float xPos = Mathf.SmoothStep(transform.position.x, positionToSet.x, t);
+                    float yPos = Mathf.SmoothStep(transform.position.y, positionToSet.y, t);
+                    float zPos = Mathf.SmoothStep(transform.position.z, positionToSet.z, t);
+
+                    Vector3 newPos = new Vector3(xPos, yPos, zPos);
+
+                    transform.position = newPos;
+                }
+                break;
+        }
+    }
+
     public void ReceiveDamage(int damage)
     {
         

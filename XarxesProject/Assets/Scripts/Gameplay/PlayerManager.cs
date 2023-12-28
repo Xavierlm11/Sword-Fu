@@ -108,13 +108,14 @@ public class PlayerManager : MonoBehaviour
         //{
 
         PlayerCharacterLink newLink = new PlayerCharacterLink();
-       
+        
 
         GameObject newPlayerCharacterObj = Instantiate(playerPrefab);
         newPlayerCharacterObj.name = playerInfo.client.nickname;
 
         newLink.isLocal = isLocal;
         newLink.playerCharacter = newPlayerCharacterObj.GetComponent<PlayerCharacter>();
+        newLink.playerCharacter.characterObject = newLink.playerCharacter.gameObject;
         newLink.playerCharacter.characterLink = newLink;
         newLink.playerInfo = playerInfo;
 
@@ -135,21 +136,21 @@ public class PlayerManager : MonoBehaviour
     }
 
     //Hace que aparezcan los players en los puntos de spawn por orden
-    //void AssignSpawnPoints()
-    //{
-    //    for (int i = 0; i < players.Count; i++)
-    //    {
-    //        if (i < spawnPoints.Count)
-    //        {
-    //            players[i].transform.position = spawnPoints[i].transform.position;
-    //            Debug.Log($"{players[i].name} aparece en el punto {spawnPoints[i].name}.");
-    //        }
-    //        else
-    //        {
-    //            Debug.Log($"No hay suficientes puntos de reaparición para {players[i].name}.");
-    //        }
-    //    }
-    //}
+    public void AssignSpawnPoints()
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (i < spawnPoints.Count)
+            {
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject.transform.position = spawnPoints[i].transform.position;
+                Debug.Log($"{PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname} aparece en el punto {spawnPoints[i].name}.");
+            }
+            else
+            {
+                Debug.Log($"No hay suficientes puntos de reaparición para {PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname}.");
+            }
+        }
+    }
 
 
 }

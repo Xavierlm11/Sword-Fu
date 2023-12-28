@@ -58,5 +58,7 @@ public class GameManager : MonoBehaviour
             }
             
         }
+
+        PlayerManager.Instance.AssignSpawnPoints();
     }
 }

@@ -356,20 +356,16 @@ public class ConnectionManager : MonoBehaviour
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == playerTransform.player.client.nickname)
             {
-                //PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.position = 
-                //    new Vector3(playerTransform.position[0], playerTransform.position[1], playerTransform.position[2]);
+                Vector3 newPos = new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
 
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.position =
-                    new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos);
+
 
                 Vector3 rot = PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.rotation.eulerAngles;
-                rot.y = playerTransform.rotY;
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.eulerAngles = rot;
-            }
-            //foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
-            //{
+                rot.y = playerTransform.rotY;
 
-            //}
+            }
         }
 
     }
