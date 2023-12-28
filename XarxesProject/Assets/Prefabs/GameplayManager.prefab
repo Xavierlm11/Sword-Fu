@@ -383,7 +383,7 @@ Transform:
   m_Children:
   - {fileID: 8767308891726066160}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &201224486788675784
 MonoBehaviour:
@@ -400,7 +400,7 @@ MonoBehaviour:
   rounds: 4
   currentRound: 1
   winScreen: {fileID: 1561985495202208822}
-  WinnerText: {fileID: 0}
+  WinnerText: {fileID: 2242967345381136267}
   isEndOfRound: 0
   timeWinScreen: 5
   dtWinScreen: 0

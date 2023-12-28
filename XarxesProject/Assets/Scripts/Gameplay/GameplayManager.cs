@@ -23,7 +23,7 @@ public class GameplayManager : MonoBehaviour
     private TMP_Text WinnerText;
 
     [SerializeField]
-    private bool isEndOfRound = false;
+    public bool isEndOfRound = false;
 
     [SerializeField]
     private float timeWinScreen = 5.0f;
@@ -41,7 +41,7 @@ public class GameplayManager : MonoBehaviour
     private int lastLevelIndex = 1;
 
     [SerializeField]
-    private int randomLvl = 1;
+    public int randomLvl = 1;
 
     private List<Scene> scenesList = new List<Scene>();
     #endregion
@@ -50,7 +50,7 @@ public class GameplayManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if(Instance==null)
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -78,7 +78,7 @@ public class GameplayManager : MonoBehaviour
         Debug.Log("Scenes on build: " + SceneManager.sceneCountInBuildSettings);
         //Debug.Log(SceneManager.GetSceneByBuildIndex(0).name);
         levelsCount = SceneManager.sceneCountInBuildSettings;
-        
+
     }
 
     // Update is called once per frame
@@ -87,26 +87,45 @@ public class GameplayManager : MonoBehaviour
 
         if (isEndOfRound)
         {
-            dtWinScreen = Time.deltaTime;
-            winScreen.SetActive(true);
-            WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
+            dtWinScreen += Time.deltaTime;
+            if (winScreen.activeSelf == false)
+            {
+                winScreen.SetActive(true);
+            }
+            //WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
+            WinnerText.text = "PACO " + " somehow won";
             if (dtWinScreen >= timeWinScreen)
             {
                 dtWinScreen = 0f;
                 winScreen.SetActive(false);
-                if (NetworkManager.Instance.GetLocalClient().isHost)
-                {
-                    LoadNewRandomRound();
+                //if (NetworkManager.Instance.GetLocalClient().isHost)
+                //{
+                //    LoadNewRandomRound();
 
-                }
-
+                //}
+                //else
+                //{
+                //    LoadNewRound(randomLvl);
+                //}
+                LoadNewRound(randomLvl);
                 isEndOfRound = false;
             }
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
+            GetRandomNextLvl();
             LoadNewRandomRound();
+        }
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            if (NetworkManager.Instance.GetLocalClient().isHost)
+            {
+               // winScreen.SetActive(true);
+                isEndOfRound = true;
+                GetRandomNextLvl();
+                UpdateGameplayEveryOne();
+            }
         }
 
     }
@@ -125,10 +144,10 @@ public class GameplayManager : MonoBehaviour
         //}
 
 
-        lastLevelIndex = randomLvl;
+        //lastLevelIndex = randomLvl;
         SceneManager.LoadScene(randomLvl);
         Debug.Log("Loaded Level: " + randomLvl);
-        Debug.Log("lvl index Level: " + startLevelsIndex);
+        // Debug.Log("lvl index Level: " + startLevelsIndex);
     }
 
     private int GetRandomNextLvl()
@@ -137,6 +156,7 @@ public class GameplayManager : MonoBehaviour
         {
             randomLvl = Random.Range(startLevelsIndex, levelsCount);
         }
+        lastLevelIndex = randomLvl;
         return randomLvl;
     }
 
@@ -144,13 +164,14 @@ public class GameplayManager : MonoBehaviour
     {
         if (CountPlayerAlive() <= 1)
         {
-            
+
             if (NetworkManager.Instance.GetLocalClient().isHost)
             {
                 GetRandomNextLvl();
                 UpdateGameplayEveryOne();
             }
             isEndOfRound = true;
+            winScreen.SetActive(true);
 
         }
     }
@@ -193,7 +214,8 @@ public class GameplayManager : MonoBehaviour
 
     private void UpdateGameplayEveryOne()
     {
-        UpdateGameplay _updateGameplay = new UpdateGameplay(randomLvl, GetWinner().playerInfo.client.nickname);
+        UpdateGameplay _updateGameplay = new UpdateGameplay(randomLvl, isEndOfRound/*, GetWinner().playerInfo.client.nickname*/);
         _updateGameplay.transferType = TransferType.OnlyClients;
+        ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
 }

@@ -439,7 +439,9 @@ public class ConnectionManager : MonoBehaviour
     }
     public void Receive_UpdateGameplay(UpdateGameplay updateGameplay)
     {
-        //GameplayManager 
+        GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
+        GameplayManager.Instance.isEndOfRound = updateGameplay.isEnd;
+        
     }
     public void StartGame()
     {

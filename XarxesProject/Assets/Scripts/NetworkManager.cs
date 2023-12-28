@@ -244,16 +244,18 @@ public class UpdateParty : GenericSendClass
 public class UpdateGameplay : GenericSendClass
 {
     public int nextLvl;
-    public string winnerName;
+    public bool isEnd;
+    //public string winnerName;
 
     public UpdateGameplay()
     {
 
     }
-    public UpdateGameplay(int nextLvl, string winnerName) : base(true)
+    public UpdateGameplay(int nextLvl,bool isEnd/*, string winnerName*/) : base(true)
     {
         this.nextLvl = nextLvl;
-        this.winnerName = winnerName;
+        this.isEnd = isEnd;
+       // this.winnerName = winnerName;
 
         sendCode= SendCode.UpdateGameplay;
     }   
