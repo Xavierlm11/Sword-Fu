@@ -28,6 +28,8 @@ public class PartyManager : MonoBehaviour
 
     public static PartyManager Instance;
 
+    public float sendTimer;
+
     private void OnEnable()
     {
         if (Instance == null)
@@ -44,6 +46,7 @@ public class PartyManager : MonoBehaviour
     void Start()
     {
         //DontDestroyOnLoad(gameObject);
+        sendTimer = 0;
     }
 
     // Update is called once per frame
@@ -54,7 +57,37 @@ public class PartyManager : MonoBehaviour
         //    return;
         //}
 
-        foreach(PlayerCharacterLink link in playerCharacterLinks)
+
+        SendLocalPlayerPosition(NetworkManager.Instance.useNetworkUpdateInterval);
+
+
+
+
+
+    }
+
+    public void SendLocalPlayerPosition(bool useInterval)
+    {
+        sendTimer += Time.deltaTime;
+
+        bool sendPositions = false;
+
+        if (!useInterval)
+        {
+            sendPositions = true;
+        }
+        else if (sendTimer >= NetworkManager.Instance.networkUpdateInterval)
+        {
+            sendTimer = 0;
+            sendPositions = true;
+        }
+
+        if(!sendPositions)
+        {
+            return;
+        }
+
+        foreach (PlayerCharacterLink link in playerCharacterLinks)
         {
             if (link.isLocal && link.playerCharacter.characterObject != null)
             {

@@ -430,7 +430,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public bool allowSameIPInRoom;
 
     public bool useNetworkUpdateInterval;
-    public float netrorkUpdateInterval;
+    public float networkUpdateInterval;
 
     #endregion
 

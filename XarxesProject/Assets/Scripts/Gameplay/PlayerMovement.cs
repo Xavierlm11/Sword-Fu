@@ -39,15 +39,16 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        //if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
-        //{
-        //    return;
-        //}
+        if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
+        {
+            return;
+        }
+
         //if (isLocal)
         //{
 
 
-        //Detecta los imputs
+        //Detecta los inputs
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -75,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
            
         }
 
-        //}
+       // }
 
     }
     public void ReceiveDamage(int damage)
