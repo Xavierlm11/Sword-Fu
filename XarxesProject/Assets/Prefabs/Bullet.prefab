@@ -82,6 +82,7 @@ MonoBehaviour:
   velocidad: 20
   direccion: {x: 0, y: 0, z: 1}
   damageAmount: 20
+  fallensword: {fileID: 8171556430097898244, guid: 6796a784ec628f74e82be9a198c4002f, type: 3}
 --- !u!54 &2339256770099562770
 Rigidbody:
   m_ObjectHideFlags: 0

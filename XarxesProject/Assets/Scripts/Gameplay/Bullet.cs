@@ -35,17 +35,10 @@ public class Bullet : MonoBehaviour
         }
 
         Destroy(this.gameObject);
-        GameObject FallenSword = Instantiate(fallensword);
+        GameObject FallenSword = Instantiate(fallensword, transform.position, Quaternion.identity);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Muro"))
-        {
-            Debug.Log("Destroy bullet");
-            Destroy(this.gameObject);
-        }
-    }
+  
 
     public void SetOwner(GameObject player)
     {

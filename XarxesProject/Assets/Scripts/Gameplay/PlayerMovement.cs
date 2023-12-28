@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject ataquePrefab;
     private Animator animator;
     private bool isAttacking = false;
+    public bool havesword = true;
     private bool canRotate = true;
     public Transform puntoDeDisparo;
     public Transform puntoDeAtaque;
@@ -37,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
         //{
         //    StartCoroutine(SendPlayerPositionsToServer());
         //}
+
+        havesword = true;
+
         playerCharacter = gameObject.GetComponent<PlayerCharacter>();
     }
 
@@ -66,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Al hacer click izquierdo del raton actiba la funcion de disparo
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && havesword == true)
         {
 
             Disparar();
@@ -133,6 +137,16 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("FallenSword") && havesword == false)
+        {
+            Debug.Log("Player recogió FallenSword");
+            Destroy(other.gameObject);
+            havesword = true;
+        }
+    }
+
     public void ReceiveDamage(int damage)
     {
         
@@ -171,6 +185,7 @@ public class PlayerMovement : MonoBehaviour
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
+            havesword = false;
 
             //Crea una bala en el punto de disparo
 
