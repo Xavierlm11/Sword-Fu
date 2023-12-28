@@ -25,7 +25,8 @@ MonoBehaviour:
   remoteIp: 26.145.90.77
   maxTransferedDataSize: 1024
   hasInitialized: 1
-  appIsQuitting: 1
+  appIsQuitting: 0
   allowSameIPInRoom: 1
   useNetworkUpdateInterval: 1
-  networkUpdateInterval: 0.2
+  networkUpdateInterval: 0.1
+  movementInterpolation: 3

@@ -28,7 +28,9 @@ public class PlayerMovement : MonoBehaviour
     public PlayerCharacter playerCharacter;
 
     public Vector3 positionToSet;
-    public float startInterpolationTime;
+    public float currentInterpolationTime;
+    public float lastInterpolationTime;
+    public float interpolationTimeDiff;
 
     private void Start()
     {
@@ -91,15 +93,26 @@ public class PlayerMovement : MonoBehaviour
     public void SetTransformInterpolation(Vector3 newPos)
     {
         positionToSet = newPos;
-        startInterpolationTime = Time.time;
+
+        lastInterpolationTime = currentInterpolationTime;
+        currentInterpolationTime = Time.time;
+        
+        interpolationTimeDiff = currentInterpolationTime - lastInterpolationTime;
+
+        if (interpolationTimeDiff == 0)
+        {
+            interpolationTimeDiff = NetworkManager.Instance.networkUpdateInterval;
+        }
+
+
         CheckTransformInterpolation();
     }
 
     public void CheckTransformInterpolation()
     {
-        float elapsed_time = Time.time - startInterpolationTime;
+        float elapsed_time = Time.time - currentInterpolationTime;
 
-        switch (PartyManager.Instance.movementInterpolation)
+        switch (NetworkManager.Instance.movementInterpolation)
         {
             case InterpolationMode.None:
                 {
@@ -109,21 +122,21 @@ public class PlayerMovement : MonoBehaviour
 
             case InterpolationMode.Lerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
                     transform.position = Vector3.Lerp(transform.position, positionToSet, t);
                 }
                 break;
 
             case InterpolationMode.Slerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
                     transform.position = Vector3.Slerp(transform.position, positionToSet, t);
                 }
                 break;
 
             case InterpolationMode.SmoothStep:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / NetworkManager.Instance.networkUpdateInterval);
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
 
                     float xPos = Mathf.SmoothStep(transform.position.x, positionToSet.x, t);
                     float yPos = Mathf.SmoothStep(transform.position.y, positionToSet.y, t);

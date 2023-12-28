@@ -2,14 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum InterpolationMode
-{
-    None,
-    Lerp,
-    Slerp,
-    SmoothStep,
-}
-
 public class PlayerCharacterLink
 {
     public bool isLocal;
@@ -36,8 +28,6 @@ public class PartyManager : MonoBehaviour
     public static PartyManager Instance;
 
     public float sendTimer;
-
-    public InterpolationMode movementInterpolation;
 
     private void OnEnable()
     {
@@ -87,7 +77,6 @@ public class PartyManager : MonoBehaviour
         }
         else if (sendTimer >= NetworkManager.Instance.networkUpdateInterval)
         {
-            sendTimer = 0;
             sendPositions = true;
         }
 
@@ -120,8 +109,12 @@ public class PartyManager : MonoBehaviour
                 playerTransform.transferType = TransferType.AllExceptLocal;
 
                 ConnectionManager.Instance.SerializeToJsonAndSend(playerTransform);
+
+                
             }
         }
+
+        sendTimer = 0;
     }
 
     public PlayerInfo GetLocalPlayerCharacter()

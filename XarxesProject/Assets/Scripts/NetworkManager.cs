@@ -347,6 +347,13 @@ public class Room
 
 //}
 
+public enum InterpolationMode
+{
+    None,
+    Lerp,
+    Slerp,
+    SmoothStep,
+}
 
 public class PlayerInfo
 {
@@ -431,6 +438,8 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public bool useNetworkUpdateInterval;
     public float networkUpdateInterval;
+
+    public InterpolationMode movementInterpolation;
 
     #endregion
 
