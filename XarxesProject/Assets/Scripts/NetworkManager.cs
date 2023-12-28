@@ -241,6 +241,23 @@ public class UpdateParty : GenericSendClass
 
 }
 
+public class UpdateGameplay : GenericSendClass
+{
+    public int nextLvl;
+    public string winnerName;
+
+    public UpdateGameplay()
+    {
+
+    }
+    public UpdateGameplay(int nextLvl, string winnerName) : base(true)
+    {
+        this.nextLvl = nextLvl;
+        this.winnerName = winnerName;
+
+        sendCode= SendCode.UpdateGameplay;
+    }   
+}
 
 #endregion
 
@@ -290,6 +307,7 @@ public enum SendCode
     RoomInfoUpdate,
     StartGame,
     UpdateParty,
+    UpdateGameplay,
 }
 
 public enum TransferType

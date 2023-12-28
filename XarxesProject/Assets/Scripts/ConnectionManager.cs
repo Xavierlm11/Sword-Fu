@@ -107,7 +107,7 @@ public class ConnectionManager : MonoBehaviour
     private void Start()
     {
 
-        
+
     }
 
     //This is called when the user tries to create/join a room. It connects the player to the network
@@ -172,7 +172,7 @@ public class ConnectionManager : MonoBehaviour
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                
+
                 ////Remote = ipEndPointOfSender;
                 ////byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
@@ -240,17 +240,17 @@ public class ConnectionManager : MonoBehaviour
 
                         UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
                     }
-                    
+
                     //receivedData = null;
                 }
                 catch
                 {
                     //Debug.Log($"Error al recibir datos: {ex.Message}");
                 }
-                
+
             }
         }
-        
+
     }
 
     //The deserialization gets the base class of the transfered data first.
@@ -340,13 +340,19 @@ public class ConnectionManager : MonoBehaviour
                     updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
                     Receive_UpdateParty(updateParty);
                     break;
+
+                case SendCode.UpdateGameplay:
+                    UpdateGameplay updateGameplay = new UpdateGameplay();
+                    updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
+                    Receive_UpdateGameplay(updateGameplay);
+                    break;
             }
         }
     }
 
     public void Receive_PlayerTransform(PlayerTransform playerTransform)
     {
-        for(int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == playerTransform.player.client.nickname)
             {
@@ -362,10 +368,10 @@ public class ConnectionManager : MonoBehaviour
             }
             //foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
             //{
-                
+
             //}
         }
-       
+
     }
 
     public void SetTargetsAsChecked(GenericSendClass sendClass, string json)
@@ -419,6 +425,14 @@ public class ConnectionManager : MonoBehaviour
                 playerTransform.CheckTargets();
                 SerializeToJsonAndSend(playerTransform);
                 break;
+
+            case SendCode.UpdateGameplay:
+                UpdateGameplay updateGameplay = new UpdateGameplay();
+                updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
+                updateGameplay.CheckTargets();
+                SerializeToJsonAndSend(updateGameplay);
+                break;
+
         }
     }
 
@@ -427,7 +441,10 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Instance.activeRoom.party = updateParty.party;
         GameManager.Instance.SpawnPlayers();
     }
-
+    public void Receive_UpdateGameplay(UpdateGameplay updateGameplay)
+    {
+        //GameplayManager 
+    }
     public void StartGame()
     {
         SceneManager.LoadScene("Game");
@@ -508,7 +525,7 @@ public class ConnectionManager : MonoBehaviour
             connectionRequest.sender.globalIP = connectionRequest.remoteIP;
             connectionRequest.sender.globalPort = connectionRequest.remotePort;
             NetworkManager.Instance.activeRoom.clients.Add(connectionRequest.sender);
-            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null );
+            ConnectionConfirmation(connectionRequest.remoteIP, connectionRequest.remotePort, connectionRequest.sender, true, null);
             //UnityMainThreadDispatcher.Instance().Enqueue(() => SendClientListUpdate());
 
             //SendClientListUpdate();
@@ -531,7 +548,7 @@ public class ConnectionManager : MonoBehaviour
             SerializeToJsonAndSend(roomInfoUpdate);
         }
     }
-    
+
     //public void AddNewPartyPlayer(Client cl) //Add new player to the party and asing their own player Id  
     //{
     //    PartyPlayersInfo newplayer = new PartyPlayersInfo();
@@ -717,7 +734,7 @@ public class ConnectionManager : MonoBehaviour
                         //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
 
-                    
+
                         switch (dataInfo.transferType)
                         {
                             case TransferType.AllClients:
@@ -749,7 +766,7 @@ public class ConnectionManager : MonoBehaviour
                                 dataInfo.receivers.Clear();
                                 foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
                                 {
-                                    if(cl.nickname != dataInfo.sender.nickname)
+                                    if (cl.nickname != dataInfo.sender.nickname)
                                     {
                                         dataInfo.receivers.Add(cl);
                                     }
@@ -787,7 +804,7 @@ public class ConnectionManager : MonoBehaviour
 
                             //}
 
-                            
+
                         }
                         //}
 
@@ -813,9 +830,9 @@ public class ConnectionManager : MonoBehaviour
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
-                
 
-                for(int i = dataToSendList.Count - 1; i >= 0; i--)
+
+                for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
                     GenericSendClass dataInfo = new GenericSendClass();
 
@@ -836,7 +853,7 @@ public class ConnectionManager : MonoBehaviour
                         // Manejar la excepción
                         //Debug.Log($"Error al enviar datos");
                     }
-                    
+
                 }
             }
         }
@@ -868,7 +885,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateEndPointToReceive()
     {
-        
+
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
             SetEndPoint(ref ipEndPointToReceive, IPAddress.Any, NetworkManager.Instance.defaultPort);
@@ -891,7 +908,7 @@ public class ConnectionManager : MonoBehaviour
         {
             SetEndPoint(ref ipEndPointToSend, IPAddress.Any, 0);
         }
-        
+
     }
 
     public void EndConnections()
