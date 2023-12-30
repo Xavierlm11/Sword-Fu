@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 87889335504330072}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.6}
+  m_LocalPosition: {x: 0, y: 0, z: 2.131}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 5567037439167127164}
   - component: {fileID: 5646234533599425373}
   - component: {fileID: 3896134259602796263}
+  - component: {fileID: 7667288090761476619}
   m_Layer: 0
   m_Name: TestPlayer
   m_TagString: Untagged
@@ -87,7 +88,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1945753006552530396}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -170,7 +171,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &5646234533599425373
 MonoBehaviour:
@@ -204,14 +205,53 @@ MonoBehaviour:
   rotationSpeed: 5
   isAlive: 1
   direction: {x: 0, y: 0, z: 0}
+  wins: 0
   health: 1
   balaPrefab: {fileID: 889169457289343228, guid: f161da97794c07647b082cf094200d35, type: 3}
   ataquePrefab: {fileID: 9046585939145048810, guid: f2c3c3b71ba3b1c4db2e81c5629cf5d6, type: 3}
+  havesword: 1
   puntoDeDisparo: {fileID: 8507261900318837598}
   puntoDeAtaque: {fileID: 1602129760634538639}
   velocidadBala: 10
   shootRate: 1
+  characters:
+  - {fileID: 8728740277022203491, guid: 51dbb270b91196348b2c13c837434b35, type: 3}
+  - {fileID: 2385679663525706445, guid: f47be45050b165b4bb098f8b31a940bd, type: 3}
+  - {fileID: 7267754116719088766, guid: d3bffca57ddfe804691a503d4ea235c9, type: 3}
+  - {fileID: 274511851308157889, guid: 9215ae1ce13b48e42b2ad38637ca05d9, type: 3}
   playerCharacter: {fileID: 0}
+  positionToSet: {x: 0, y: 0, z: 0}
+  rotationToSet: {x: 0, y: 0, z: 0}
+  currentInterpolationPosition: {x: 0, y: 0, z: 0}
+  currentInterpolationRotation: {x: 0, y: 0, z: 0}
+  currentInterpolationTime: 0
+  lastInterpolationTime: 0
+  interpolationTimeDiff: 0
+  canSynchronizeTransform: 0
+  canSendSynchronizationData: 0
+--- !u!136 &7667288090761476619
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945753006552530396}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2129575338492736122
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,7 +302,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &625355982769116290
 Transform:
   m_ObjectHideFlags: 0
@@ -390,7 +430,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6284192706539011555
 Transform:
   m_ObjectHideFlags: 0
@@ -421,7 +461,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8153422935213095010}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

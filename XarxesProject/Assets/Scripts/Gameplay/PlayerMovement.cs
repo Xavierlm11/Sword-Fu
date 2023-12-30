@@ -26,6 +26,10 @@ public class PlayerMovement : MonoBehaviour
     public float shootRate = 0.5f;
     float nextFireRate;
 
+    public GameObject[] characters;
+    private int currentCharacterIndex = 0;
+    private GameObject currentCharacter;
+
     public PlayerCharacter playerCharacter;
 
     public Vector3 positionToSet;
@@ -44,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        SwitchCharacter(currentCharacterIndex);
         animator = GetComponentInChildren<Animator>();
         //if (isLocal)
         //{
@@ -83,6 +88,18 @@ public class PlayerMovement : MonoBehaviour
             if (direction != Vector3.zero && canRotate && !isAttacking)
             {
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
+
+                animator.SetBool("Run", true);
+            }
+            else
+            {
+                
+                animator.SetBool("Run", false);
+
+                if (!isAttacking)
+                {
+                    animator.SetBool("Idle", true);
+                }
             }
 
             //Al hacer click izquierdo del raton actiba la funcion de disparo
@@ -215,6 +232,18 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    void SwitchCharacter(int index)
+    {
+        if (currentCharacter != null)
+        {
+            Destroy(currentCharacter);
+        }
+        
+        currentCharacter = Instantiate(characters[index], transform.position, Quaternion.identity);
+
+        currentCharacter.transform.parent = transform;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("FallenSword") && havesword == false)
@@ -291,7 +320,7 @@ public class PlayerMovement : MonoBehaviour
         if (Time.time > nextFireRate)
         {
             GameObject ataque = Instantiate(ataquePrefab, puntoDeAtaque.position, puntoDeAtaque.rotation);
-            
+            animator.SetTrigger("Attack");
             nextFireRate = Time.time + shootRate;
 
             if (!isAttacking)
@@ -310,13 +339,14 @@ public class PlayerMovement : MonoBehaviour
     {
         isAttacking = true;
         canRotate = false;
-        animator.SetTrigger("Attack");
+        
 
         yield return new WaitForSeconds(0.45f);
 
         isAttacking = false;
         canRotate = true;
-        animator.SetTrigger("Idle");
+        //animator.SetBool("Attack", false);
+        //animator.SetTrigger("Idle");
     }
 
     IEnumerator SendPlayerPositionsToServer()
