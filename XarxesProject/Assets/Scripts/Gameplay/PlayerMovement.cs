@@ -178,6 +178,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Die()
     {
+        GameplayManager.Instance.CheckEndOfRound();
+        GameplayManager.Instance.CountPlayerAlive();
         isAlive = false;
         gameObject.SetActive(false);
     }
