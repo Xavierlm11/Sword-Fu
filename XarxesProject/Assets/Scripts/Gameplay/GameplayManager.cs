@@ -132,6 +132,7 @@ public class GameplayManager : MonoBehaviour
             case roundPhase.Starting:
                 {
                     roundState = roundPhase.InGame;
+                    GameManager.Instance.ResetCharacters();
                     CountPlayerAlive();
                 }
                 break;
