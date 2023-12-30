@@ -60,7 +60,7 @@ public class PartyManager : MonoBehaviour
         {
             if (link.isLocal && link.playerCharacter != null && link.playerCharacter.playerMovement != null)
             {
-                if (link.playerCharacter.playerMovement.canSynchronizeTransform)
+                if (link.playerCharacter.playerMovement.canSendSynchronizationData)
                 {
                     SendLocalPlayerPosition(NetworkManager.Instance.useNetworkUpdateInterval);
                 }

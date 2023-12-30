@@ -40,8 +40,20 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+    public void GetSpawns()
+    {
+        spawnPoints.Clear();
+        GameObject[] spawns = GameObject.FindGameObjectsWithTag("Spawn");
+        foreach (GameObject sp in spawns)
+        {
+            spawnPoints.Add(sp);
+        }
+    }
+
     public void SpawnCharacters()
     {
+        GetSpawns();
+
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             if (i < spawnPoints.Count)
@@ -54,7 +66,7 @@ public class PlayerManager : MonoBehaviour
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterLink = PartyManager.Instance.playerCharacterLinks[i];
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject.transform.position = spawnPoints[i].transform.position;
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement = PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject.GetComponent<PlayerMovement>();
-                //PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.canSynchronizeTransform = true;
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.canSendSynchronizationData = true;
 
                 Debug.Log($"[{PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname}] spawns on the point [{spawnPoints[i].name}].");
             }

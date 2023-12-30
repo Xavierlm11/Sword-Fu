@@ -307,7 +307,7 @@ GameObject:
   - component: {fileID: 120626184}
   m_Layer: 0
   m_Name: SpawnPoint (2)
-  m_TagString: Untagged
+  m_TagString: Spawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -412,7 +412,7 @@ GameObject:
   - component: {fileID: 183198355}
   m_Layer: 0
   m_Name: SpawnPoint (3)
-  m_TagString: Untagged
+  m_TagString: Spawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -820,11 +820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1945753006552530396, guid: 108479c6e01aca24f934dfaa579c6351, type: 3}
-  spawnPoints:
-  - {fileID: 1530258095}
-  - {fileID: 1454865923}
-  - {fileID: 120626183}
-  - {fileID: 183198354}
+  spawnPoints: []
   numberOfPlayers: 4
 --- !u!4 &1262046961
 Transform:
@@ -936,7 +932,7 @@ GameObject:
   - component: {fileID: 1454865924}
   m_Layer: 0
   m_Name: SpawnPoint (1)
-  m_TagString: Untagged
+  m_TagString: Spawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1041,7 +1037,7 @@ GameObject:
   - component: {fileID: 1530258096}
   m_Layer: 0
   m_Name: SpawnPoint
-  m_TagString: Untagged
+  m_TagString: Spawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

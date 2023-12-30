@@ -39,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
     public float interpolationTimeDiff;
 
     public bool canSynchronizeTransform;
+    public bool canSendSynchronizationData;
 
     private void Start()
     {
