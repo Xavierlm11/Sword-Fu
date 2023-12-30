@@ -341,6 +341,12 @@ public class ConnectionManager : MonoBehaviour
                     Receive_UpdateParty(updateParty);
                     break;
 
+                case SendCode.UpdateGameplayHost:
+                    UpdateGameplayHost updateGameplayHost = new UpdateGameplayHost();
+                    updateGameplayHost = JsonConvert.DeserializeObject<UpdateGameplayHost>(json);
+                    Receive_UpdateGameplayHost(updateGameplayHost);
+                    break;
+                    
                 case SendCode.UpdateGameplay:
                     UpdateGameplay updateGameplay = new UpdateGameplay();
                     updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
@@ -454,6 +460,12 @@ public class ConnectionManager : MonoBehaviour
                 SerializeToJsonAndSend(playerTransform);
                 break;
 
+            case SendCode.UpdateGameplayHost:
+                UpdateGameplayHost updateGameplayHost = new UpdateGameplayHost();
+                updateGameplayHost = JsonConvert.DeserializeObject<UpdateGameplayHost>(json);
+                updateGameplayHost.CheckTargets();
+                SerializeToJsonAndSend(updateGameplayHost);
+                break;
             case SendCode.UpdateGameplay:
                 UpdateGameplay updateGameplay = new UpdateGameplay();
                 updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
@@ -483,12 +495,30 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Instance.activeRoom.party = updateParty.party;
         GameManager.Instance.SpawnPlayers();
     }
-    public void Receive_UpdateGameplay(UpdateGameplay updateGameplay)
+    public void Receive_UpdateGameplayHost(UpdateGameplayHost updateGameplay)
     {
         GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
         GameplayManager.Instance.isEndOfRound = updateGameplay.isEnd;
         
     }
+     public void Receive_UpdateGameplay(UpdateGameplay updateGameplay)
+    {
+        GameplayManager.Instance.isPaused = updateGameplay.isPaused;
+        GameplayManager.Instance.PauseTheGame();
+
+        if (!GameplayManager.Instance.canPaused)
+        {
+            GameplayManager.Instance.canPaused = true; 
+        }
+        else
+        {
+            GameplayManager.Instance.canPaused=false;
+        }
+       
+        
+    }
+
+
     public void StartGame()
     {
         SceneManager.LoadScene("Game");

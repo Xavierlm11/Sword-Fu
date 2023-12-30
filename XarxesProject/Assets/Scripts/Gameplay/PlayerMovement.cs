@@ -71,36 +71,39 @@ public class PlayerMovement : MonoBehaviour
 
 
         //Detecta los inputs
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        // El movimiento de los jugadores hecho de forma que gire de forma suave
-        direction = new Vector3(horizontal, 0f, vertical).normalized;
-
-
-        if (direction != Vector3.zero && canRotate && !isAttacking)
+        if (!GameplayManager.Instance.isPaused)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
-        }
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
 
-        //Al hacer click izquierdo del raton actiba la funcion de disparo
-        if (Input.GetButtonDown("Fire1") && havesword == true)
-        {
-            DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
-            distanceAttack.transferType = TransferType.AllExceptLocal;
-            ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
-            Disparar();
-        }
+            // El movimiento de los jugadores hecho de forma que gire de forma suave
+            direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        if (Input.GetButtonDown("Fire2"))
-        {
-            MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
-            meleeAttack.transferType = TransferType.AllExceptLocal;
-            ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
-            Ataque();
-           
-        }
 
+            if (direction != Vector3.zero && canRotate && !isAttacking)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
+            }
+
+            //Al hacer click izquierdo del raton actiba la funcion de disparo
+            if (Input.GetButtonDown("Fire1") && havesword == true)
+            {
+                DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
+                distanceAttack.transferType = TransferType.AllExceptLocal;
+                ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
+                Disparar();
+            }
+
+            if (Input.GetButtonDown("Fire2"))
+            {
+                MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
+                meleeAttack.transferType = TransferType.AllExceptLocal;
+                ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
+                Ataque();
+
+            }
+
+        }
        // }
 
     }

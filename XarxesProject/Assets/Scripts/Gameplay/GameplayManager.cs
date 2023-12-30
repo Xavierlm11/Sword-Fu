@@ -49,10 +49,19 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private int playerAlive = 0;
 
-    private List<Scene> scenesList = new List<Scene>();
+    // private List<Scene> scenesList = new List<Scene>();
 
     [SerializeField]
     private GameObject leaderboardScreen;
+
+    [SerializeField]
+    private GameObject pauseScreen;
+
+    [SerializeField]
+    public bool isPaused = false;
+
+    [SerializeField]
+    public bool canPaused = true;
 
     [SerializeField]
     private List<GameObject> winsList = new List<GameObject>();
@@ -92,19 +101,19 @@ public class GameplayManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            if (i > 1)
-            {
-                if (SceneManager.GetSceneByBuildIndex(i) != null)
-                    scenesList.Add(SceneManager.GetSceneByBuildIndex(i));
-                else
-                    Debug.Log("failed scene " + i);
-            }
-        }
+        //for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        //{
+        //    if (i > 1)
+        //    {
+        //        if (SceneManager.GetSceneByBuildIndex(i) != null)
+        //            scenesList.Add(SceneManager.GetSceneByBuildIndex(i));
+        //        else
+        //            Debug.Log("failed scene " + i);
+        //    }
+        //}
         //Debug.Log("amogassss " +  scenesList.Count);
         Debug.Log("Scenes on build: " + SceneManager.sceneCountInBuildSettings);
-        //Debug.Log(SceneManager.GetSceneByBuildIndex(0).name);
+
         levelsCount = SceneManager.sceneCountInBuildSettings;
 
     }
@@ -133,6 +142,24 @@ public class GameplayManager : MonoBehaviour
 
                     }
 
+
+
+                    if (Input.GetKeyDown(KeyCode.Escape) && canPaused)
+                    {
+
+                        if (!isPaused)
+                        {
+                            isPaused = true;
+                        }
+                        else
+                        {
+                            isPaused = false;
+                        }
+                        PauseTheGame();
+                        UpdateGameplayEveryOne();
+                    }
+
+
                     if (Input.GetKeyDown(KeyCode.Tab))
                     {
                         leaderboardScreen.SetActive(true);
@@ -153,6 +180,7 @@ public class GameplayManager : MonoBehaviour
                     {
                         leaderboardScreen.SetActive(false);
                     }
+
                     if (Input.GetKeyUp(KeyCode.U))
                     {
                         CountPlayerAlive();
@@ -170,7 +198,7 @@ public class GameplayManager : MonoBehaviour
                             // winScreen.SetActive(true);
                             isEndOfRound = true;
                             GetRandomNextLvl();
-                            UpdateGameplayEveryOne();
+                            UpdateGameplayEveryOneHost();
                         }
                     }
                 }
@@ -204,21 +232,21 @@ public class GameplayManager : MonoBehaviour
                         dtWinScreen = 0f;
                         winScreen.SetActive(false);
 
-                        // if(rounds)
 
-                        //foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
-                        //{
-                        //    if (player.playerCharacter.playerMovement.wins < rounds)
-                        //    {
-                        //        LoadNewRound(randomLvl);
-                        //        roundState = roundPhase.Starting;
 
-                        //    }
-                        //    else
-                        //    {
-                        //        roundState = roundPhase.EndGame;
-                        //    }
-                        //}
+                        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+                        {
+                            if (player.playerCharacter.playerMovement.wins < rounds)
+                            {
+                                LoadNewRound(randomLvl);
+                                roundState = roundPhase.Starting;
+
+                            }
+                            else
+                            {
+                                roundState = roundPhase.EndGame;
+                            }
+                        }
                         roundState = roundPhase.Starting;
                         isEndOfRound = false;
                     }
@@ -234,6 +262,21 @@ public class GameplayManager : MonoBehaviour
 
 
     }
+
+    public void PauseTheGame()
+    {
+        if (isPaused)
+        {
+            pauseScreen.SetActive(true);
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            pauseScreen.SetActive(false);
+            Time.timeScale = 1f;
+        }
+    }
+
     public void UpdateLeaderboard()
     {
         int count = 0;
@@ -315,7 +358,7 @@ public class GameplayManager : MonoBehaviour
             if (NetworkManager.Instance.GetLocalClient().isHost)
             {
                 GetRandomNextLvl();
-                UpdateGameplayEveryOne();
+                UpdateGameplayEveryOneHost();
             }
             isEndOfRound = true;
             //winScreen.SetActive(true);
@@ -361,10 +404,16 @@ public class GameplayManager : MonoBehaviour
         return count;
     }
 
+    private void UpdateGameplayEveryOneHost()
+    {
+        UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound);
+        _updateGameplay.transferType = TransferType.OnlyClients;
+        ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
+    }
     private void UpdateGameplayEveryOne()
     {
-        UpdateGameplay _updateGameplay = new UpdateGameplay(randomLvl, isEndOfRound/*, GetWinner().playerInfo.client.nickname*/);
-        _updateGameplay.transferType = TransferType.OnlyClients;
+        UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused);
+        _updateGameplay.transferType = TransferType.AllExceptLocal;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
 }

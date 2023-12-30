@@ -235,26 +235,42 @@ public class UpdateParty : GenericSendClass
 
 }
 
-public class UpdateGameplay : GenericSendClass
+public class UpdateGameplayHost : GenericSendClass
 {
     public int nextLvl;
     public bool isEnd;
+    
     //public string winnerName;
+
+    public UpdateGameplayHost()
+    {
+
+    }
+    public UpdateGameplayHost(int nextLvl, bool isEnd) : base(true)
+    {
+        this.nextLvl = nextLvl;
+        this.isEnd = isEnd;
+
+        sendCode = SendCode.UpdateGameplayHost;
+    }   
+}
+
+public class UpdateGameplay : GenericSendClass
+{
+    
+    public bool isPaused;
 
     public UpdateGameplay()
     {
 
     }
-    public UpdateGameplay(int nextLvl,bool isEnd/*, string winnerName*/) : base(true)
+    public UpdateGameplay(bool isPuased) : base(true)
     {
-        this.nextLvl = nextLvl;
-        this.isEnd = isEnd;
-       // this.winnerName = winnerName;
+        this.isPaused = isPuased;
 
-        sendCode= SendCode.UpdateGameplay;
-    }   
+        sendCode = SendCode.UpdateGameplay;
+    }
 }
-
 #endregion
 
 
@@ -303,6 +319,7 @@ public enum SendCode
     RoomInfoUpdate,
     StartGame,
     UpdateParty,
+    UpdateGameplayHost,
     UpdateGameplay,
     MeleeAttack,
     DistanceAttack,
