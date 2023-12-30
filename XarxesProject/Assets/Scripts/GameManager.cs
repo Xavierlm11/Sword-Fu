@@ -77,6 +77,20 @@ public class GameManager : MonoBehaviour
             
         }
 
+        SetNicknameInUI();
+
         PlayerManager.Instance.SpawnCharacters();
+    }
+
+    public void SetNicknameInUI()
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (PartyManager.Instance.playerCharacterLinks[i].isLocal)
+            {
+                GameplayManager.Instance.localNicknameText.text = PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname;
+            }
+        }
+
     }
 }

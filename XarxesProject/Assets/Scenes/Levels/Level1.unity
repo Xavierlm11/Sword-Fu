@@ -425,6 +425,14 @@ MonoBehaviour:
   startLevelsIndex: 1
   lastLevelIndex: 1
   randomLvl: 1
+  playerAlive: 0
+  leaderboardScreen: {fileID: 0}
+  pauseScreen: {fileID: 0}
+  isPaused: 0
+  canPaused: 1
+  winsList: []
+  leaderPlayersObjList: []
+  localNicknameText: {fileID: 0}
 --- !u!4 &715169860
 Transform:
   m_ObjectHideFlags: 0

@@ -69,6 +69,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private List<GameObject> leaderPlayersObjList = new List<GameObject>();
 
+    public TextMeshProUGUI localNicknameText;
 
     #endregion
 
