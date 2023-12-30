@@ -178,7 +178,9 @@ public class PlayerTransform : GenericSendClass
     public float positionY;
     public float positionZ;
 
-    public float rotY;
+    public float rotationX;
+    public float rotationY;
+    public float rotationZ;
 
     public PlayerInfo player;
 
@@ -442,6 +444,7 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
     public float networkUpdateInterval;
 
     public InterpolationMode movementInterpolation;
+    public InterpolationMode rotationInterpolation;
 
     #endregion
 

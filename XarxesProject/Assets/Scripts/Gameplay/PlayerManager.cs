@@ -116,6 +116,7 @@ public class PlayerManager : MonoBehaviour
         newLink.isLocal = isLocal;
         newLink.playerCharacter = newPlayerCharacterObj.GetComponent<PlayerCharacter>();
         newLink.playerCharacter.characterObject = newLink.playerCharacter.gameObject;
+        newLink.playerCharacter.characterObject.SetActive(false);
         newLink.playerCharacter.characterLink = newLink;
         newLink.playerInfo = playerInfo;
 
@@ -143,6 +144,7 @@ public class PlayerManager : MonoBehaviour
             if (i < spawnPoints.Count)
             {
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject.transform.position = spawnPoints[i].transform.position;
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject.SetActive(true);
                 Debug.Log($"{PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname} aparece en el punto {spawnPoints[i].name}.");
             }
             else

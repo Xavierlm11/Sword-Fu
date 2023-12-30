@@ -29,6 +29,11 @@ public class PlayerMovement : MonoBehaviour
     public PlayerCharacter playerCharacter;
 
     public Vector3 positionToSet;
+    public Vector3 rotationToSet;
+
+    public Vector3 currentInterpolationPosition;
+    public Vector3 currentInterpolationRotation;
+
     public float currentInterpolationTime;
     public float lastInterpolationTime;
     public float interpolationTimeDiff;
@@ -91,9 +96,10 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    public void SetTransformInterpolation(Vector3 newPos)
+    public void SetTransformInterpolation(Vector3 newPos, Vector3 newRot)
     {
         positionToSet = newPos;
+        rotationToSet = newRot;
 
         lastInterpolationTime = currentInterpolationTime;
         currentInterpolationTime = Time.time;
@@ -105,6 +111,8 @@ public class PlayerMovement : MonoBehaviour
             interpolationTimeDiff = NetworkManager.Instance.networkUpdateInterval;
         }
 
+        currentInterpolationPosition = transform.position;
+        currentInterpolationRotation = transform.eulerAngles;
 
         CheckTransformInterpolation();
     }
@@ -112,6 +120,8 @@ public class PlayerMovement : MonoBehaviour
     public void CheckTransformInterpolation()
     {
         float elapsed_time = Time.time - currentInterpolationTime;
+
+        float interpolationDelay =1;
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -123,25 +133,25 @@ public class PlayerMovement : MonoBehaviour
 
             case InterpolationMode.Lerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
-                    transform.position = Vector3.Lerp(transform.position, positionToSet, t);
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
+                    transform.position = Vector3.Lerp(currentInterpolationPosition, positionToSet, t);
                 }
                 break;
 
             case InterpolationMode.Slerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
-                    transform.position = Vector3.Slerp(transform.position, positionToSet, t);
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
+                    transform.position = Vector3.Slerp(currentInterpolationPosition, positionToSet, t);
                 }
                 break;
 
             case InterpolationMode.SmoothStep:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * 2));
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
 
-                    float xPos = Mathf.SmoothStep(transform.position.x, positionToSet.x, t);
-                    float yPos = Mathf.SmoothStep(transform.position.y, positionToSet.y, t);
-                    float zPos = Mathf.SmoothStep(transform.position.z, positionToSet.z, t);
+                    float xPos = Mathf.SmoothStep(currentInterpolationPosition.x, positionToSet.x, t);
+                    float yPos = Mathf.SmoothStep(currentInterpolationPosition.y, positionToSet.y, t);
+                    float zPos = Mathf.SmoothStep(currentInterpolationPosition.z, positionToSet.z, t);
 
                     Vector3 newPos = new Vector3(xPos, yPos, zPos);
 
@@ -149,6 +159,46 @@ public class PlayerMovement : MonoBehaviour
                 }
                 break;
         }
+
+        switch (NetworkManager.Instance.rotationInterpolation)
+        {
+            case InterpolationMode.None:
+                {
+                    transform.rotation = Quaternion.Euler(rotationToSet);
+                }
+                break;
+
+            case InterpolationMode.Lerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
+                    transform.rotation = Quaternion.Euler(Vector3.Lerp(currentInterpolationRotation, rotationToSet, t));
+                }
+                break;
+
+            case InterpolationMode.Slerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
+                    transform.rotation = Quaternion.Euler(Vector3.Slerp(currentInterpolationRotation, rotationToSet, t));
+                    //transform.rotation = Vector3.Slerp(currentInterpolationRotation, rotationToSet, t);
+
+                }
+                break;
+
+            case InterpolationMode.SmoothStep:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff * interpolationDelay));
+
+                    float xRot = Mathf.SmoothStep(currentInterpolationRotation.x, rotationToSet.x, t);
+                    float yRot = Mathf.SmoothStep(currentInterpolationRotation.y, rotationToSet.y, t);
+                    float zRot = Mathf.SmoothStep(currentInterpolationRotation.z, rotationToSet.z, t);
+
+                    Vector3 newRot = new Vector3(xRot, yRot, zRot);
+
+                    transform.rotation = Quaternion.Euler(newRot);
+                }
+                break;
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)

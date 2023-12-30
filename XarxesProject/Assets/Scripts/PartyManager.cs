@@ -103,8 +103,9 @@ public class PartyManager : MonoBehaviour
                 playerTransform.positionY = link.playerCharacter.characterObject.transform.position.y;
                 playerTransform.positionZ = link.playerCharacter.characterObject.transform.position.z;
 
-
-                playerTransform.rotY = link.playerCharacter.characterObject.transform.rotation.y;
+                playerTransform.rotationX = link.playerCharacter.characterObject.transform.rotation.eulerAngles.x;
+                playerTransform.rotationY = link.playerCharacter.characterObject.transform.rotation.eulerAngles.y;
+                playerTransform.rotationZ = link.playerCharacter.characterObject.transform.rotation.eulerAngles.z;
 
                 playerTransform.transferType = TransferType.AllExceptLocal;
 

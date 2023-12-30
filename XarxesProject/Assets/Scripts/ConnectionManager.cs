@@ -358,12 +358,18 @@ public class ConnectionManager : MonoBehaviour
             {
                 Vector3 newPos = new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
 
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos);
+                Vector3 rot = new Vector3(playerTransform.rotationX, playerTransform.rotationY, playerTransform.rotationZ);
+
+                //rot.x = playerTransform.rotationX;
+                //rot.y = playerTransform.rotationY;
+                //rot.z = playerTransform.rotationZ;
+
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos, rot);
 
 
-                Vector3 rot = PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.rotation.eulerAngles;
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.transform.eulerAngles = rot;
-                rot.y = playerTransform.rotY;
+                
+
+                
 
             }
         }
