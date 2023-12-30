@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
+
 public class GameplayManager : MonoBehaviour
 {
     #region variables
@@ -44,6 +45,9 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     public int randomLvl = 1;
+
+    [SerializeField]
+    private int playerAlive = 0;
 
     private List<Scene> scenesList = new List<Scene>();
 
@@ -118,7 +122,7 @@ public class GameplayManager : MonoBehaviour
             case roundPhase.Starting:
                 {
                     roundState = roundPhase.InGame;
-
+                    CountPlayerAlive();
                 }
                 break;
             case roundPhase.InGame:
@@ -149,6 +153,10 @@ public class GameplayManager : MonoBehaviour
                     {
                         leaderboardScreen.SetActive(false);
                     }
+                    if (Input.GetKeyUp(KeyCode.U))
+                    {
+                        CountPlayerAlive();
+                    }
 
                     //if (Input.GetKeyDown(KeyCode.L))
                     //{
@@ -172,11 +180,24 @@ public class GameplayManager : MonoBehaviour
                     dtWinScreen += Time.deltaTime;
                     if (winScreen.activeSelf == false)
                     {
+                        PlayerCharacterLink winnerLink = GetWinner();
+                        if (winnerLink != null)
+                        {
+                            WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
+                            winnerLink.playerCharacter.playerMovement.wins++;
+                        }
+                        else
+                        {
+                            WinnerText.text = "Someone" + " somehow won";
+                        }
+
+
+
+                        UpdateLeaderboard();
                         winScreen.SetActive(true);
+
                     }
 
-                    if (GetWinner() != null) WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
-                    else WinnerText.text = "PACO " + " somehow won";
 
                     if (dtWinScreen >= timeWinScreen)
                     {
@@ -184,20 +205,21 @@ public class GameplayManager : MonoBehaviour
                         winScreen.SetActive(false);
 
                         // if(rounds)
-                        UpdateLeaderboard();
-                        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
-                        {
-                            if (player.playerCharacter.playerMovement.wins < rounds)
-                            {
-                                LoadNewRound(randomLvl);
-                                roundState = roundPhase.Starting;
 
-                            }
-                            else
-                            {
-                                roundState = roundPhase.EndGame;
-                            }
-                        }
+                        //foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+                        //{
+                        //    if (player.playerCharacter.playerMovement.wins < rounds)
+                        //    {
+                        //        LoadNewRound(randomLvl);
+                        //        roundState = roundPhase.Starting;
+
+                        //    }
+                        //    else
+                        //    {
+                        //        roundState = roundPhase.EndGame;
+                        //    }
+                        //}
+                        roundState = roundPhase.Starting;
                         isEndOfRound = false;
                     }
                 }
@@ -296,7 +318,7 @@ public class GameplayManager : MonoBehaviour
                 UpdateGameplayEveryOne();
             }
             isEndOfRound = true;
-            winScreen.SetActive(true);
+            //winScreen.SetActive(true);
 
         }
     }
@@ -312,7 +334,7 @@ public class GameplayManager : MonoBehaviour
 
                 if (item.playerCharacter.playerMovement.isAlive)
                 {
-                    item.playerCharacter.playerMovement.wins++;
+
                     return item;
                 }
             }
@@ -320,10 +342,9 @@ public class GameplayManager : MonoBehaviour
 
         return link;
     }
-    private int CountPlayerAlive()
+    public int CountPlayerAlive()
     {
         int count = 0;
-
         foreach (PlayerCharacterLink item in PartyManager.Instance.playerCharacterLinks)
         {
             if (item != null)
@@ -335,6 +356,8 @@ public class GameplayManager : MonoBehaviour
                 }
             }
         }
+        Debug.Log("Players alive: " + count);
+        playerAlive = count;
         return count;
     }
 

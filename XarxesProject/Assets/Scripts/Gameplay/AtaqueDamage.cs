@@ -15,11 +15,11 @@ public class AtaqueDamage : MonoBehaviour
         {
             Debug.Log("Le hace daño");
             player.ReceiveDamage(damageAmount);
-            player.Die();
-            
+            //player.Die();
+
         }
     }
-    
+
     public void SetOwner(GameObject player)
     {
         owner = player;

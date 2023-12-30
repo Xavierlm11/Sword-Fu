@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float velocidad = 5.0f; 
+    public float velocidad = 5.0f;
     public Vector3 direccion = Vector3.forward;
     public int damageAmount = 20;
     public GameObject fallensword;
@@ -21,8 +21,8 @@ public class Bullet : MonoBehaviour
         //Hace que ña bala se mueva hacia delante
         transform.Translate(direccion * velocidad * Time.deltaTime);
     }
-    
-        private void OnTriggerEnter(Collider other)
+
+    private void OnTriggerEnter(Collider other)
     {
         PlayerMovement player = other.GetComponent<PlayerMovement>();
 
@@ -30,7 +30,7 @@ public class Bullet : MonoBehaviour
         {
             Debug.Log("Le hace daño");
             player.ReceiveDamage(damageAmount);
-            player.Die();
+            // player.Die();
 
         }
 
@@ -38,7 +38,7 @@ public class Bullet : MonoBehaviour
         GameObject FallenSword = Instantiate(fallensword, transform.position, Quaternion.identity);
     }
 
-  
+
 
     public void SetOwner(GameObject player)
     {
