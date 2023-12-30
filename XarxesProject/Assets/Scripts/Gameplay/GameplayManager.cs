@@ -5,13 +5,15 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class GameplayManager : MonoBehaviour
 {
     #region variables
 
     [SerializeField]
-    private int rounds = 4;
+    private int rounds = 3;
 
     [SerializeField]
     private int currentRound = 1;
@@ -44,8 +46,30 @@ public class GameplayManager : MonoBehaviour
     public int randomLvl = 1;
 
     private List<Scene> scenesList = new List<Scene>();
+
+    [SerializeField]
+    private GameObject leaderboardScreen;
+
+    [SerializeField]
+    private List<GameObject> winsList = new List<GameObject>();
+
+    [SerializeField]
+    private List<GameObject> leaderPlayersObjList = new List<GameObject>();
+
+
     #endregion
 
+    public enum roundPhase
+    {
+
+        StartGame,
+        Starting,
+        InGame,
+        Ending,
+        EndGame,
+
+    }
+    private roundPhase roundState = roundPhase.Starting;
     public static GameplayManager Instance;
 
     private void OnEnable()
@@ -84,50 +108,151 @@ public class GameplayManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        if (isEndOfRound)
+        switch (roundState)
         {
-            dtWinScreen += Time.deltaTime;
-            if (winScreen.activeSelf == false)
+            case roundPhase.StartGame:
+                {
+                    roundState = roundPhase.Starting;
+                }
+                break;
+            case roundPhase.Starting:
+                {
+                    roundState = roundPhase.InGame;
+
+                }
+                break;
+            case roundPhase.InGame:
+                {
+                    if (isEndOfRound)
+                    {
+                        roundState = roundPhase.Ending;
+
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Tab))
+                    {
+                        leaderboardScreen.SetActive(true);
+                        if (!leaderPlayersObjList[0].activeSelf)
+                        {
+                            for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+                            {
+                                if (!leaderPlayersObjList[i].activeSelf)
+                                {
+                                    leaderPlayersObjList[i].SetActive(true);
+                                    leaderPlayersObjList[i].GetComponent<TMP_Text>().text = PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname;
+                                }
+                            }
+                        }
+
+                    }
+                    if (Input.GetKeyUp(KeyCode.Tab))
+                    {
+                        leaderboardScreen.SetActive(false);
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.L))
+                    {
+                        GetRandomNextLvl();
+                        LoadNewRandomRound();
+                    }
+                    if (Input.GetKeyDown(KeyCode.K))
+                    {
+                        if (NetworkManager.Instance.GetLocalClient().isHost)
+                        {
+                            // winScreen.SetActive(true);
+                            isEndOfRound = true;
+                            GetRandomNextLvl();
+                            UpdateGameplayEveryOne();
+                        }
+                    }
+                }
+                break;
+            case roundPhase.Ending:
+                {
+                    dtWinScreen += Time.deltaTime;
+                    if (winScreen.activeSelf == false)
+                    {
+                        winScreen.SetActive(true);
+                    }
+
+                    if (GetWinner() != null) WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
+                    else WinnerText.text = "PACO " + " somehow won";
+
+                    if (dtWinScreen >= timeWinScreen)
+                    {
+                        dtWinScreen = 0f;
+                        winScreen.SetActive(false);
+
+                        // if(rounds)
+                        UpdateLeaderboard();
+                        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+                        {
+                            if (player.playerCharacter.playerMovement.wins < rounds)
+                            {
+                                LoadNewRound(randomLvl);
+                                roundState = roundPhase.Starting;
+
+                            }
+                            else
+                            {
+                                roundState = roundPhase.EndGame;
+                            }
+                        }
+                        isEndOfRound = false;
+                    }
+                }
+                break;
+            case roundPhase.EndGame:
+                {
+
+                }
+                break;
+        }
+
+
+
+    }
+    public void UpdateLeaderboard()
+    {
+        int count = 0;
+
+        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        {
+
+            if (player != null)
             {
-                winScreen.SetActive(true);
-            }
-            //WinnerText.text = GetWinner().playerInfo.client.nickname + " somehow won";
-            WinnerText.text = "PACO " + " somehow won";
-            if (dtWinScreen >= timeWinScreen)
-            {
-                dtWinScreen = 0f;
-                winScreen.SetActive(false);
-                //if (NetworkManager.Instance.GetLocalClient().isHost)
+                for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
+                {
+
+                    if (winsList[count].transform.childCount > player.playerCharacter.playerMovement.wins)
+                    {
+                        winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.yellow;
+                    }
+                }
+
+                //foreach (GameObject stars in winsList)
                 //{
-                //    LoadNewRandomRound();
 
                 //}
-                //else
+                //for (int i = 0; i < winsList.Count; i++)
                 //{
-                //    LoadNewRound(randomLvl);
+                //    winsList[i].transform.GetChild()
                 //}
-                LoadNewRound(randomLvl);
-                isEndOfRound = false;
+                //for (int j = 0; j < count; j++)
+                //{
+                //    for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
+                //    {
+                //        winsList[j].transform.GetChild(i).GetComponent<RawImage>().color = Color.yellow;
+                //    } 
+                //}
+
+                //if (player.playerCharacter.playerMovement)
+                //{
+
+                //}
+                count++;
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            GetRandomNextLvl();
-            LoadNewRandomRound();
-        }
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            if (NetworkManager.Instance.GetLocalClient().isHost)
-            {
-               // winScreen.SetActive(true);
-                isEndOfRound = true;
-                GetRandomNextLvl();
-                UpdateGameplayEveryOne();
-            }
-        }
-
     }
     public void LoadNewRound(int lvlIndex)
     {
@@ -187,6 +312,7 @@ public class GameplayManager : MonoBehaviour
 
                 if (item.playerCharacter.playerMovement.isAlive)
                 {
+                    item.playerCharacter.playerMovement.wins++;
                     return item;
                 }
             }

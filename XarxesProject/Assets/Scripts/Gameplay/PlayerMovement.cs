@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isAlive = true;
     private Rigidbody rb;
     public Vector3 direction;
+    public int wins = 0;
 
     public int health = 100;
     public GameObject balaPrefab;
