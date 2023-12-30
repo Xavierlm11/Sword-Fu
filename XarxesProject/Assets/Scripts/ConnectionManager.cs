@@ -528,6 +528,7 @@ public class ConnectionManager : MonoBehaviour
 
             //SendClientListUpdate();
             SendRoomInfoUpdate();
+            LobbyManager.Instance.UpdateWaitingRoom();
         }
     }
 
@@ -644,6 +645,7 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Instance.activeRoom = null;
         NetworkManager.Instance.activeRoom = newRoomInfo;
         LobbyManager.Instance.titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
+        LobbyManager.Instance.UpdateWaitingRoom();
     }
 
     public void Receive_DebugMessage(DebugMessage debugMessage)

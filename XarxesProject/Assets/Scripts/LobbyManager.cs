@@ -175,29 +175,34 @@ public class LobbyManager : MonoBehaviour
 
         if (stage == MenuStage.waitingRoom)
         {
-            if (!NetworkManager.Instance.GetLocalClient().isHost)
+            if (!NetworkManager.Instance.GetLocalClient().isHost && startBut.activeSelf)
             {
                 startBut.SetActive(false);
             }
 
+           // UpdateWaitingRoom();
+        }
 
-            if(NetworkManager.Instance.activeRoom != null)
+    }
+
+    public void UpdateWaitingRoom()
+    {
+       
+        if (NetworkManager.Instance.activeRoom != null)
+        {
+            if (NetworkManager.Instance.activeRoom.clients != null)
             {
-                if (NetworkManager.Instance.activeRoom.clients != null)
+                for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
                 {
-                    for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
+                    if (listPlayerText[i] != null && NetworkManager.Instance.activeRoom.clients[i] != null)
                     {
-                        if (listPlayerText[i] != null && NetworkManager.Instance.activeRoom.clients[i] != null)
-                        {
-                            listPlayerText[i].SetActive(true);
-                            listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname;
-                        }
-
+                        listPlayerText[i].SetActive(true);
+                        listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname;
                     }
+
                 }
             }
         }
-
     }
 
     public void ChangeStage(MenuStage newStage)
