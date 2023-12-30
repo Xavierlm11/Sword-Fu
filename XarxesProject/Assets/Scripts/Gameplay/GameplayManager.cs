@@ -150,11 +150,11 @@ public class GameplayManager : MonoBehaviour
                         leaderboardScreen.SetActive(false);
                     }
 
-                    if (Input.GetKeyDown(KeyCode.L))
-                    {
-                        GetRandomNextLvl();
-                        LoadNewRandomRound();
-                    }
+                    //if (Input.GetKeyDown(KeyCode.L))
+                    //{
+                    //    GetRandomNextLvl();
+                    //    LoadNewRandomRound();
+                    //}
                     if (Input.GetKeyDown(KeyCode.K))
                     {
                         if (NetworkManager.Instance.GetLocalClient().isHost)
