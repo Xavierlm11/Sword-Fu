@@ -270,7 +270,7 @@ public class ConnectionManager : MonoBehaviour
         GenericSendClass sendClass = new GenericSendClass();
         sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
-        Debug.Log("Data Received: " + sendClass.sendCode.ToString());
+        //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
 
         if (sendClass.hasToCheckTargets)
         {
@@ -390,14 +390,16 @@ public class ConnectionManager : MonoBehaviour
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == playerTransform.player.client.nickname)
             {
-                Vector3 newPos = new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
+                if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement != null)
+                {
+                    Vector3 newPos = new Vector3(playerTransform.positionX, playerTransform.positionY, playerTransform.positionZ);
 
-                Vector3 rot = new Vector3(playerTransform.rotationX, playerTransform.rotationY, playerTransform.rotationZ);
+                    Vector3 rot = new Vector3(playerTransform.rotationX, playerTransform.rotationY, playerTransform.rotationZ);
 
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos, rot);
+                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos, rot);
+                }
             }
         }
-
     }
 
     public void SetTargetsAsChecked(GenericSendClass sendClass, string json)

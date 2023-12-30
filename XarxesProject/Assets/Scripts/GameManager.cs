@@ -29,6 +29,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ResetCharacters()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            EraseAllCharacters();
+            PlayerManager.Instance.SpawnCharacters();
+        }
+    }
+
     public void CreateParty()
     {
         NetworkManager.Instance.activeRoom.party = new Party();
@@ -44,8 +53,17 @@ public class GameManager : MonoBehaviour
         ConnectionManager.Instance.SerializeToJsonAndSend(updateParty);
     }
 
+    public void EraseAllCharacters()
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.characterObject);
+        }
+    }
+
     public void SpawnPlayers()
     {
+
         foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
         {
             if (pl.client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
@@ -59,6 +77,6 @@ public class GameManager : MonoBehaviour
             
         }
 
-        PlayerManager.Instance.AssignSpawnPoints();
+        PlayerManager.Instance.SpawnCharacters();
     }
 }

@@ -38,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
     public float lastInterpolationTime;
     public float interpolationTimeDiff;
 
+    public bool canSynchronizeTransform;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -56,7 +58,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (playerCharacter != null && !playerCharacter.characterLink.isLocal)
         {
-            CheckTransformInterpolation();
+            if (canSynchronizeTransform)
+            {
+                CheckTransformInterpolation();
+            }
             return;
         }
 
@@ -101,6 +106,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetTransformInterpolation(Vector3 newPos, Vector3 newRot)
     {
+        canSynchronizeTransform = true;
+
         positionToSet = newPos;
         rotationToSet = newRot;
 

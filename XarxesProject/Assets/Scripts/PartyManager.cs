@@ -56,8 +56,16 @@ public class PartyManager : MonoBehaviour
         //    return;
         //}
 
-
-        SendLocalPlayerPosition(NetworkManager.Instance.useNetworkUpdateInterval);
+        foreach (PlayerCharacterLink link in playerCharacterLinks)
+        {
+            if (link.isLocal && link.playerCharacter != null && link.playerCharacter.playerMovement != null)
+            {
+                if (link.playerCharacter.playerMovement.canSynchronizeTransform)
+                {
+                    SendLocalPlayerPosition(NetworkManager.Instance.useNetworkUpdateInterval);
+                }
+            }
+        }
 
 
 

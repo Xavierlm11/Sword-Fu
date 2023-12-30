@@ -4,7 +4,6 @@
 - If server has to do some action, do it instead of sending it to itself and then doing it.
 - Manage lost packets
 - Manage packets order
-- Interpolation
 - Check if go back goes well
 - Manage if clients or host disconnect
 - Limit to 4 max players per match
@@ -19,8 +18,12 @@ xavi l - gestion de partidas, menus, pausa, nicknames
 xavi c - interpolacion, package management
 albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
 
------ Network connections
+----- Network Synchronizations
 -Player positions
 -Player rotations
 -Melee attack (function)
 -Long attack (function)
+-Sword position
+-Dies
+
+-Spawns
