@@ -80,14 +80,17 @@ public class PlayerMovement : MonoBehaviour
         //Al hacer click izquierdo del raton actiba la funcion de disparo
         if (Input.GetButtonDown("Fire1") && havesword == true)
         {
-
+            DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
+            distanceAttack.transferType = TransferType.AllExceptLocal;
+            ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
             Disparar();
-
         }
 
         if (Input.GetButtonDown("Fire2"))
         {
-
+            MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
+            meleeAttack.transferType = TransferType.AllExceptLocal;
+            ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
             Ataque();
            
         }
@@ -121,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
     {
         float elapsed_time = Time.time - currentInterpolationTime;
 
-        float interpolationDelay =1;
+        float interpolationDelay = 1;
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -246,7 +249,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Disparar()
+    public void Disparar()
     {
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
@@ -271,7 +274,7 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
-    void Ataque()
+    public void Ataque()
     {
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)

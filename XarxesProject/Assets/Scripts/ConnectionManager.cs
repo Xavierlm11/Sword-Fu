@@ -346,6 +346,40 @@ public class ConnectionManager : MonoBehaviour
                     updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
                     Receive_UpdateGameplay(updateGameplay);
                     break;
+
+                case SendCode.MeleeAttack:
+                    MeleeAttack meleeAttack = new MeleeAttack();
+                    meleeAttack = JsonConvert.DeserializeObject<MeleeAttack>(json);
+                    Receive_MeleeAttack(meleeAttack);
+                    break;
+
+                case SendCode.DistanceAttack:
+                    DistanceAttack distanceAttack = new DistanceAttack();
+                    distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
+                    Receive_DistanceAttack(distanceAttack);
+                    break;
+            }
+        }
+    }
+
+    public void Receive_MeleeAttack(MeleeAttack meleeAttack)
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == meleeAttack.player.client.nickname)
+            {
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Ataque();
+            }
+        }
+    }
+
+    public void Receive_DistanceAttack(DistanceAttack distanceAttack)
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == distanceAttack.player.client.nickname)
+            {
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Disparar();
             }
         }
     }
@@ -360,17 +394,7 @@ public class ConnectionManager : MonoBehaviour
 
                 Vector3 rot = new Vector3(playerTransform.rotationX, playerTransform.rotationY, playerTransform.rotationZ);
 
-                //rot.x = playerTransform.rotationX;
-                //rot.y = playerTransform.rotationY;
-                //rot.z = playerTransform.rotationZ;
-
                 PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation(newPos, rot);
-
-
-                
-
-                
-
             }
         }
 
@@ -433,6 +457,20 @@ public class ConnectionManager : MonoBehaviour
                 updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
                 updateGameplay.CheckTargets();
                 SerializeToJsonAndSend(updateGameplay);
+                break;
+
+            case SendCode.MeleeAttack:
+                MeleeAttack meleeAttack = new MeleeAttack();
+                meleeAttack = JsonConvert.DeserializeObject<MeleeAttack>(json);
+                meleeAttack.CheckTargets();
+                SerializeToJsonAndSend(meleeAttack);
+                break;
+
+            case SendCode.DistanceAttack:
+                DistanceAttack distanceAttack = new DistanceAttack();
+                distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
+                distanceAttack.CheckTargets();
+                SerializeToJsonAndSend(distanceAttack);
                 break;
 
         }

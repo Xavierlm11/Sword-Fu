@@ -172,8 +172,6 @@ public class PlayerTransform : GenericSendClass
         sendCode = SendCode.PlayerTransform;
     }
 
-    //public float[] position;
-
     public float positionX;
     public float positionY;
     public float positionZ;
@@ -186,44 +184,38 @@ public class PlayerTransform : GenericSendClass
 
 }
 
-//public class SendIdPlayer : GenericSendClass
-//{
-//    public int playerId =2;
-//   // public string playerIp;
-//    public SendIdPlayer()
-//    {
-
-//    }
-//    public SendIdPlayer(ConnectionManager.PartyPlayersInfo ppi)
-//    {
-//        playerId = ppi.playerID;
-//        sendCode = SendCode.SendIdPlayer;
-//        //playerIp = ppi.playerInfo.playerIp;
-//    }
-
-//}
-
-public class SendTransPlayer : GenericSendClass
+public class MeleeAttack : GenericSendClass
 {
-    public Vector3 pos;
-    public float angRot;
-    public int playerId;
-   // public string playerIp;
-    public SendTransPlayer()
+    public MeleeAttack()
     {
 
     }
 
-    //public SendTransPlayer(PlayerPosition ppi) : base(true)
-    //{
-    //    ConnectionManager.PlayerPosition newPos = ppi.playerPositions;
-    //    pos = new Vector3(newPos.positionX,newPos.positionY,newPos.positionZ);
-    //    angRot = newPos.rotY;
-    //    playerId = newPos.playerId;
-    //    sendCode = SendCode.PlayerPositions;
-    //    //playerIp = ppi.playerInfo.playerIp;
-    //}
-    
+    public MeleeAttack(PlayerInfo playerInfo) : base(true)
+    {
+        player = playerInfo;
+        sendCode = SendCode.MeleeAttack;
+    }
+
+    public PlayerInfo player;
+
+}
+
+public class DistanceAttack : GenericSendClass
+{
+    public DistanceAttack()
+    {
+
+    }
+
+    public DistanceAttack(PlayerInfo playerInfo) : base(true)
+    {
+        player = playerInfo;
+        sendCode = SendCode.DistanceAttack;
+    }
+
+    public PlayerInfo player;
+
 }
 
 public class UpdateParty : GenericSendClass
@@ -312,6 +304,8 @@ public enum SendCode
     StartGame,
     UpdateParty,
     UpdateGameplay,
+    MeleeAttack,
+    DistanceAttack,
 }
 
 public enum TransferType
