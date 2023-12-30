@@ -7,7 +7,6 @@ TagManager:
   - PartyManager
   - Muro
   - FallenSword
-  - Spawn
   layers:
   - Default
   - TransparentFX

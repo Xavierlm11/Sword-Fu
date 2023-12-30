@@ -24,7 +24,6 @@ public class PartyManager : MonoBehaviour
 
     public List<PlayerCharacterLink> playerCharacterLinks = new List<PlayerCharacterLink>();
 
-
     public static PartyManager Instance;
 
     public float sendTimer;

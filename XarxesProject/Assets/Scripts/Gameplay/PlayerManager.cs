@@ -43,11 +43,7 @@ public class PlayerManager : MonoBehaviour
     public void GetSpawns()
     {
         spawnPoints.Clear();
-        GameObject[] spawns = GameObject.FindGameObjectsWithTag("Spawn");
-        foreach (GameObject sp in spawns)
-        {
-            spawnPoints.Add(sp);
-        }
+        spawnPoints = SpawnManager.Instance.spawnPoints;
     }
 
     public void SpawnCharacters()
