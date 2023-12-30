@@ -18,3 +18,9 @@
 xavi l - gestion de partidas, menus, pausa, nicknames
 xavi c - interpolacion, package management
 albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
+
+----- Network connections
+-Player positions
+-Player rotations
+-Melee attack (function)
+-Long attack (function)
