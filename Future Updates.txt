@@ -25,5 +25,23 @@ albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
 -Long attack (function)
 -Sword position
 -Dies
+-Round pass
 
--Spawns
+Cosas por hacer:
+Spawns a diferentes alturas y colliders ----
+Escenarios ---
+Dash
+Espada más visible ---
+Marca del local ---
+Animaciones sincronizadas
+Personajes variados
+Nombre del host en el lobby cuando está solo
+Personajes más veloces y que rotan más rápido ----
+
+-Video (Xavi L)
+-Comentar código
+-Readme (lo que hemos hecho y bugs y funcionamiento y links)
+
+
+
+
