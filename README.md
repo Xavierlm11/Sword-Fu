@@ -68,6 +68,12 @@ Hemos usado este package para poder serializar objectos dentro de otros objetos 
 https://github.com/PimDeWitte/UnityMainThreadDispatcher
 Hemos usado esta clase para llamar a funciones en el threat principal
 
+-Character models and animations:
+https://www.mixamo.com/#/
+
+-Scene assets:
+https://assetstore.unity.com/packages/3d/environments/dungeons/lite-dungeon-pack-low-poly-3d-art-by-gridness-242692
+
 ###Main Tasks
 
 -Xavier Casadó: Package Replication System, players data and connections, in-game players synchronization
