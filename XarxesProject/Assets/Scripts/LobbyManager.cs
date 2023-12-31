@@ -365,6 +365,7 @@ public class LobbyManager : MonoBehaviour
             ConnectionManager.Instance.CreateRoom();
 
             ChangeStage(MenuStage.waitingRoom);
+            UpdateWaitingRoom();
             titleIp.text = "Host IP: " + NetworkManager.Instance.activeRoom.host.localIp.ToString();
             //titlePort.text = NetworkManager.Instance.localPort.ToString();
         }
