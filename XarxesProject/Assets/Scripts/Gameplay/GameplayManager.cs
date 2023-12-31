@@ -80,6 +80,9 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     public bool isRoundZero = true;
+    
+    [SerializeField]
+    public bool smoWon = false;
 
     [SerializeField]
     private List<GameObject> winsList = new List<GameObject>();
@@ -233,8 +236,8 @@ public class GameplayManager : MonoBehaviour
                         if (winnerLink != null)
                         {
                             WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
-                            //winnerLink.playerCharacter.playerMovement.wins++;
-                            winnerLink.playerCharacter.playerMovement.wins=3;
+                            winnerLink.playerCharacter.playerMovement.wins++;
+                            //winnerLink.playerCharacter.playerMovement.wins=3;
                         }
                         else
                         {
@@ -258,9 +261,10 @@ public class GameplayManager : MonoBehaviour
 
                         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
                         {
-                            if (player.playerCharacter.playerMovement.wins < rounds)
+                            if (player.playerCharacter.playerMovement.wins < rounds && !smoWon)
                             {
                                 LoadNewRound(randomLvl);
+                                GameManager.Instance.EraseAllCharacters();
                                 roundState = roundPhase.Starting;
 
                             }
@@ -281,11 +285,12 @@ public class GameplayManager : MonoBehaviour
                                     EndGameWinnerText.text = "Someone" + "  beat your ass and won the game";
                                 }
                                 roundState = roundPhase.EndGame;
+                                smoWon = true;
                             }
                         }
 
                         isEndOfRound = false;
-                        GameManager.Instance.EraseAllCharacters();
+                        
                     }
                     isRoundZero = false;
                 }
@@ -301,6 +306,18 @@ public class GameplayManager : MonoBehaviour
                         if (!leaderboardScreen.activeSelf)
                         {
                             leaderboardScreen.SetActive(true);
+                            if (!leaderPlayersObjList[0].activeSelf)
+                            {
+                                for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+                                {
+                                    if (!leaderPlayersObjList[i].activeSelf)
+                                    {
+                                        leaderPlayersObjList[i].SetActive(true);
+                                        leaderPlayersObjList[i].GetComponent<TMP_Text>().text = PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname;
+                                    }
+                                }
+                            }
+                            GameManager.Instance.EraseAllCharacters();
                         }
                         if (!endGameScreen.activeSelf)
                         {
@@ -362,8 +379,10 @@ public class GameplayManager : MonoBehaviour
     {
         leaderboardScreen.SetActive(false);
         endGameScreen.SetActive(false);
+        smoWon = false;
         ResetLeaderboard();
         dtEndGame = 0f;
+        LoadNewRound(randomLvl);
         roundState = roundPhase.StartGame;
     }
 
