@@ -24,6 +24,9 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     private TMP_Text WinnerText;
+    
+    [SerializeField]
+    private TMP_Text EndGameWinnerText;
 
     [SerializeField]
     public bool isEndOfRound = false;
@@ -33,6 +36,12 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     private float dtWinScreen = 0f;
+
+    [SerializeField]
+    private float timeEndGame = 5.0f;
+
+    [SerializeField]
+    private float dtEndGame = 0f;
 
     [SerializeField]
     private int levelsCount = 0;
@@ -58,10 +67,19 @@ public class GameplayManager : MonoBehaviour
     private GameObject pauseScreen;
 
     [SerializeField]
+    private GameObject endGameScreen;
+
+    [SerializeField]
+    private GameObject winEndGameScreen;
+
+    [SerializeField]
     public bool isPaused = false;
 
     [SerializeField]
     public bool canPaused = true;
+
+    [SerializeField]
+    public bool isRoundZero = true;
 
     [SerializeField]
     private List<GameObject> winsList = new List<GameObject>();
@@ -131,13 +149,18 @@ public class GameplayManager : MonoBehaviour
                 break;
             case roundPhase.Starting:
                 {
-                    GameManager.Instance.ResetCharacters();
                     CountPlayerAlive();
+                    if (!isRoundZero)
+                        PlayerManager.Instance.SpawnCharacters();
+
                     roundState = roundPhase.InGame;
+
                 }
                 break;
             case roundPhase.InGame:
                 {
+                    // GameManager.Instance.ResetPlayersAtStart();
+                    //GameManager.Instance.ResetCharacters();
                     if (isEndOfRound)
                     {
                         roundState = roundPhase.Ending;
@@ -188,11 +211,7 @@ public class GameplayManager : MonoBehaviour
                         CountPlayerAlive();
                     }
 
-                    //if (Input.GetKeyDown(KeyCode.L))
-                    //{
-                    //    GetRandomNextLvl();
-                    //    LoadNewRandomRound();
-                    //}
+
                     if (Input.GetKeyDown(KeyCode.K))
                     {
                         if (NetworkManager.Instance.GetLocalClient().isHost)
@@ -214,7 +233,8 @@ public class GameplayManager : MonoBehaviour
                         if (winnerLink != null)
                         {
                             WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
-                            winnerLink.playerCharacter.playerMovement.wins++;
+                            //winnerLink.playerCharacter.playerMovement.wins++;
+                            winnerLink.playerCharacter.playerMovement.wins=3;
                         }
                         else
                         {
@@ -232,7 +252,7 @@ public class GameplayManager : MonoBehaviour
                     if (dtWinScreen >= timeWinScreen)
                     {
                         dtWinScreen = 0f;
-                        winScreen.SetActive(false);
+                       if(winScreen.activeSelf) winScreen.SetActive(false);
 
 
 
@@ -246,16 +266,53 @@ public class GameplayManager : MonoBehaviour
                             }
                             else
                             {
+                                if (!winEndGameScreen.activeSelf)
+                                {
+                                    winEndGameScreen.SetActive(true);
+                                }
+                                PlayerCharacterLink winnerLink = GetWinner();
+                                if (winnerLink != null)
+                                {
+                                    EndGameWinnerText.text = winnerLink.playerInfo.client.nickname + " beat your ass and won the game";
+                                   
+                                }
+                                else
+                                {
+                                    EndGameWinnerText.text = "Someone" + "  beat your ass and won the game";
+                                }
                                 roundState = roundPhase.EndGame;
                             }
                         }
-                        roundState = roundPhase.Starting;
+
                         isEndOfRound = false;
+                        GameManager.Instance.EraseAllCharacters();
                     }
+                    isRoundZero = false;
                 }
                 break;
             case roundPhase.EndGame:
                 {
+
+                    if (dtEndGame >= timeEndGame)
+                    {
+                        if (winEndGameScreen.activeSelf)
+                            winEndGameScreen.SetActive(false);
+
+                        if (!leaderboardScreen.activeSelf)
+                        {
+                            leaderboardScreen.SetActive(true);
+                        }
+                        if (!endGameScreen.activeSelf)
+                        {
+                            endGameScreen.SetActive(true);
+                        }
+
+                    }
+                    else
+                    {
+                        
+                        dtEndGame += Time.deltaTime;
+                    }
 
                 }
                 break;
@@ -291,36 +348,48 @@ public class GameplayManager : MonoBehaviour
                 for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
                 {
 
-                    if (winsList[count].transform.childCount > player.playerCharacter.playerMovement.wins)
+                    if (winsList[count].transform.childCount >= player.playerCharacter.playerMovement.wins)
                     {
                         winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.yellow;
                     }
                 }
 
-                //foreach (GameObject stars in winsList)
-                //{
-
-                //}
-                //for (int i = 0; i < winsList.Count; i++)
-                //{
-                //    winsList[i].transform.GetChild()
-                //}
-                //for (int j = 0; j < count; j++)
-                //{
-                //    for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
-                //    {
-                //        winsList[j].transform.GetChild(i).GetComponent<RawImage>().color = Color.yellow;
-                //    } 
-                //}
-
-                //if (player.playerCharacter.playerMovement)
-                //{
-
-                //}
                 count++;
             }
         }
     }
+    public void RestartGame()
+    {
+        leaderboardScreen.SetActive(false);
+        endGameScreen.SetActive(false);
+        ResetLeaderboard();
+        dtEndGame = 0f;
+        roundState = roundPhase.StartGame;
+    }
+
+    private void ResetLeaderboard()
+    {
+        int count = 0;
+
+        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        {
+
+            if (player != null)
+            {
+                for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
+                {
+
+                    if (winsList[count].transform.childCount > player.playerCharacter.playerMovement.wins)
+                    {
+                        winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.gray;
+                    }
+                }
+                player.playerCharacter.playerMovement.wins = 0;
+                count++;
+            }
+        }
+    }
+
     public void LoadNewRound(int lvlIndex)
     {
 

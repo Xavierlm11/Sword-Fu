@@ -37,6 +37,16 @@ public class GameManager : MonoBehaviour
             PlayerManager.Instance.SpawnCharacters();
         }
     }
+    public void ResetPlayersAtStart()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            EraseAllCharacters();
+            SpawnPlayers();
+        }
+       
+        // SpawnPlayers();
+    }
 
     public void CreateParty()
     {
