@@ -407,7 +407,7 @@ public class ConnectionManager : MonoBehaviour
             }
         }
     }
-
+    //Serialize the clases and send the json to the destination
     public void SetTargetsAsChecked(GenericSendClass sendClass, string json)
     {
         switch (sendClass.sendCode)

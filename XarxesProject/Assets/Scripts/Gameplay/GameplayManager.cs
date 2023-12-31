@@ -99,6 +99,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private int[] winsPlayers = { 0, 0, 0, 0 };
 
+    private bool isF1 = false;  
     public TextMeshProUGUI localNicknameText;
 
     #endregion
@@ -161,7 +162,7 @@ public class GameplayManager : MonoBehaviour
 
                 }
                 break;
-                //What happens during the game
+            //What happens during the game
             case roundPhase.InGame:
                 {
 
@@ -172,7 +173,7 @@ public class GameplayManager : MonoBehaviour
                     }
 
 
-
+                    //pause the game for everyone but only can renaude who pause the game
                     if (Input.GetKeyDown(KeyCode.Escape) && canPaused)
                     {
 
@@ -188,7 +189,7 @@ public class GameplayManager : MonoBehaviour
                         UpdateGameplayEveryOne();
                     }
 
-
+                    //Show the wins and names of everyone 
                     if (Input.GetKeyDown(KeyCode.Tab))
                     {
                         leaderboardScreen.SetActive(true);
@@ -210,17 +211,17 @@ public class GameplayManager : MonoBehaviour
                         leaderboardScreen.SetActive(false);
                     }
 
-                    if (Input.GetKeyUp(KeyCode.U))
-                    {
-                        CountPlayerAlive();
-                    }
+                    //if (Input.GetKeyUp(KeyCode.U))
+                    //{
+                    //    CountPlayerAlive();
+                    //}
 
-
-                    if (Input.GetKeyDown(KeyCode.K))
+                    // Debug kay in case someone is async sync everyone in the same escene
+                    if (Input.GetKeyDown(KeyCode.F1))
                     {
                         if (NetworkManager.Instance.GetLocalClient().isHost)
                         {
-
+                            isF1 = true;
                             isEndOfRound = true;
                             GetRandomNextLvl();
                             UpdateGameplayEveryOneHost();
@@ -244,7 +245,8 @@ public class GameplayManager : MonoBehaviour
                         if (winnerLink != null)
                         {
                             WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
-                            winnerLink.playerCharacter.playerMovement.wins++;
+                           if(!isF1) winnerLink.playerCharacter.playerMovement.wins++;
+                           else isF1 = false;
                             //winnerLink.playerCharacter.playerMovement.wins=3;
                         }
                         else
@@ -266,7 +268,7 @@ public class GameplayManager : MonoBehaviour
                         if (winScreen.activeSelf) winScreen.SetActive(false);
 
 
-
+                        //checks if someone alredy won 3 times and loaad next round or end the game
                         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
                         {
                             if (player.playerCharacter.playerMovement.wins < rounds && !smoWon)
