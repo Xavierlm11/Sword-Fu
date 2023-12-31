@@ -24,7 +24,7 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     private TMP_Text WinnerText;
-    
+
     [SerializeField]
     private TMP_Text EndGameWinnerText;
 
@@ -42,6 +42,12 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     private float dtEndGame = 0f;
+
+    [SerializeField]
+    private float timeIsAlive = 5.0f;
+
+    [SerializeField]
+    private float dtIsAlive = 0f;
 
     [SerializeField]
     private int levelsCount = 0;
@@ -80,7 +86,7 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField]
     public bool isRoundZero = true;
-    
+
     [SerializeField]
     public bool smoWon = false;
 
@@ -91,7 +97,7 @@ public class GameplayManager : MonoBehaviour
     private List<GameObject> leaderPlayersObjList = new List<GameObject>();
 
     [SerializeField]
-    private int[] winsPlayers={0,0,0,0 };
+    private int[] winsPlayers = { 0, 0, 0, 0 };
 
     public TextMeshProUGUI localNicknameText;
 
@@ -126,17 +132,7 @@ public class GameplayManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        //{
-        //    if (i > 1)
-        //    {
-        //        if (SceneManager.GetSceneByBuildIndex(i) != null)
-        //            scenesList.Add(SceneManager.GetSceneByBuildIndex(i));
-        //        else
-        //            Debug.Log("failed scene " + i);
-        //    }
-        //}
-        //Debug.Log("amogassss " +  scenesList.Count);
+
         Debug.Log("Scenes on build: " + SceneManager.sceneCountInBuildSettings);
 
         levelsCount = SceneManager.sceneCountInBuildSettings;
@@ -153,21 +149,22 @@ public class GameplayManager : MonoBehaviour
                     roundState = roundPhase.Starting;
                 }
                 break;
+            //Inizilice the players and set the round
             case roundPhase.Starting:
                 {
                     CountPlayerAlive();
                     if (!isRoundZero)
                         PlayerManager.Instance.SpawnCharacters();
 
-                    AsingPlayerWins();
+                    AssingPlayerWins();
                     roundState = roundPhase.InGame;
 
                 }
                 break;
+                //What happens during the game
             case roundPhase.InGame:
                 {
-                    // GameManager.Instance.ResetPlayersAtStart();
-                    //GameManager.Instance.ResetCharacters();
+
                     if (isEndOfRound)
                     {
                         roundState = roundPhase.Ending;
@@ -223,12 +220,19 @@ public class GameplayManager : MonoBehaviour
                     {
                         if (NetworkManager.Instance.GetLocalClient().isHost)
                         {
-                            // winScreen.SetActive(true);
+
                             isEndOfRound = true;
                             GetRandomNextLvl();
                             UpdateGameplayEveryOneHost();
                         }
                     }
+                    dtIsAlive = Time.deltaTime;
+                    if (dtIsAlive >= timeIsAlive)
+                    {
+                        dtIsAlive = 0f;
+                        CheckEndOfRound();
+                    }
+
                 }
                 break;
             case roundPhase.Ending:
@@ -259,7 +263,7 @@ public class GameplayManager : MonoBehaviour
                     if (dtWinScreen >= timeWinScreen)
                     {
                         dtWinScreen = 0f;
-                       if(winScreen.activeSelf) winScreen.SetActive(false);
+                        if (winScreen.activeSelf) winScreen.SetActive(false);
 
 
 
@@ -281,12 +285,12 @@ public class GameplayManager : MonoBehaviour
                                 PlayerCharacterLink winnerLink = GetWinner();
                                 if (winnerLink != null)
                                 {
-                                    EndGameWinnerText.text = winnerLink.playerInfo.client.nickname + " beat your ass and won the game";
-                                   
+                                    EndGameWinnerText.text = winnerLink.playerInfo.client.nickname + " won the game Congratulations!";
+
                                 }
                                 else
                                 {
-                                    EndGameWinnerText.text = "Someone" + "  beat your ass and won the game";
+                                    EndGameWinnerText.text = "¡Someone" + " won the game Congratulations!";
                                 }
                                 roundState = roundPhase.EndGame;
                                 smoWon = true;
@@ -294,7 +298,7 @@ public class GameplayManager : MonoBehaviour
                         }
 
                         isEndOfRound = false;
-                        
+
                     }
                     isRoundZero = false;
                 }
@@ -331,7 +335,7 @@ public class GameplayManager : MonoBehaviour
                     }
                     else
                     {
-                        
+
                         dtEndGame += Time.deltaTime;
                     }
 
@@ -356,7 +360,8 @@ public class GameplayManager : MonoBehaviour
             Time.timeScale = 1f;
         }
     }
-    public void AsingPlayerWins()
+    //assing the wins for the players at start of the round
+    public void AssingPlayerWins()
     {
         int count = 0;
         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
@@ -365,7 +370,7 @@ public class GameplayManager : MonoBehaviour
             if (player != null)
             {
                 player.playerCharacter.playerMovement.wins = winsPlayers[count];
-               
+
                 count++;
             }
         }
@@ -424,8 +429,8 @@ public class GameplayManager : MonoBehaviour
                         winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.gray;
                     }
                 }
-                winsPlayers[count]=player.playerCharacter.playerMovement.wins = 0;
-                
+                winsPlayers[count] = player.playerCharacter.playerMovement.wins = 0;
+
                 count++;
             }
         }
@@ -440,16 +445,10 @@ public class GameplayManager : MonoBehaviour
     }
     public void LoadNewRandomRound()
     {
-        //for (int i = 0; i < SceneManager.; i++)
-        //{
-        //    SceneManager.GetSceneByName("Level" + "i%");
-        //}
 
-
-        //lastLevelIndex = randomLvl;
         SceneManager.LoadScene(randomLvl);
         Debug.Log("Loaded Level: " + randomLvl);
-        // Debug.Log("lvl index Level: " + startLevelsIndex);
+
     }
 
     private int GetRandomNextLvl()
@@ -473,7 +472,7 @@ public class GameplayManager : MonoBehaviour
                 UpdateGameplayEveryOneHost();
             }
             isEndOfRound = true;
-            //winScreen.SetActive(true);
+
 
         }
     }
@@ -502,7 +501,7 @@ public class GameplayManager : MonoBehaviour
         int count = 0;
         foreach (PlayerCharacterLink item in PartyManager.Instance.playerCharacterLinks)
         {
-            if (item != null)
+            if (item != null && item.playerCharacter != null && item.playerCharacter.playerMovement != null)
             {
 
                 if (item.playerCharacter.playerMovement.isAlive)
@@ -515,13 +514,14 @@ public class GameplayManager : MonoBehaviour
         playerAlive = count;
         return count;
     }
-
-    private void UpdateGameplayEveryOneHost(bool isRestart=false)
+    //updates the gameplay for everyone except the host
+    private void UpdateGameplayEveryOneHost(bool isRestart = false)
     {
         UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound, isRestart);
         _updateGameplay.transferType = TransferType.OnlyClients;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
+    //updates the gameplay for everyone except for yourself
     private void UpdateGameplayEveryOne()
     {
         UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused);
