@@ -1,6 +1,5 @@
-- Optimize lobby nicknames (not in update)
+- Host nickname in lobby
 - Game UI (your nickname and other menus)
-- Pause
 - If server has to do some action, do it instead of sending it to itself and then doing it.
 - Manage lost packets
 - Manage packets order
@@ -12,12 +11,6 @@
 - Ready player on lobby
 - Lobby Chat
 
-
------ Tasks
-xavi l - gestion de partidas, menus, pausa, nicknames
-xavi c - interpolacion, package management
-albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
-
 ----- Network Synchronizations
 -Player positions
 -Player rotations
@@ -27,20 +20,15 @@ albert - gameplay, escenarios, aplicar modelos, texturas, animaciones
 -Dies
 -Round pass
 
-Cosas por hacer:
-Spawns a diferentes alturas y colliders ----
+------Cosas por hacer:
 Escenarios ---
 Dash
-Espada más visible ---
 Marca del local ---
 Animaciones sincronizadas
 Personajes variados
 Nombre del host en el lobby cuando está solo
-Personajes más veloces y que rotan más rápido ----
 
--Video (Xavi L)
--Comentar código
--Readme (lo que hemos hecho y bugs y funcionamiento y links)
+
 
 
 
