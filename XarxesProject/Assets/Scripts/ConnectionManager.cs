@@ -497,6 +497,10 @@ public class ConnectionManager : MonoBehaviour
     }
     public void Receive_UpdateGameplayHost(UpdateGameplayHost updateGameplay)
     {
+        if (updateGameplay.isRestart)
+        {
+            GameplayManager.Instance.RestartGame(); 
+        }
         GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
         GameplayManager.Instance.isEndOfRound = updateGameplay.isEnd;
         

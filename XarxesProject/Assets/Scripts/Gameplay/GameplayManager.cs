@@ -90,6 +90,9 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private List<GameObject> leaderPlayersObjList = new List<GameObject>();
 
+    [SerializeField]
+    private int[] winsPlayers={0,0,0,0 };
+
     public TextMeshProUGUI localNicknameText;
 
     #endregion
@@ -156,6 +159,7 @@ public class GameplayManager : MonoBehaviour
                     if (!isRoundZero)
                         PlayerManager.Instance.SpawnCharacters();
 
+                    AsingPlayerWins();
                     roundState = roundPhase.InGame;
 
                 }
@@ -319,7 +323,7 @@ public class GameplayManager : MonoBehaviour
                             }
                             GameManager.Instance.EraseAllCharacters();
                         }
-                        if (!endGameScreen.activeSelf)
+                        if (!endGameScreen.activeSelf && NetworkManager.Instance.GetLocalClient().isHost)
                         {
                             endGameScreen.SetActive(true);
                         }
@@ -352,7 +356,20 @@ public class GameplayManager : MonoBehaviour
             Time.timeScale = 1f;
         }
     }
+    public void AsingPlayerWins()
+    {
+        int count = 0;
+        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        {
 
+            if (player != null)
+            {
+                player.playerCharacter.playerMovement.wins = winsPlayers[count];
+               
+                count++;
+            }
+        }
+    }
     public void UpdateLeaderboard()
     {
         int count = 0;
@@ -368,6 +385,7 @@ public class GameplayManager : MonoBehaviour
                     if (winsList[count].transform.childCount >= player.playerCharacter.playerMovement.wins)
                     {
                         winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.yellow;
+                        winsPlayers[count] = player.playerCharacter.playerMovement.wins;
                     }
                 }
 
@@ -377,6 +395,9 @@ public class GameplayManager : MonoBehaviour
     }
     public void RestartGame()
     {
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+            UpdateGameplayEveryOneHost(true);
+
         leaderboardScreen.SetActive(false);
         endGameScreen.SetActive(false);
         smoWon = false;
@@ -398,12 +419,13 @@ public class GameplayManager : MonoBehaviour
                 for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
                 {
 
-                    if (winsList[count].transform.childCount > player.playerCharacter.playerMovement.wins)
+                    if (winsList[count].transform.childCount >= player.playerCharacter.playerMovement.wins)
                     {
                         winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.gray;
                     }
                 }
-                player.playerCharacter.playerMovement.wins = 0;
+                winsPlayers[count]=player.playerCharacter.playerMovement.wins = 0;
+                
                 count++;
             }
         }
@@ -494,9 +516,9 @@ public class GameplayManager : MonoBehaviour
         return count;
     }
 
-    private void UpdateGameplayEveryOneHost()
+    private void UpdateGameplayEveryOneHost(bool isRestart=false)
     {
-        UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound);
+        UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound, isRestart);
         _updateGameplay.transferType = TransferType.OnlyClients;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }

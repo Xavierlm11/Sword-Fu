@@ -239,6 +239,7 @@ public class UpdateGameplayHost : GenericSendClass
 {
     public int nextLvl;
     public bool isEnd;
+    public bool isRestart;
     
     //public string winnerName;
 
@@ -246,11 +247,11 @@ public class UpdateGameplayHost : GenericSendClass
     {
 
     }
-    public UpdateGameplayHost(int nextLvl, bool isEnd) : base(true)
+    public UpdateGameplayHost(int nextLvl, bool isEnd, bool isRestart) : base(true)
     {
         this.nextLvl = nextLvl;
         this.isEnd = isEnd;
-
+        this.isRestart = isRestart;
         sendCode = SendCode.UpdateGameplayHost;
     }   
 }
