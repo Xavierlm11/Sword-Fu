@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canRotate = true;
     public Transform puntoDeDisparo;
     public Transform puntoDeAtaque;
+    public Transform charSpawn;
     public float velocidadBala = 10f;
     public float shootRate = 0.5f;
     float nextFireRate;
@@ -239,7 +240,7 @@ public class PlayerMovement : MonoBehaviour
             Destroy(currentCharacter);
         }
         
-        currentCharacter = Instantiate(characters[index], transform.position, Quaternion.identity);
+        currentCharacter = Instantiate(characters[index], charSpawn.position, charSpawn.rotation);
 
         currentCharacter.transform.parent = transform;
     }
