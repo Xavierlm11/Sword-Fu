@@ -321,6 +321,11 @@ public class PlayerMovement : MonoBehaviour
         if (Time.time > nextFireRate)
         {
             GameObject ataque = Instantiate(ataquePrefab, puntoDeAtaque.position, puntoDeAtaque.rotation);
+            AtaqueDamage ataqueDamageScript = ataque.GetComponent<AtaqueDamage>();
+            if (ataqueDamageScript != null)
+            {
+                ataqueDamageScript.SetOwner(gameObject);
+            }
             animator.SetTrigger("Attack");
             nextFireRate = Time.time + shootRate;
 

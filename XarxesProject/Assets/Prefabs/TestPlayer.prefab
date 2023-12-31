@@ -202,8 +202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isLocal: 0
   playerId: 0
-  speed: 5
-  rotationSpeed: 5
+  speed: 10
+  rotationSpeed: 15
   isAlive: 1
   direction: {x: 0, y: 0, z: 0}
   wins: 0
