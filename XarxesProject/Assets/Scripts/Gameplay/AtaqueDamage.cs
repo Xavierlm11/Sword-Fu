@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AtaqueDamage : MonoBehaviour
+public class AttackDamage : MonoBehaviour
 {
     public int damageAmount = 20;
     private GameObject owner;

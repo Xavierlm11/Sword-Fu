@@ -14,16 +14,16 @@ public class PlayerMovement : MonoBehaviour
     public int wins = 0;
 
     public int health = 100;
-    public GameObject balaPrefab;
-    public GameObject ataquePrefab;
+    public GameObject bulletPrefab;
+    public GameObject AttackPrefab;
     private Animator animator;
     private bool isAttacking = false;
     public bool havesword = true;
     private bool canRotate = true;
-    public Transform puntoDeDisparo;
-    public Transform puntoDeAtaque;
+    public Transform pointDeshoot;
+    public Transform pointDeAttack;
     public Transform charSpawn;
-    public float velocidadBala = 10f;
+    public float velocidadbullet = 10f;
     public float shootRate = 0.5f;
     float nextFireRate;
 
@@ -103,13 +103,13 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
-            //Al hacer click izquierdo del raton actiba la funcion de disparo
+            //Al hacer click izquierdo del raton actiba la funcion de shoot
             if (Input.GetButtonDown("Fire1") && havesword == true)
             {
                 DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
                 distanceAttack.transferType = TransferType.AllExceptLocal;
                 ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
-                Disparar();
+                Shoot();
             }
 
             if (Input.GetButtonDown("Fire2"))
@@ -117,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
                 MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
                 meleeAttack.transferType = TransferType.AllExceptLocal;
                 ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
-                Ataque();
+                Attack();
 
             }
 
@@ -290,41 +290,41 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void Disparar()
+    public void Shoot()
     {
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
             havesword = false;
 
-            //Crea una bala en el punto de disparo
+            //Crea una bullet en el point de shoot
 
-            GameObject bala = Instantiate(balaPrefab, puntoDeDisparo.position, puntoDeDisparo.rotation);
-            Rigidbody rbBala = bala.GetComponent<Rigidbody>();
+            GameObject bullet = Instantiate(bulletPrefab, pointDeshoot.position, pointDeshoot.rotation);
+            Rigidbody rbbullet = bullet.GetComponent<Rigidbody>();
 
             nextFireRate = Time.time + shootRate;
 
 
-            //if (rbBala != null)
+            //if (rbbullet != null)
             //{
-            //    rbBala.velocity = bala.transform.forward * velocidadBala;
+            //    rbbullet.velocity = bullet.transform.forward * velocidadbullet;
             //}
 
-            //Destruye la bala 5 segundos despues de ser creada
-            Destroy(bala, 5f);
+            //Destruye la bullet 5 segundos despues de ser creada
+            Destroy(bullet, 5f);
 
         }
     }
-    public void Ataque()
+    public void Attack()
     {
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
-            GameObject ataque = Instantiate(ataquePrefab, puntoDeAtaque.position, puntoDeAtaque.rotation);
-            AtaqueDamage ataqueDamageScript = ataque.GetComponent<AtaqueDamage>();
-            if (ataqueDamageScript != null)
+            GameObject Attack = Instantiate(AttackPrefab, pointDeAttack.position, pointDeAttack.rotation);
+            AttackDamage AttackDamageScript = Attack.GetComponent<AttackDamage>();
+            if (AttackDamageScript != null)
             {
-                ataqueDamageScript.SetOwner(gameObject);
+                AttackDamageScript.SetOwner(gameObject);
             }
             animator.SetTrigger("Attack");
             nextFireRate = Time.time + shootRate;
@@ -334,10 +334,10 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(AttackAnimation());
             }
            
-            Destroy(ataque, 0.5f);
+            Destroy(Attack, 0.5f);
 
-            AtaqueDamage ataqueDamage = ataque.AddComponent<AtaqueDamage>();
-            ataqueDamage.SetOwner(gameObject);
+            AttackDamage AttackDamage = Attack.AddComponent<AttackDamage>();
+            AttackDamage.SetOwner(gameObject);
 
         }
     }

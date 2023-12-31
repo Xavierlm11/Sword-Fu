@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
 
     void Update()
     {
-        //Hace que ña bala se mueva hacia delante
+        //Hace que lo bullet se mueva hacia delante
         transform.Translate(direccion * velocidad * Time.deltaTime);
     }
 

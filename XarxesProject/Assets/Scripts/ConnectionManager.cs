@@ -374,7 +374,7 @@ public class ConnectionManager : MonoBehaviour
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == meleeAttack.player.client.nickname)
             {
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Ataque();
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Attack();
             }
         }
     }
@@ -385,7 +385,7 @@ public class ConnectionManager : MonoBehaviour
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == distanceAttack.player.client.nickname)
             {
-                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Disparar();
+                PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.Shoot();
             }
         }
     }
