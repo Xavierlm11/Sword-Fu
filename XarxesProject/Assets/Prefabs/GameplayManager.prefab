@@ -2547,7 +2547,7 @@ Transform:
   m_Children:
   - {fileID: 8767308891726066160}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &201224486788675784
 MonoBehaviour:
@@ -2561,7 +2561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22eefdffe0e63604a9e24df25a232d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rounds: 4
+  rounds: 3
   currentRound: 1
   winScreen: {fileID: 1561985495202208822}
   WinnerText: {fileID: 2242967345381136267}
@@ -2583,6 +2583,7 @@ MonoBehaviour:
   isPaused: 0
   canPaused: 1
   isRoundZero: 1
+  smoWon: 0
   winsList:
   - {fileID: 561804295765305293}
   - {fileID: 5787814146339440480}
