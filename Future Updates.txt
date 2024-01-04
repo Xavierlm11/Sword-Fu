@@ -16,20 +16,38 @@
 -Player rotations
 -Melee attack (function)
 -Long attack (function)
--Sword position
--Dies
--Round pass
+
+-Sword position --- Xavi C
+-Dies --- Xavi L
+-Round pass --- Xavi L
+-Dash --- Xavi C
 
 ------Cosas por hacer:
-Escenarios ---
-Dash
-Marca del local ---
-Animaciones sincronizadas
-Personajes variados
-Nombre del host en el lobby cuando está solo
+
+Package lost --- Xavi L
+Package order --- Xavi C
+
+Escenarios --- Albert
+Dash --- Albert
+Marca del local --- Albert
+Animaciones sincronizadas --- Xavi C
+Personajes variados --- Xavi C
 
 
+Solucionar errores serialización --- Xavi C
+Solucionar cambios de escena --- Xavi L
 
+Volver al lobby
+Permitir espectadores --- Xavi C
 
+Si o si:
+Solucionar errores serialización --- Xavi C
+Solucionar cambios de escena --- Xavi L
 
+-Sword position --- Xavi C
+-Dies --- Xavi L
+-Round pass --- Xavi L
+-Dash --- Xavi C
+
+Escenarios --- Albert
 
