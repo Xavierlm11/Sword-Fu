@@ -179,12 +179,12 @@ public class ConnectionManager : MonoBehaviour
                 try
                 {
                     Remote = ipEndPointOfSender;
-                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-
-                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
                     if (Remote is IPEndPoint remoteEndPoint)
                     {
+                        byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                        int recv = socket.ReceiveFrom(receivedData, ref Remote);
+
                         // Accede a la información de la IP y el puerto remotos
                         IPAddress remoteIPAdress = remoteEndPoint.Address;
                         int remotePort = remoteEndPoint.Port;
