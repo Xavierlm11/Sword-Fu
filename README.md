@@ -14,6 +14,8 @@ En este nuevo lanzamiento hemos implementado un sistema para enviar y recibir da
 ha permitido replicar acciones en distintas sesiones y sincronizar estas.
 
 ### Funcionamiento
+Las escenas usadas son "Lobby", "Game", "Level1", "Level2", "Level3" y "Level4", siendo "Lobby" la primera.
+
 Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre y
 crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. El nombre no
 puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Una vez todos los jugadores están dentro
