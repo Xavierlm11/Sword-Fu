@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
             PlayerManager.Instance.SpawnCharacters();
         }
     }
+
     public void ResetPlayersAtStart()
     {
         if (Input.GetKeyDown(KeyCode.O))
@@ -74,17 +75,30 @@ public class GameManager : MonoBehaviour
     public void SpawnPlayers()
     {
 
-        foreach (PlayerInfo pl in NetworkManager.Instance.activeRoom.party.players)
+        for( int i = 0; i <  NetworkManager.Instance.activeRoom.party.players.Count; i++)
         {
-            if (pl.client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
+            if (NetworkManager.Instance.activeRoom.party.players[i].client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
             {
-                PlayerManager.Instance.AddPlayer(pl, true);
+                PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i], true);
+                NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
             }
             else
             {
-                PlayerManager.Instance.AddPlayer(pl);
+                PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i]);
+                NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
             }
-            
+
+            if (i <= NetworkManager.Instance.maxPlayers - 1)
+            {
+
+                
+
+            }
+            else
+            {
+                NetworkManager.Instance.activeRoom.party.players[i].isSpectator = true;
+            }
+
         }
 
         SetNicknameInUI();

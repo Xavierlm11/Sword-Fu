@@ -371,6 +371,15 @@ public enum InterpolationMode
     SmoothStep,
 }
 
+public enum CharacterModel
+{
+    None,
+    BigHead,
+    Gothic,
+    Granny,
+    CapBoy
+}
+
 public class PlayerInfo
 {
     public PlayerInfo()
@@ -384,6 +393,8 @@ public class PlayerInfo
     }
 
     public Client client;
+    public CharacterModel characterModel;
+    public bool isSpectator = false;
 }
 
 public class Party
@@ -457,6 +468,8 @@ public class NetworkManager : SingletonScriptableObject<NetworkManager>
 
     public InterpolationMode movementInterpolation;
     public InterpolationMode rotationInterpolation;
+
+    public int maxPlayers;
 
     #endregion
 

@@ -178,12 +178,16 @@ public class ConnectionManager : MonoBehaviour
 
                 try
                 {
+                    
+
                     Remote = ipEndPointOfSender;
+
+                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
                     if (Remote is IPEndPoint remoteEndPoint)
                     {
-                        byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                        int recv = socket.ReceiveFrom(receivedData, ref Remote);
+                        
 
                         // Accede a la información de la IP y el puerto remotos
                         IPAddress remoteIPAdress = remoteEndPoint.Address;
@@ -455,6 +459,7 @@ public class ConnectionManager : MonoBehaviour
                 startGame.CheckTargets();
                 SerializeToJsonAndSend(startGame);
                 break;
+
             case SendCode.UpdateParty:
                 UpdateParty updateParty = new UpdateParty();
                 updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
@@ -504,6 +509,7 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Instance.activeRoom.party = updateParty.party;
         GameManager.Instance.SpawnPlayers();
     }
+
     public void Receive_UpdateGameplayHost(UpdateGameplayHost updateGameplay)
     {
         if (updateGameplay.isRestart)
@@ -760,19 +766,26 @@ public class ConnectionManager : MonoBehaviour
     //information you want to send, serialize them and send them.
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
+        try
+        {
+            string json = JsonConvert.SerializeObject(objectToSerialize);
 
-        string json = JsonConvert.SerializeObject(objectToSerialize);
+            stream = new MemoryStream();
+            binaryWriter = new BinaryWriter(stream);
+            binaryWriter.Write(json);
 
-        stream = new MemoryStream();
-        binaryWriter = new BinaryWriter(stream);
-        binaryWriter.Write(json);
+            byte[] data = stream.ToArray();
+            dataToSendList.Add(data);
 
-        byte[] data = stream.ToArray();
-        dataToSendList.Add(data);
+            //byte[] data = stream.ToArray();
 
-        //byte[] data = stream.ToArray();
-
-        //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+            //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+        }
+        catch
+        {
+            Debug.Log("Cannot serilize");
+        }
+       
     }
 
     public void SendNetworkData()

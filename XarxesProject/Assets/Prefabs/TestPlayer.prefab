@@ -63,7 +63,7 @@ Transform:
   m_GameObject: {fileID: 2837434101916443790}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 928923321659995422}
@@ -218,8 +218,8 @@ MonoBehaviour:
   shootRate: 1
   characters:
   - {fileID: 8728740277022203491, guid: 51dbb270b91196348b2c13c837434b35, type: 3}
-  - {fileID: 2385679663525706445, guid: f47be45050b165b4bb098f8b31a940bd, type: 3}
   - {fileID: 7267754116719088766, guid: d3bffca57ddfe804691a503d4ea235c9, type: 3}
+  - {fileID: 2385679663525706445, guid: f47be45050b165b4bb098f8b31a940bd, type: 3}
   - {fileID: 274511851308157889, guid: 9215ae1ce13b48e42b2ad38637ca05d9, type: 3}
   playerCharacter: {fileID: 0}
   positionToSet: {x: 0, y: 0, z: 0}

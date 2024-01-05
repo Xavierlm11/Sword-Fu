@@ -384,7 +384,7 @@ public class GameplayManager : MonoBehaviour
         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
         {
 
-            if (player != null)
+            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
             {
                 for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
                 {
@@ -421,7 +421,7 @@ public class GameplayManager : MonoBehaviour
         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
         {
 
-            if (player != null)
+            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
             {
                 for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
                 {
@@ -485,7 +485,7 @@ public class GameplayManager : MonoBehaviour
 
         foreach (PlayerCharacterLink item in PartyManager.Instance.playerCharacterLinks)
         {
-            if (item != null)
+            if (item != null && item.playerCharacter != null && item.playerCharacter.playerMovement != null)
             {
 
                 if (item.playerCharacter.playerMovement.isAlive)

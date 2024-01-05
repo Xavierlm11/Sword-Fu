@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
     float nextFireRate;
 
     public GameObject[] characters;
-    private int currentCharacterIndex = 0;
+
     private GameObject currentCharacter;
 
     public PlayerCharacter playerCharacter;
@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        SwitchCharacter(currentCharacterIndex);
+
         animator = GetComponentInChildren<Animator>();
         //if (isLocal)
         //{
@@ -59,6 +59,44 @@ public class PlayerMovement : MonoBehaviour
         haveSword = true;
 
         playerCharacter = gameObject.GetComponent<PlayerCharacter>();
+    }
+
+    public void SetCharacterModel(CharacterModel charModel)
+    {
+
+        if (currentCharacter != null)
+        {
+            Destroy(currentCharacter);
+        }
+
+        int modelInd = 0;
+
+        switch (charModel)
+        {
+            case CharacterModel.None:
+                modelInd = 0;
+                break;
+
+            case CharacterModel.BigHead:
+                modelInd = 0;
+                break;
+
+            case CharacterModel.Gothic:
+                modelInd = 1;
+                break;
+
+            case CharacterModel.Granny:
+                modelInd = 2;
+                break;
+
+            case CharacterModel.CapBoy:
+                modelInd = 3;
+                break;
+        }
+
+        currentCharacter = Instantiate(characters[modelInd], charSpawn.position, charSpawn.rotation, transform);
+
+        //currentCharacter.transform.parent = transform;
     }
 
     void Update()
@@ -233,17 +271,17 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    void SwitchCharacter(int index)
-    {
-        if (currentCharacter != null)
-        {
-            Destroy(currentCharacter);
-        }
+    //void SwitchCharacter(int index)
+    //{
+    //    if (currentCharacter != null)
+    //    {
+    //        Destroy(currentCharacter);
+    //    }
         
-        currentCharacter = Instantiate(characters[index], charSpawn.position, charSpawn.rotation);
+    //    currentCharacter = Instantiate(characters[index], charSpawn.position, charSpawn.rotation);
 
-        currentCharacter.transform.parent = transform;
-    }
+    //    currentCharacter.transform.parent = transform;
+    //}
 
     private void OnTriggerEnter(Collider other)
     {
