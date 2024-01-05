@@ -194,7 +194,7 @@ public class LobbyManager : MonoBehaviour
             {
                 for (int i = 0; i < NetworkManager.Instance.activeRoom.clients.Count; i++)
                 {
-                    if (listPlayerText[i] != null && NetworkManager.Instance.activeRoom.clients[i] != null)
+                    if (listPlayerText.Count > i && NetworkManager.Instance.activeRoom.clients[i] != null)
                     {
                         listPlayerText[i].SetActive(true);
                         listPlayerText[i].GetComponent<TMP_Text>().text = "-> " + NetworkManager.Instance.activeRoom.clients[i].nickname;
