@@ -30,9 +30,9 @@ Package order --- Xavi C
 Escenarios --- Albert
 Dash --- Albert
 Marca del local --- Albert
-Implementar marca del local --- Xavi C
+[x]Implementar marca del local --- Xavi C
 Animaciones sincronizadas --- Xavi C
-Personajes variados --- Xavi C
+[x]Personajes variados --- Xavi C
 
 
 [x]Solucionar errores serialización --- Xavi C
