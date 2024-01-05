@@ -77,22 +77,20 @@ public class GameManager : MonoBehaviour
 
         for( int i = 0; i <  NetworkManager.Instance.activeRoom.party.players.Count; i++)
         {
-            if (NetworkManager.Instance.activeRoom.party.players[i].client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
-            {
-                PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i], true);
-                NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
-            }
-            else
-            {
-                PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i]);
-                NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
-            }
+            
 
             if (i <= NetworkManager.Instance.maxPlayers - 1)
             {
-
-                
-
+                if (NetworkManager.Instance.activeRoom.party.players[i].client.nickname == NetworkManager.Instance.GetLocalClient().nickname)
+                {
+                    PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i], true);
+                    NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
+                }
+                else
+                {
+                    PlayerManager.Instance.AddPlayer(NetworkManager.Instance.activeRoom.party.players[i]);
+                    NetworkManager.Instance.activeRoom.party.players[i].characterModel = (CharacterModel)i + 1;
+                }
             }
             else
             {

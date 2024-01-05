@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public bool isLocal = false;
+    //public bool isLocal = false;
     public int playerId = 0;
     public float speed = 5f;
     public float rotationSpeed = 40f;
@@ -46,8 +46,20 @@ public class PlayerMovement : MonoBehaviour
     public bool canSynchronizeTransform;
     public bool canSendSynchronizationData;
 
+    public GameObject localMark;
+
     private void Start()
     {
+
+        if (playerCharacter.characterLink.isLocal)
+        {
+            localMark.SetActive(true);
+        }
+        else
+        {
+            localMark.SetActive(false);
+        }
+
         rb = GetComponent<Rigidbody>();
 
         animator = GetComponentInChildren<Animator>();
