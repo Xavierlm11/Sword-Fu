@@ -2,14 +2,18 @@
 
 Github: https://github.com/Xavierlm11/Sword-Fu
 
-##31/12/2023:
+## 05/01/2024 (Patch):
 
-###Novedades
+Un pequeño error que hacía que los jugadores no pudieran atacar ha sido corregido.
+
+## 31/12/2023:
+
+### Novedades
 En esta versión hemos rehecho el sistema para prescindir del antiguo sistema en el que había que introducir dos puertos distintos.
 En este nuevo lanzamiento hemos implementado un sistema para enviar y recibir datos entre sesiones de forma sencilla, lo que nos
 ha permitido replicar acciones en distintas sesiones y sincronizar estas.
 
-###Funcionamiento
+### Funcionamiento
 Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre y
 crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. El nombre no
 puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Una vez todos los jugadores están dentro
@@ -21,7 +25,7 @@ Con __tabulador__ se muestran las puntuaciones de la partida y con __Escape__ un
 el mismo quien haga ambas cosas). Por último, y a modo de debug, el host puede usar __F1__ para que todos los jugadores avancen a un nuevo
 escenario, sobretodo en caso de que debido a las pérdidas de paquetes los jugadores queden desincronizados.
 
-###Estructura
+### Estructura
 El código se basa en varios Singleton, siendo estos algunos de los más relevantes:
 
 -NetworkManager: 
@@ -42,14 +46,14 @@ Gestiona eventos generales de los clientes de la party en la party.
 -GameplayManager:
 Gestiona eventos del Game Loop, como los cambios de escena y puntuaciones.
 
-###Problemas
+### Problemas
 Aunque un game loop correcto es posible, desde la conexión inicial de todos los jugadores hasta la victoria de uno, a menudo es
 interrumpido por pérdidas de paquetes que desincronizan el estado de la partida, sobretodo cuando un jugador gana la ronda.
 
 Además, aun tenemos que investigar los motivos, pero haciendo testing nos hemos dado cuenta que las desincronizaciones ocurren
 con más frecuencia si es el Host quien gana la ronda.
 
-###Actualizaciones futuras
+### Actualizaciones futuras
 -Sincronizar las animaciones de los personajes
 -Implementar personajes diferentes para cada jugador
 -Sincronizar mejor los ataques
@@ -58,11 +62,12 @@ con más frecuencia si es el Host quien gana la ronda.
 -Implementar predicción en las acciones de los personajes
 -Solventar problemas ocasionados por la pérdida de packetes o un orden incorrecto de su envío
 
-###External
+### External
 
 -Newtonsoft Json: 
 https://github.com/JamesNK/Newtonsoft.Json
 Hemos usado este package para poder serializar objectos dentro de otros objetos y ponerlos en un Json.
+Para instalar en Unity: Window -> Package Manager -> Add package from git URL -> "com.unity.nuget.newtonsoft-json"
 
 -UnityMainThreadDispatcher: 
 https://github.com/PimDeWitte/UnityMainThreadDispatcher
@@ -74,7 +79,10 @@ https://www.mixamo.com/#/
 -Scene assets:
 https://assetstore.unity.com/packages/3d/environments/dungeons/lite-dungeon-pack-low-poly-3d-art-by-gridness-242692
 
-###Main Tasks
+-Visual Scripting:
+Para instalar en Unity: Window -> Package Manager -> Add package from git URL -> "com.unity.visualscripting"
+
+### Main Tasks
 
 -Xavier Casadó: Package Replication System, players data and connections, in-game players synchronization
 
@@ -84,14 +92,14 @@ https://assetstore.unity.com/packages/3d/environments/dungeons/lite-dungeon-pack
 
 ----------------------------------------------------------------------------------------
 
-##21/11/2023:
+## 21/11/2023:
 
-###Novedades
+### Novedades
 En esta versión hemos prescindido del modo de conexión TCP para centrarnos solamente en UDP.
 Hemos reestructrado todo el código para que ambos clientes sean capaces tanto de recibir información como de enviarla.
 Además, también hemos rehecho el Lobby y conectado con una base de Gameplay.
 
-###Funcionamiento
+### Funcionamiento
 Inicia dos instancias de la aplicación. Una será el host y otra un cliente, uniéndose en ese orden. El host le dará al
 botón de Create Game y podrá ponerse un nickname. También puede configurar el puerto que usará (Server Port) o el que deben
 usar los clientes que se conecten a él (Client Port). Ambos campos tienen un botón de Default para establecerlos en 
@@ -101,7 +109,7 @@ usar los clientes que se conecten a él (Client Port). Ambos campos tienen un bo
 Por el lado del cliente, los campos de Nickname y puertos son iguales, pero hay un campo IP en el que hay que introducir la 
 IP del servidor, y al finalizar hay que pulsar el botón "Join", el cual te llevará a la sala de espera con el servidor.
 
-###Estructura
+### Estructura
 El código se basa principalmente en varios Singleton. El primero (que también es un ScriptableObject) se llama NetworkManager
 y contiene datos de la configuración de la aplicación y clases básicas como la de cliente y otras usadas para el traspaso
 de información entre clientes, además de datos sobre el cliente local. El LobbyManager maneja los menús y lo que ocurre cuando
@@ -110,7 +118,7 @@ conexiones entre estos. El PartyManager gestion la lista de jugadores que hay en
 de jugadores y la actualización de sus posiciones.
 
 
-###Problemas
+### Problemas
 Teníamos un error que no supimos exactamente como solventar, ya que este se producía al llamar a la función Socket.Bind()
  por segunda vez con la misma dirección IP y puerto, cosa que hacíamos a la hora de crear varias instancias de la aplicación
 en un mismo ordenador e intentar conectar los clientes, los cuales tenían la misma IP y puerto. Un Fix provisional ha sido
@@ -119,12 +127,12 @@ aplicación. Aún así, la aplicación solo ha podido ser testeada con dos únic
 importante que el Host se conecte primero y el otro cliente segundo.
 
 
-###Main Tasks
+### Main Tasks
 -Xavi C: Reestructuración de todo el código y las conexiones entre clientes, reformas en los menús.
 -Xavi L: Reestructuración de los menús y conexiones entre estos y el Gameplay.
 -Albert M: Gameplay
 
-###External
+### External
 
 -Newtonsoft Json: 
 https://github.com/JamesNK/Newtonsoft.Json
