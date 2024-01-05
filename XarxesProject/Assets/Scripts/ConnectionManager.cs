@@ -265,12 +265,12 @@ public class ConnectionManager : MonoBehaviour
 
         stream.Seek(0, SeekOrigin.Begin);
 
-        string json = binaryReader.ReadString();
-
-        GenericSendClass sendClass = new GenericSendClass();
-
         try
         {
+
+            string json = binaryReader.ReadString();
+            GenericSendClass sendClass = new GenericSendClass();
+        
             sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
             //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
