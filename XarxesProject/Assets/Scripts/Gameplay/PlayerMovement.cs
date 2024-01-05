@@ -15,15 +15,15 @@ public class PlayerMovement : MonoBehaviour
 
     public int health = 100;
     public GameObject bulletPrefab;
-    public GameObject AttackPrefab;
+    public GameObject attackPrefab;
     private Animator animator;
     private bool isAttacking = false;
-    public bool havesword = true;
+    public bool haveSword = true;
     private bool canRotate = true;
-    public Transform pointDeshoot;
-    public Transform pointDeAttack;
+    public Transform shootPoint;
+    public Transform attackPoint;
     public Transform charSpawn;
-    public float velocidadbullet = 10f;
+    public float bulletSpeed = 10f;
     public float shootRate = 0.5f;
     float nextFireRate;
 
@@ -56,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
         //    StartCoroutine(SendPlayerPositionsToServer());
         //}
 
-        havesword = true;
+        haveSword = true;
 
         playerCharacter = gameObject.GetComponent<PlayerCharacter>();
     }
@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             //Al hacer click izquierdo del raton actiba la funcion de shoot
-            if (Input.GetButtonDown("Fire1") && havesword == true)
+            if (Input.GetButtonDown("Fire1") && haveSword == true)
             {
                 DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
                 distanceAttack.transferType = TransferType.AllExceptLocal;
@@ -247,11 +247,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("FallenSword") && havesword == false)
+        if (other.CompareTag("FallenSword") && haveSword == false)
         {
             Debug.Log("Player recogió FallenSword");
             Destroy(other.gameObject);
-            havesword = true;
+            haveSword = true;
         }
     }
 
@@ -295,11 +295,11 @@ public class PlayerMovement : MonoBehaviour
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
-            havesword = false;
+            haveSword = false;
 
             //Crea una bullet en el point de shoot
 
-            GameObject bullet = Instantiate(bulletPrefab, pointDeshoot.position, pointDeshoot.rotation);
+            GameObject bullet = Instantiate(bulletPrefab, shootPoint.position, shootPoint.rotation);
             Rigidbody rbbullet = bullet.GetComponent<Rigidbody>();
 
             nextFireRate = Time.time + shootRate;
@@ -307,7 +307,7 @@ public class PlayerMovement : MonoBehaviour
 
             //if (rbbullet != null)
             //{
-            //    rbbullet.velocity = bullet.transform.forward * velocidadbullet;
+            //    rbbullet.velocity = bullet.transform.forward * bulletSpeed;
             //}
 
             //Destruye la bullet 5 segundos despues de ser creada
@@ -320,7 +320,7 @@ public class PlayerMovement : MonoBehaviour
         //El if es para controlar el fire-rate
         if (Time.time > nextFireRate)
         {
-            GameObject Attack = Instantiate(AttackPrefab, pointDeAttack.position, pointDeAttack.rotation);
+            GameObject Attack = Instantiate(attackPrefab, attackPoint.position, attackPoint.rotation);
             AttackDamage AttackDamageScript = Attack.GetComponent<AttackDamage>();
             if (AttackDamageScript != null)
             {

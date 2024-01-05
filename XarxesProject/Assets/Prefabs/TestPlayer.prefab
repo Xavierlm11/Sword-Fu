@@ -208,18 +208,18 @@ MonoBehaviour:
   direction: {x: 0, y: 0, z: 0}
   wins: 0
   health: 1
-  balaPrefab: {fileID: 889169457289343228, guid: f161da97794c07647b082cf094200d35, type: 3}
-  ataquePrefab: {fileID: 9046585939145048810, guid: f2c3c3b71ba3b1c4db2e81c5629cf5d6, type: 3}
-  havesword: 1
-  puntoDeDisparo: {fileID: 8038038045161809576}
-  puntoDeAtaque: {fileID: 2429821944370552705}
+  bulletPrefab: {fileID: 889169457289343228, guid: f161da97794c07647b082cf094200d35, type: 3}
+  attackPrefab: {fileID: 9046585939145048810, guid: f2c3c3b71ba3b1c4db2e81c5629cf5d6, type: 3}
+  haveSword: 1
+  shootPoint: {fileID: 8038038045161809576}
+  attackPoint: {fileID: 2429821944370552705}
   charSpawn: {fileID: 2236874505290324134}
-  velocidadBala: 10
+  bulletSpeed: 10
   shootRate: 1
   characters:
+  - {fileID: 8728740277022203491, guid: 51dbb270b91196348b2c13c837434b35, type: 3}
   - {fileID: 2385679663525706445, guid: f47be45050b165b4bb098f8b31a940bd, type: 3}
   - {fileID: 7267754116719088766, guid: d3bffca57ddfe804691a503d4ea235c9, type: 3}
-  - {fileID: 8728740277022203491, guid: 51dbb270b91196348b2c13c837434b35, type: 3}
   - {fileID: 274511851308157889, guid: 9215ae1ce13b48e42b2ad38637ca05d9, type: 3}
   playerCharacter: {fileID: 0}
   positionToSet: {x: 0, y: 0, z: 0}
