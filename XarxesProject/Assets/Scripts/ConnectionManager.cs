@@ -268,104 +268,113 @@ public class ConnectionManager : MonoBehaviour
         string json = binaryReader.ReadString();
 
         GenericSendClass sendClass = new GenericSendClass();
-        sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
-        //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
-
-        if (sendClass.hasToCheckTargets)
+        try
         {
-            SetTargetsAsChecked(sendClass, json);
+            sendClass = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
-            return;
-        }
-        else
-        {
-            switch (sendClass.sendCode)
+            //Debug.Log("Data Received: " + sendClass.sendCode.ToString());
+
+            if (sendClass.hasToCheckTargets)
             {
-                case SendCode.ConnectionRequest:
-                    ConnectionRequest connectionRequest = new ConnectionRequest();
-                    connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
-                    connectionRequest.remoteIP = remoteIP;
-                    connectionRequest.remotePort = remotePort;
-                    Receive_ConnectionRequest(connectionRequest);
-                    break;
+                SetTargetsAsChecked(sendClass, json);
 
-                case SendCode.ConnectionConfirmation:
-                    ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
-                    connectionConfirmation = JsonConvert.DeserializeObject<ConnectionConfirmation>(json);
-                    Receive_ConnectionConfirmation(connectionConfirmation);
-                    break;
+                return;
+            }
+            else
+            {
+                switch (sendClass.sendCode)
+                {
+                    case SendCode.ConnectionRequest:
+                        ConnectionRequest connectionRequest = new ConnectionRequest();
+                        connectionRequest = JsonConvert.DeserializeObject<ConnectionRequest>(json);
+                        connectionRequest.remoteIP = remoteIP;
+                        connectionRequest.remotePort = remotePort;
+                        Receive_ConnectionRequest(connectionRequest);
+                        break;
 
-                case SendCode.DebugMessage:
-                    DebugMessage debugMessage = new DebugMessage();
-                    debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
-                    Receive_DebugMessage(debugMessage);
-                    break;
+                    case SendCode.ConnectionConfirmation:
+                        ConnectionConfirmation connectionConfirmation = new ConnectionConfirmation();
+                        connectionConfirmation = JsonConvert.DeserializeObject<ConnectionConfirmation>(json);
+                        Receive_ConnectionConfirmation(connectionConfirmation);
+                        break;
 
-                case SendCode.PlayerTransform:
-                    PlayerTransform playerTransform = new PlayerTransform();
-                    playerTransform = JsonConvert.DeserializeObject<PlayerTransform>(json);
-                    Receive_PlayerTransform(playerTransform);
-                    break;
+                    case SendCode.DebugMessage:
+                        DebugMessage debugMessage = new DebugMessage();
+                        debugMessage = JsonConvert.DeserializeObject<DebugMessage>(json);
+                        Receive_DebugMessage(debugMessage);
+                        break;
 
-                //case SendCode.PartyManager:
-                //    PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
-                //    Receive_PartyPlayersInfo(PPI);
-                //    break;
+                    case SendCode.PlayerTransform:
+                        PlayerTransform playerTransform = new PlayerTransform();
+                        playerTransform = JsonConvert.DeserializeObject<PlayerTransform>(json);
+                        Receive_PlayerTransform(playerTransform);
+                        break;
 
-                //case SendCode.SendIdPlayer:
-                //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
-                //    Receive_SendIdPlayer(sIP);
-                //    break;
+                    //case SendCode.PartyManager:
+                    //    PartyPlayersInfo PPI = JsonConvert.DeserializeObject<PartyPlayersInfo>(json);
+                    //    Receive_PartyPlayersInfo(PPI);
+                    //    break;
 
-                //case SendCode.ClientListUpdate:
-                //    //ClientListUpdate clientListUpdate = new ClientListUpdate();
-                //    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
-                //    ////UpdateClientList(clientListUpdate.clientList);
-                //    break;
-                case SendCode.RoomInfoUpdate:
-                    RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
-                    roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
-                    UpdateRoomInfo(roomInfoUpdate.room);
-                    break;
+                    //case SendCode.SendIdPlayer:
+                    //    SendIdPlayer sIP = JsonConvert.DeserializeObject<SendIdPlayer>(json);
+                    //    Receive_SendIdPlayer(sIP);
+                    //    break;
 
-                case SendCode.StartGame:
-                    StartGame startGame = new StartGame();
-                    startGame = JsonConvert.DeserializeObject<StartGame>(json);
-                    StartGame();
-                    break;
+                    //case SendCode.ClientListUpdate:
+                    //    //ClientListUpdate clientListUpdate = new ClientListUpdate();
+                    //    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
+                    //    ////UpdateClientList(clientListUpdate.clientList);
+                    //    break;
+                    case SendCode.RoomInfoUpdate:
+                        RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
+                        roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
+                        UpdateRoomInfo(roomInfoUpdate.room);
+                        break;
 
-                case SendCode.UpdateParty:
-                    UpdateParty updateParty = new UpdateParty();
-                    updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
-                    Receive_UpdateParty(updateParty);
-                    break;
+                    case SendCode.StartGame:
+                        StartGame startGame = new StartGame();
+                        startGame = JsonConvert.DeserializeObject<StartGame>(json);
+                        StartGame();
+                        break;
 
-                case SendCode.UpdateGameplayHost:
-                    UpdateGameplayHost updateGameplayHost = new UpdateGameplayHost();
-                    updateGameplayHost = JsonConvert.DeserializeObject<UpdateGameplayHost>(json);
-                    Receive_UpdateGameplayHost(updateGameplayHost);
-                    break;
-                    
-                case SendCode.UpdateGameplay:
-                    UpdateGameplay updateGameplay = new UpdateGameplay();
-                    updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
-                    Receive_UpdateGameplay(updateGameplay);
-                    break;
+                    case SendCode.UpdateParty:
+                        UpdateParty updateParty = new UpdateParty();
+                        updateParty = JsonConvert.DeserializeObject<UpdateParty>(json);
+                        Receive_UpdateParty(updateParty);
+                        break;
 
-                case SendCode.MeleeAttack:
-                    MeleeAttack meleeAttack = new MeleeAttack();
-                    meleeAttack = JsonConvert.DeserializeObject<MeleeAttack>(json);
-                    Receive_MeleeAttack(meleeAttack);
-                    break;
+                    case SendCode.UpdateGameplayHost:
+                        UpdateGameplayHost updateGameplayHost = new UpdateGameplayHost();
+                        updateGameplayHost = JsonConvert.DeserializeObject<UpdateGameplayHost>(json);
+                        Receive_UpdateGameplayHost(updateGameplayHost);
+                        break;
 
-                case SendCode.DistanceAttack:
-                    DistanceAttack distanceAttack = new DistanceAttack();
-                    distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
-                    Receive_DistanceAttack(distanceAttack);
-                    break;
+                    case SendCode.UpdateGameplay:
+                        UpdateGameplay updateGameplay = new UpdateGameplay();
+                        updateGameplay = JsonConvert.DeserializeObject<UpdateGameplay>(json);
+                        Receive_UpdateGameplay(updateGameplay);
+                        break;
+
+                    case SendCode.MeleeAttack:
+                        MeleeAttack meleeAttack = new MeleeAttack();
+                        meleeAttack = JsonConvert.DeserializeObject<MeleeAttack>(json);
+                        Receive_MeleeAttack(meleeAttack);
+                        break;
+
+                    case SendCode.DistanceAttack:
+                        DistanceAttack distanceAttack = new DistanceAttack();
+                        distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
+                        Receive_DistanceAttack(distanceAttack);
+                        break;
+                }
             }
         }
+        catch
+        {
+
+        }
+        
     }
 
     public void Receive_MeleeAttack(MeleeAttack meleeAttack)

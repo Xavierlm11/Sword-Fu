@@ -369,7 +369,7 @@ public class GameplayManager : MonoBehaviour
         foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
         {
 
-            if (player != null)
+            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
             {
                 player.playerCharacter.playerMovement.wins = winsPlayers[count];
 

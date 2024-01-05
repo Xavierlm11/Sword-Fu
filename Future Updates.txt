@@ -34,12 +34,12 @@ Animaciones sincronizadas --- Xavi C
 Personajes variados --- Xavi C
 
 
-Solucionar errores serialización --- Xavi C
+[x]Solucionar errores serialización --- Xavi C
 Solucionar cambios de escena --- Xavi L
 Solucionar bug espada no desaparece --- Albert
 
 Volver al lobby
-Permitir espectadores --- Xavi C
+[x]Permitir espectadores --- Xavi C
 
 Si o si:
 Solucionar errores serialización --- Xavi C
