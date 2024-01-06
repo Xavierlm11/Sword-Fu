@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
     public bool canSendSynchronizationData;
 
     public GameObject localMark;
+
+    public bool isRunning;
 
     private void Start()
     {
@@ -119,6 +122,9 @@ public class PlayerMovement : MonoBehaviour
             {
                 CheckTransformInterpolation();
             }
+
+            CheckAnimations();
+
             return;
         }
 
@@ -140,21 +146,23 @@ public class PlayerMovement : MonoBehaviour
             {
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
 
-                animator.SetBool("Run", true);
+                isRunning = true;
             }
             else
             {
-                
-                animator.SetBool("Run", false);
+                isRunning = false;
+            }
 
-                if (!isAttacking)
-                {
-                    animator.SetBool("Idle", true);
-                }
+            if (Input.GetButtonDown("Fire1"))
+            {
+                MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
+                meleeAttack.transferType = TransferType.AllExceptLocal;
+                ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
+                Attack();
             }
 
             //Al hacer click izquierdo del raton actiba la funcion de shoot
-            if (Input.GetButtonDown("Fire1") && haveSword == true)
+            if (Input.GetButtonDown("Fire2") && haveSword == true)
             {
                 DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
                 distanceAttack.transferType = TransferType.AllExceptLocal;
@@ -162,17 +170,30 @@ public class PlayerMovement : MonoBehaviour
                 Shoot();
             }
 
-            if (Input.GetButtonDown("Fire2"))
-            {
-                MeleeAttack meleeAttack = new MeleeAttack(playerCharacter.characterLink.playerInfo);
-                meleeAttack.transferType = TransferType.AllExceptLocal;
-                ConnectionManager.Instance.SerializeToJsonAndSend(meleeAttack);
-                Attack();
-
-            }
+            
 
         }
-       // }
+
+        CheckAnimations();
+        // }
+
+    }
+
+    private void CheckAnimations()
+    {
+        if (!isAttacking)
+        {
+            animator.SetBool("Idle", true);
+        }
+
+        if (isRunning)
+        {
+            animator.SetBool("Run", true);
+        }
+        else
+        {
+            animator.SetBool("Run", false);
+        }
 
     }
 
@@ -204,6 +225,15 @@ public class PlayerMovement : MonoBehaviour
         float elapsed_time = Time.time - currentInterpolationTime;
 
         float interpolationDelay = 1;
+
+
+        bool isMoving = true;
+
+        if(Mathf.Abs(currentInterpolationPosition.x - transform.position.x) < 0.01 &&
+           Mathf.Abs(currentInterpolationPosition.z - transform.position.z) < 0.01)
+        {
+            isMoving = false;
+        }
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -240,6 +270,15 @@ public class PlayerMovement : MonoBehaviour
                     transform.position = newPos;
                 }
                 break;
+        }
+
+        if (isMoving)
+        {
+            isRunning = true;
+        }
+        else
+        {
+            isRunning = false;
         }
 
         switch (NetworkManager.Instance.rotationInterpolation)
