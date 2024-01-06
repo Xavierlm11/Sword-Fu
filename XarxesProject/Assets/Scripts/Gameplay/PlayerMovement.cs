@@ -28,6 +28,10 @@ public class PlayerMovement : MonoBehaviour
     public float shootRate = 0.5f;
     float nextFireRate;
 
+    private bool isDashing = false;
+    public float dashDistance = 5f;
+    public float dashDuration = 0.5f;
+
     public GameObject[] characters;
 
     private GameObject currentCharacter;
@@ -193,7 +197,11 @@ public class PlayerMovement : MonoBehaviour
                 Shoot();
             }
 
-            
+            if (Input.GetKeyDown(KeyCode.Space) && !isDashing)
+            {
+                StartCoroutine(Dash());
+            }
+
 
         }
 
@@ -587,6 +595,47 @@ public class PlayerMovement : MonoBehaviour
         canRotate = true;
         //animator.SetBool("Attack", false);
         //animator.SetTrigger("Idle");
+    }
+
+    IEnumerator Dash()
+    {
+        isDashing = true;
+
+        Vector3 dashDirection = direction.normalized;
+        Vector3 dashTarget = transform.position + dashDirection * dashDistance;
+
+        float startTime = Time.time;
+
+        while (Time.time < startTime + dashDuration)
+        {
+            // Verifica si hay obstáculos en la dirección del dash
+            if (!CheckObstaclesInDirection(dashDirection))
+            {
+                // Interpola la posición durante el dash
+                float t = (Time.time - startTime) / dashDuration;
+                transform.position = Vector3.Lerp(transform.position, dashTarget, t);
+            }
+
+            yield return null;
+        }
+
+        isDashing = false;
+    }
+
+    bool CheckObstaclesInDirection(Vector3 direction)
+    {
+        // Realiza un raycast en la dirección del dash
+        Ray ray = new Ray(transform.position, direction);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, dashDistance))
+        {
+            // Si hay un obstáculo, devuelve true
+            return true;
+        }
+
+        // No hay obstáculos en la dirección del dash
+        return false;
     }
 
     IEnumerator SendPlayerPositionsToServer()
