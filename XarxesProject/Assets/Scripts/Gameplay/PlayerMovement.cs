@@ -31,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isDashing = false;
     public float dashDistance = 5f;
     public float dashDuration = 0.5f;
+    public LayerMask obstacleLayer;
 
     public GameObject[] characters;
 
@@ -608,34 +609,24 @@ public class PlayerMovement : MonoBehaviour
 
         while (Time.time < startTime + dashDuration)
         {
-            // Verifica si hay obstáculos en la dirección del dash
-            if (!CheckObstaclesInDirection(dashDirection))
+            
+            Ray ray = new Ray(transform.position, dashDirection);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, dashDistance, obstacleLayer))
             {
-                // Interpola la posición durante el dash
-                float t = (Time.time - startTime) / dashDuration;
-                transform.position = Vector3.Lerp(transform.position, dashTarget, t);
+                
+                dashTarget = hit.point;
             }
+
+           
+            float t = (Time.time - startTime) / dashDuration;
+            transform.position = Vector3.Lerp(transform.position, dashTarget, t);
 
             yield return null;
         }
 
         isDashing = false;
-    }
-
-    bool CheckObstaclesInDirection(Vector3 direction)
-    {
-        // Realiza un raycast en la dirección del dash
-        Ray ray = new Ray(transform.position, direction);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, dashDistance))
-        {
-            // Si hay un obstáculo, devuelve true
-            return true;
-        }
-
-        // No hay obstáculos en la dirección del dash
-        return false;
     }
 
     IEnumerator SendPlayerPositionsToServer()

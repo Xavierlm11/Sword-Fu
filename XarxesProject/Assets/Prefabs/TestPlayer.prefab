@@ -218,6 +218,9 @@ MonoBehaviour:
   shootRate: 1
   dashDistance: 5
   dashDuration: 0.5
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
   characters:
   - {fileID: 8728740277022203491, guid: 51dbb270b91196348b2c13c837434b35, type: 3}
   - {fileID: 7267754116719088766, guid: d3bffca57ddfe804691a503d4ea235c9, type: 3}
