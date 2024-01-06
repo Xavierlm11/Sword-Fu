@@ -330,6 +330,7 @@ public class ConnectionManager : MonoBehaviour
                     //    //clientListUpdate = JsonConvert.DeserializeObject<ClientListUpdate>(json);
                     //    ////UpdateClientList(clientListUpdate.clientList);
                     //    break;
+
                     case SendCode.RoomInfoUpdate:
                         RoomInfoUpdate roomInfoUpdate = new RoomInfoUpdate();
                         roomInfoUpdate = JsonConvert.DeserializeObject<RoomInfoUpdate>(json);
@@ -370,6 +371,18 @@ public class ConnectionManager : MonoBehaviour
                         DistanceAttack distanceAttack = new DistanceAttack();
                         distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
                         Receive_DistanceAttack(distanceAttack);
+                        break;
+
+                    case SendCode.SwordTransform:
+                        SwordTransform swordTransform = new SwordTransform();
+                        swordTransform = JsonConvert.DeserializeObject<SwordTransform>(json);
+                        Receive_SwordTransform(swordTransform);
+                        break;
+
+                    case SendCode.FallSword:
+                        FallSword fallSword = new FallSword();
+                        fallSword = JsonConvert.DeserializeObject<FallSword>(json);
+                        Receive_FallSword(fallSword);
                         break;
                 }
             }
@@ -420,6 +433,44 @@ public class ConnectionManager : MonoBehaviour
             }
         }
     }
+
+    public void Receive_SwordTransform(SwordTransform swordTransform)
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == swordTransform.player.client.nickname)
+            {
+                if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement != null)
+                {
+                    Vector3 newPos = new Vector3(swordTransform.positionX, swordTransform.positionY, swordTransform.positionZ);
+
+                    Vector3 rot = new Vector3(swordTransform.rotationX, swordTransform.rotationY, swordTransform.rotationZ);
+
+                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.SetTransformInterpolation_Sword(newPos, rot);
+                }
+            }
+        }
+    }
+
+    public void Receive_FallSword(FallSword fallSword)
+    {
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+        {
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == fallSword.player.client.nickname)
+            {
+                if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement != null && PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet != null)
+                {
+                    Vector3 newPos = new Vector3(fallSword.positionX, fallSword.positionY, fallSword.positionZ);
+
+                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet.GetComponent<Bullet>().positionToFall = newPos;
+                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet.GetComponent<Bullet>().isDestroying = true;
+                    //Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet);
+                }
+            }
+        }
+    }
+
+
     //Serialize the clases and send the json to the destination
     public void SetTargetsAsChecked(GenericSendClass sendClass, string json)
     {
@@ -499,6 +550,20 @@ public class ConnectionManager : MonoBehaviour
                 distanceAttack = JsonConvert.DeserializeObject<DistanceAttack>(json);
                 distanceAttack.CheckTargets();
                 SerializeToJsonAndSend(distanceAttack);
+                break;
+
+            case SendCode.SwordTransform:
+                SwordTransform swordTransform = new SwordTransform();
+                swordTransform = JsonConvert.DeserializeObject<SwordTransform>(json);
+                swordTransform.CheckTargets();
+                SerializeToJsonAndSend(swordTransform);
+                break;
+
+            case SendCode.FallSword:
+                FallSword fallSword = new FallSword();
+                fallSword = JsonConvert.DeserializeObject<FallSword>(json);
+                fallSword.CheckTargets();
+                SerializeToJsonAndSend(fallSword);
                 break;
 
         }

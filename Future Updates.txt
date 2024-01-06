@@ -17,7 +17,7 @@
 -Melee attack (function)
 -Long attack (function)
 
--Sword position --- Xavi C
+[x]Sword position and rotation --- Xavi C
 -Dies --- Xavi L
 -Round pass --- Xavi L
 -Dash --- Xavi C
@@ -31,7 +31,7 @@ Escenarios --- Albert
 Dash --- Albert
 Marca del local --- Albert
 [x]Implementar marca del local --- Xavi C
-Animaciones sincronizadas --- Xavi C
+[x]Animaciones sincronizadas --- Xavi C
 [x]Personajes variados --- Xavi C
 
 

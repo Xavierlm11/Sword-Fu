@@ -51,8 +51,30 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isRunning;
 
+    public GameObject bullet;
+    public Rigidbody rbullet;
+
+    #region sword synchronization
+
+    public Vector3 positionToSet_Sword;
+    public Vector3 rotationToSet_Sword;
+
+    public Vector3 currentInterpolationPosition_Sword;
+    public Vector3 currentInterpolationRotation_Sword;
+
+    public float currentInterpolationTime_Sword;
+    public float lastInterpolationTime_Sword;
+    public float interpolationTimeDiff_Sword;
+
+    public bool canSyncSword;
+
+    public int syncFrameCount;
+
+    #endregion
+
     private void Start()
     {
+        syncFrameCount = 0;
 
         if (playerCharacter.characterLink.isLocal)
         {
@@ -123,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
                 CheckTransformInterpolation();
             }
 
+            CheckTransformInterpolation_Sword();
             CheckAnimations();
 
             return;
@@ -322,17 +345,137 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    //void SwitchCharacter(int index)
-    //{
-    //    if (currentCharacter != null)
-    //    {
-    //        Destroy(currentCharacter);
-    //    }
-        
-    //    currentCharacter = Instantiate(characters[index], charSpawn.position, charSpawn.rotation);
+    public void SetTransformInterpolation_Sword(Vector3 newPos, Vector3 newRot)
+    {
+        if(bullet == null)
+        {
+            return;
+        }
 
-    //    currentCharacter.transform.parent = transform;
-    //}
+        syncFrameCount++;
+
+        //Get the position and rotation to set next
+        positionToSet_Sword = newPos;
+        rotationToSet_Sword = newRot;
+
+        //Get the difference between the last interpolation frame and this
+        lastInterpolationTime_Sword = currentInterpolationTime_Sword;
+        currentInterpolationTime_Sword = Time.time;
+
+        interpolationTimeDiff_Sword = currentInterpolationTime_Sword - lastInterpolationTime_Sword;
+
+        //If there is no previous interpolation frame, the difference is the default
+        if (interpolationTimeDiff_Sword == 0)
+        {
+            interpolationTimeDiff_Sword = NetworkManager.Instance.networkUpdateInterval;
+        }
+
+        //Get the position and rotation on this frame
+        currentInterpolationPosition_Sword = bullet.transform.position;
+        currentInterpolationRotation_Sword = bullet.transform.eulerAngles;
+
+        canSyncSword = true;
+
+        CheckTransformInterpolation_Sword();
+        
+    }
+
+    public void CheckTransformInterpolation_Sword()
+    {
+        float elapsed_time = Time.time - currentInterpolationTime_Sword;
+
+        float interpolationDelay = 1;
+
+        if (bullet == null || !canSyncSword)
+        {
+            return;
+        }
+
+        if(syncFrameCount >= 2)
+        {
+            bullet.SetActive(true);
+        }
+
+        switch (NetworkManager.Instance.movementInterpolation)
+        {
+            case InterpolationMode.None:
+                {
+                    bullet.transform.position = positionToSet_Sword;
+                }
+                break;
+
+            case InterpolationMode.Lerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    bullet.transform.position = Vector3.Lerp(currentInterpolationPosition_Sword, positionToSet_Sword, t);
+
+                    if(bullet.GetComponent<Bullet>().isDestroying && t >= 1)
+                    {
+                        Destroy(bullet);
+                    }
+                }
+                break;
+
+            case InterpolationMode.Slerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    bullet.transform.position = Vector3.Slerp(currentInterpolationPosition_Sword, positionToSet_Sword, t);
+                }
+                break;
+
+            case InterpolationMode.SmoothStep:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+
+                    float xPos = Mathf.SmoothStep(currentInterpolationPosition_Sword.x, positionToSet_Sword.x, t);
+                    float yPos = Mathf.SmoothStep(currentInterpolationPosition_Sword.y, positionToSet_Sword.y, t);
+                    float zPos = Mathf.SmoothStep(currentInterpolationPosition_Sword.z, positionToSet_Sword.z, t);
+
+                    Vector3 newPos = new Vector3(xPos, yPos, zPos);
+
+                    bullet.transform.position = newPos;
+                }
+                break;
+        }
+
+        switch (NetworkManager.Instance.rotationInterpolation)
+        {
+            case InterpolationMode.None:
+                {
+                    bullet.transform.rotation = Quaternion.Euler(rotationToSet_Sword);
+                }
+                break;
+
+            case InterpolationMode.Lerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    bullet.transform.rotation = Quaternion.Euler(Vector3.Lerp(currentInterpolationRotation_Sword, rotationToSet_Sword, t));
+                }
+                break;
+
+            case InterpolationMode.Slerp:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    bullet.transform.rotation = Quaternion.Euler(Vector3.Slerp(currentInterpolationRotation_Sword, rotationToSet_Sword, t));
+                }
+                break;
+
+            case InterpolationMode.SmoothStep:
+                {
+                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+
+                    float xRot = Mathf.SmoothStep(currentInterpolationRotation_Sword.x, rotationToSet_Sword.x, t);
+                    float yRot = Mathf.SmoothStep(currentInterpolationRotation_Sword.y, rotationToSet_Sword.y, t);
+                    float zRot = Mathf.SmoothStep(currentInterpolationRotation_Sword.z, rotationToSet_Sword.z, t);
+
+                    Vector3 newRot = new Vector3(xRot, yRot, zRot);
+
+                    bullet.transform.rotation = Quaternion.Euler(newRot);
+                }
+                break;
+        }
+
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -388,16 +531,18 @@ public class PlayerMovement : MonoBehaviour
 
             //Crea una bullet en el point de shoot
 
-            GameObject bullet = Instantiate(bulletPrefab, shootPoint.position, shootPoint.rotation);
-            Rigidbody rbbullet = bullet.GetComponent<Rigidbody>();
+            bullet = Instantiate(bulletPrefab, shootPoint.position, shootPoint.rotation);
+            Bullet bul = bullet.GetComponent<Bullet>();
+            bul.SetOwner(gameObject);
+            rbullet = bullet.GetComponent<Rigidbody>();
+            if(!playerCharacter.characterLink.isLocal)
+            {
+                bullet.SetActive(false);
+            }
+
+            syncFrameCount = 0;
 
             nextFireRate = Time.time + shootRate;
-
-
-            //if (rbbullet != null)
-            //{
-            //    rbbullet.velocity = bullet.transform.forward * bulletSpeed;
-            //}
 
             //Destruye la bullet 5 segundos despues de ser creada
             Destroy(bullet, 5f);

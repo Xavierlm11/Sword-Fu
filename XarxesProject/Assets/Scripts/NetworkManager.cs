@@ -184,6 +184,55 @@ public class PlayerTransform : GenericSendClass
 
 }
 
+public class FallSword : GenericSendClass
+{
+
+    public FallSword()
+    {
+
+    }
+
+    public FallSword(Vector3 pos) : base(true)
+    {
+        positionX = pos.x;
+        positionY = pos.y;
+        positionZ = pos.z;
+
+        sendCode = SendCode.FallSword;
+    }
+
+    public float positionX;
+    public float positionY;
+    public float positionZ;
+
+    public PlayerInfo player;
+
+}
+
+public class SwordTransform : GenericSendClass
+{
+
+    public SwordTransform()
+    {
+
+    }
+
+    public SwordTransform(bool isNotJsonConversion) : base(true)
+    {
+        sendCode = SendCode.SwordTransform;
+    }
+
+    public float positionX;
+    public float positionY;
+    public float positionZ;
+
+    public float rotationX;
+    public float rotationY;
+    public float rotationZ;
+
+    public PlayerInfo player;
+}
+
 public class MeleeAttack : GenericSendClass
 {
     public MeleeAttack()
@@ -324,6 +373,8 @@ public enum SendCode
     UpdateGameplay,
     MeleeAttack,
     DistanceAttack,
+    SwordTransform,
+    FallSword,
 }
 
 public enum TransferType

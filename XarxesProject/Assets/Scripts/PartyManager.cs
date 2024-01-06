@@ -96,6 +96,9 @@ public class PartyManager : MonoBehaviour
         {
             if (link.isLocal && link.playerCharacter.characterObject != null)
             {
+
+                //Player Transform
+
                 PlayerTransform playerTransform = new PlayerTransform(true);
                 playerTransform.player = link.playerInfo;
 
@@ -118,7 +121,25 @@ public class PartyManager : MonoBehaviour
 
                 ConnectionManager.Instance.SerializeToJsonAndSend(playerTransform);
 
-                
+                //Sword Transform
+
+                if(link.playerCharacter.playerMovement != null && link.playerCharacter.playerMovement.bullet != null)
+                {
+                    SwordTransform swordTransform = new SwordTransform(true);
+                    swordTransform.player = link.playerInfo;
+
+                    swordTransform.positionX = link.playerCharacter.playerMovement.bullet.transform.position.x;
+                    swordTransform.positionY = link.playerCharacter.playerMovement.bullet.transform.position.y;
+                    swordTransform.positionZ = link.playerCharacter.playerMovement.bullet.transform.position.z;
+
+                    swordTransform.rotationX = link.playerCharacter.playerMovement.bullet.transform.rotation.eulerAngles.x;
+                    swordTransform.rotationY = link.playerCharacter.playerMovement.bullet.transform.rotation.eulerAngles.y;
+                    swordTransform.rotationZ = link.playerCharacter.playerMovement.bullet.transform.rotation.eulerAngles.z;
+
+                    swordTransform.transferType = TransferType.AllExceptLocal;
+
+                    ConnectionManager.Instance.SerializeToJsonAndSend(swordTransform);
+                }
             }
         }
 

@@ -158,7 +158,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 1
+  m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -232,6 +232,18 @@ MonoBehaviour:
   canSynchronizeTransform: 0
   canSendSynchronizationData: 0
   localMark: {fileID: 6810677408844789696}
+  isRunning: 0
+  bullet: {fileID: 0}
+  rbullet: {fileID: 0}
+  positionToSet_Sword: {x: 0, y: 0, z: 0}
+  rotationToSet_Sword: {x: 0, y: 0, z: 0}
+  currentInterpolationPosition_Sword: {x: 0, y: 0, z: 0}
+  currentInterpolationRotation_Sword: {x: 0, y: 0, z: 0}
+  currentInterpolationTime_Sword: 0
+  lastInterpolationTime_Sword: 0
+  interpolationTimeDiff_Sword: 0
+  canSyncSword: 0
+  syncFrameCount: 0
 --- !u!136 &7111372218279889722
 CapsuleCollider:
   m_ObjectHideFlags: 0
