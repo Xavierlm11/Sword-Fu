@@ -919,8 +919,10 @@ public class ConnectionManager : MonoBehaviour
 
 
                                 stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
+                                stream.Seek(0, SeekOrigin.Begin);
                                 binaryReader = new BinaryReader(stream);
                                 stream.Seek(0, SeekOrigin.Begin);
+
                                 string json = binaryReader.ReadString();
 
 
