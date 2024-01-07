@@ -31,6 +31,18 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
+        if(owner == null)
+        {
+            return;
+        }
+        else if (owner.GetComponent<PlayerMovement>().playerCharacter != null &&
+            owner.GetComponent<PlayerMovement>().playerCharacter.characterLink != null &&
+            !owner.GetComponent<PlayerMovement>().playerCharacter.characterLink.isLocal)
+        {
+            return;
+        }
+
         PlayerMovement player = other.GetComponent<PlayerMovement>();
 
         if (player != null && player.gameObject != owner)
@@ -60,6 +72,8 @@ public class Bullet : MonoBehaviour
 
         owner.GetComponent<PlayerMovement>().canSyncSword = false;
         GameObject FallenSword = Instantiate(fallensword, positionToFall, Quaternion.identity);
+
+        owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
     }
 
     public void SetOwner(GameObject player)

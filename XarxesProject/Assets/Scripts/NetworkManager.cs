@@ -209,6 +209,23 @@ public class FallSword : GenericSendClass
 
 }
 
+public class CollectFallSword : GenericSendClass
+{
+
+    public CollectFallSword()
+    {
+
+    }
+
+    public CollectFallSword(bool isNotJsonConversion) : base(true)
+    {
+        sendCode = SendCode.CollectFallSword;
+    }
+
+    public PlayerInfo playerWhoCollect;
+    public PlayerInfo ownerOfSword;
+}
+
 public class SwordTransform : GenericSendClass
 {
 
@@ -375,6 +392,7 @@ public enum SendCode
     DistanceAttack,
     SwordTransform,
     FallSword,
+    CollectFallSword
 }
 
 public enum TransferType

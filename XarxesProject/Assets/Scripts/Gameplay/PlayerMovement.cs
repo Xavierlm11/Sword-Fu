@@ -58,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
 
     public GameObject bullet;
     public Rigidbody rbullet;
+    public GameObject fallenSword;
 
     #region sword synchronization
 
@@ -192,10 +193,16 @@ public class PlayerMovement : MonoBehaviour
             //Al hacer click izquierdo del raton actiba la funcion de shoot
             if (Input.GetButtonDown("Fire2") && haveSword == true)
             {
-                DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
-                distanceAttack.transferType = TransferType.AllExceptLocal;
-                ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
-                Shoot();
+                if (Time.time > nextFireRate)
+                {
+                    nextFireRate = Time.time + shootRate;
+
+                    DistanceAttack distanceAttack = new DistanceAttack(playerCharacter.characterLink.playerInfo);
+                    distanceAttack.transferType = TransferType.AllExceptLocal;
+                    ConnectionManager.Instance.SerializeToJsonAndSend(distanceAttack);
+                    Shoot();
+                    
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Space) && !isDashing)
@@ -488,12 +495,39 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("FallenSword") && haveSword == false)
+        if (playerCharacter.characterLink.isLocal)
         {
-            Debug.Log("Player recogió FallenSword");
-            Destroy(other.gameObject);
-            haveSword = true;
+            if (other.CompareTag("FallenSword") && haveSword == false)
+            {
+                CollectFallSword collectFallSword = new CollectFallSword(true);
+                collectFallSword.playerWhoCollect = playerCharacter.characterLink.playerInfo;
+                collectFallSword.ownerOfSword = null;
+
+                for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+                {
+                    if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword == other.gameObject)
+                    {
+                        collectFallSword.ownerOfSword = PartyManager.Instance.playerCharacterLinks[i].playerInfo;
+                    }
+                }
+                
+                collectFallSword.transferType = TransferType.AllExceptLocal;
+                ConnectionManager.Instance.SerializeToJsonAndSend(collectFallSword);
+
+                CollectFallenSword(other.gameObject);
+            }
         }
+       
+    }
+
+    public void CollectFallenSword(GameObject sword)
+    {
+        if(sword != null)
+        {
+            Destroy(sword);
+        }
+
+        haveSword = true;
     }
 
     public void ReceiveDamage(int damage)
@@ -533,30 +567,28 @@ public class PlayerMovement : MonoBehaviour
 
     public void Shoot()
     {
-        //El if es para controlar el fire-rate
-        if (Time.time > nextFireRate)
+        haveSword = false;
+
+        //Crea una bullet en el point de shoot
+
+        bullet = Instantiate(bulletPrefab, shootPoint.position, shootPoint.rotation);
+        Bullet bul = bullet.GetComponent<Bullet>();
+        bul.SetOwner(gameObject);
+        rbullet = bullet.GetComponent<Rigidbody>();
+        if(!playerCharacter.characterLink.isLocal)
         {
-            haveSword = false;
-
-            //Crea una bullet en el point de shoot
-
-            bullet = Instantiate(bulletPrefab, shootPoint.position, shootPoint.rotation);
-            Bullet bul = bullet.GetComponent<Bullet>();
-            bul.SetOwner(gameObject);
-            rbullet = bullet.GetComponent<Rigidbody>();
-            if(!playerCharacter.characterLink.isLocal)
-            {
-                bullet.SetActive(false);
-            }
-
-            syncFrameCount = 0;
-
-            nextFireRate = Time.time + shootRate;
-
-            //Destruye la bullet 5 segundos despues de ser creada
-            Destroy(bullet, 5f);
-
+            bullet.SetActive(false);
         }
+
+        syncFrameCount = 0;
+
+        //Destruye la bullet 5 segundos despues de ser creada
+        Destroy(bullet, 5f);
+
+        Debug.LogError("AAAA");
+
+
+
     }
     public void Attack()
     {
@@ -627,22 +659,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         isDashing = false;
-    }
-
-    IEnumerator SendPlayerPositionsToServer()
-    {
-        while (true)
-        {
-            string message = "PlayerPositions,";
-
-            Vector3 position = gameObject.transform.position;
-            message += $"{gameObject.name},{position.x},{position.y},{position.z},{gameObject.transform.rotation.eulerAngles.y},{playerId}";
-
-
-            //ConnectionManager.Instance.Send_Data(() => ConnectionManager.Instance.SerializeToJsonAndSend(message));
-
-
-        }
     }
 
 }
