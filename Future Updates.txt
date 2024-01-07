@@ -27,9 +27,9 @@
 Package lost --- Xavi L
 Package order --- Xavi C
 
-Escenarios --- Albert
-Dash --- Albert
-Marca del local --- Albert
+[x]Escenarios --- Albert
+[x]Dash --- Albert
+[x]Marca del local --- Albert
 [x]Implementar marca del local --- Xavi C
 [x]Animaciones sincronizadas --- Xavi C
 [x]Personajes variados --- Xavi C
@@ -51,5 +51,5 @@ Solucionar cambios de escena --- Xavi L
 -Round pass --- Xavi L
 -Dash --- Xavi C
 
-Escenarios --- Albert
+[x]Escenarios --- Albert
 

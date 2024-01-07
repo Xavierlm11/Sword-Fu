@@ -29,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 889169457289343228}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6252548659433567762}
   - {fileID: 6447900096555530179}
@@ -80,10 +80,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b7ba1e2fea1464eb9dfa66fea2a648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 20
+  velocidad: 30
   direccion: {x: 0, y: 0, z: 1}
   damageAmount: 20
   fallensword: {fileID: 8171556430097898244, guid: 6796a784ec628f74e82be9a198c4002f, type: 3}
+  isDestroying: 0
+  positionToFall: {x: 0, y: 0, z: 0}
 --- !u!54 &2339256770099562770
 Rigidbody:
   m_ObjectHideFlags: 0
