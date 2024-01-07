@@ -908,7 +908,7 @@ public class ConnectionManager : MonoBehaviour
                     {
                         try
                         {
-                            if (dataToSendList[i] != null)
+                            if (dataToSendList[i] != null && dataToSendList[i].Length > 0)
                             {
                                 //Checking the info to send
 
@@ -1053,8 +1053,15 @@ public class ConnectionManager : MonoBehaviour
                         {
                             if (dataToSendList[i] != null)
                             {
-                                GenericSendClass dataInfo = new GenericSendClass();
-                                Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+                                //GenericSendClass dataInfo = new GenericSendClass();
+                                //dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
+                                //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+
+                                //if(dataInfo.sendCode == SendCode.ConnectionRequest)
+                                //{
+                                //    Debug.LogError("Request");
+                                //}
+
                                 //if (dataToSendList.Count > i && dataToSendList[i].Length > 0 && ipEndPointToSend != null)
                                 //{
                                 //Debug.Log(dataToSendList.Count);

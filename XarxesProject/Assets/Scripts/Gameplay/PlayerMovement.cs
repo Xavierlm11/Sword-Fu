@@ -363,11 +363,13 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetTransformInterpolation_Sword(Vector3 newPos, Vector3 newRot)
     {
+
+        //Debug.LogError("BBB");
         if(bullet == null)
         {
             return;
         }
-
+        //Debug.LogError("CCC");
         syncFrameCount++;
 
         //Get the position and rotation to set next
@@ -398,6 +400,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void CheckTransformInterpolation_Sword()
     {
+        
         float elapsed_time = Time.time - currentInterpolationTime_Sword;
 
         float interpolationDelay = 1;
@@ -410,7 +413,10 @@ public class PlayerMovement : MonoBehaviour
         if(syncFrameCount >= 2)
         {
             bullet.SetActive(true);
+            //Debug.LogError("Active");
         }
+
+        //Debug.LogError("DDD");
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -585,7 +591,7 @@ public class PlayerMovement : MonoBehaviour
         //Destruye la bullet 5 segundos despues de ser creada
         Destroy(bullet, 5f);
 
-        Debug.LogError("AAAA");
+        //Debug.LogError("AAAA");
 
 
 
