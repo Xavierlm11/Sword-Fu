@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
+//using System.Threading;
 using TMPro;
-using Unity.VisualScripting;
+//using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+//using UnityEngine.UIElements;
 
 
 public class GameplayManager : MonoBehaviour
@@ -184,7 +184,7 @@ public class GameplayManager : MonoBehaviour
                     AssingPlayerId();
                     AssingPlayerWins();
                     roundState = roundPhase.InGame;
-                    actualLvl = lastLevelIndex;
+                    actualLvl = randomLvl;
                 }
                 break;
             //What happens during the game
@@ -268,6 +268,7 @@ public class GameplayManager : MonoBehaviour
                             {
                                 isLvlSend = true;
                                 listLvlIndex.Clear();
+                                listLvlIndex = new List<int>();
                                 SendLvlIndex(); 
                             }
                         }
@@ -430,6 +431,7 @@ public class GameplayManager : MonoBehaviour
 
         if (!NetworkManager.Instance.GetLocalClient().isHost)
         {
+            Debug.Log("Actual lvl:  "+actualLvl);
             UpdateGameplayEveryOneHost(false,true,actualLvl);
         }
         else
