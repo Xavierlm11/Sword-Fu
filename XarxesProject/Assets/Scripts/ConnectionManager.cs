@@ -618,6 +618,7 @@ public class ConnectionManager : MonoBehaviour
     {
         if (updateGameplay.isRestart)
         {
+            Debug.Log("RESTARTING " );
             GameplayManager.Instance.RestartGame(); 
         }
         GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
@@ -629,15 +630,30 @@ public class ConnectionManager : MonoBehaviour
         GameplayManager.Instance.isPaused = updateGameplay.isPaused;
         GameplayManager.Instance.PauseTheGame();
 
-        if (!GameplayManager.Instance.canPaused)
+        if (!updateGameplay.isDead)
         {
-            GameplayManager.Instance.canPaused = true; 
+            if (!GameplayManager.Instance.canPaused)
+            {
+                GameplayManager.Instance.canPaused = true;
+            }
+            else
+            {
+                GameplayManager.Instance.canPaused = false;
+            }
+
         }
         else
         {
-            GameplayManager.Instance.canPaused=false;
+            GameplayManager.Instance.UpdatePLayersAlive(updateGameplay.playerId);
         }
-       
+
+        if(updateGameplay.isChangePhase)
+        {
+            GameplayManager.Instance.isRecivePhase = true;
+             GameplayManager.Instance.isEndOfRound = true;
+             GameplayManager.Instance.winnerId = updateGameplay.playerId;
+            Debug.Log("ENVIANDO PLAYERRR IDDDDD" + updateGameplay.playerId);
+        }
         
     }
 

@@ -99,7 +99,11 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private int[] winsPlayers = { 0, 0, 0, 0 };
 
-    private bool isF1 = false;  
+    private bool isF1 = false;
+
+    public bool isChangPhase = false;
+    public bool isRecivePhase = false;
+    public int winnerId = -1;
     public TextMeshProUGUI localNicknameText;
 
     #endregion
@@ -153,10 +157,13 @@ public class GameplayManager : MonoBehaviour
             //Inizilice the players and set the round
             case roundPhase.Starting:
                 {
+                    isChangPhase = isRecivePhase = false;
+                    winnerId = -1;  
                     CountPlayerAlive();
                     if (!isRoundZero)
                         PlayerManager.Instance.SpawnCharacters();
 
+                    AssingPlayerId();
                     AssingPlayerWins();
                     roundState = roundPhase.InGame;
 
@@ -169,7 +176,7 @@ public class GameplayManager : MonoBehaviour
                     if (isEndOfRound)
                     {
                         roundState = roundPhase.Ending;
-
+                        if (!isRecivePhase) isChangPhase = true;
                     }
 
 
@@ -227,7 +234,14 @@ public class GameplayManager : MonoBehaviour
                             UpdateGameplayEveryOneHost();
                         }
                     }
-                    dtIsAlive = Time.deltaTime;
+                    if (Input.GetKeyDown(KeyCode.F2))
+                    {
+                        if (NetworkManager.Instance.GetLocalClient().isHost)
+                        {
+                            RestartGame(); 
+                        }
+                    }
+                        dtIsAlive += Time.deltaTime;
                     if (dtIsAlive >= timeIsAlive)
                     {
                         dtIsAlive = 0f;
@@ -241,12 +255,16 @@ public class GameplayManager : MonoBehaviour
                     dtWinScreen += Time.deltaTime;
                     if (winScreen.activeSelf == false)
                     {
-                        PlayerCharacterLink winnerLink = GetWinner();
+                        PlayerCharacterLink winnerLink = null;
+                        if (!isRecivePhase && CountPlayerAlive() <= 1) winnerLink = GetWinner();
+                        else winnerLink = GetWinner(true, winnerId);
+
                         if (winnerLink != null)
                         {
                             WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
-                           if(!isF1) winnerLink.playerCharacter.playerMovement.wins++;
-                           else isF1 = false;
+                            winnerId = winnerLink.playerCharacter.playerMovement.playerId;
+                            if (!isF1) winnerLink.playerCharacter.playerMovement.wins++;
+                            else isF1 = false;
                             //winnerLink.playerCharacter.playerMovement.wins=3;
                         }
                         else
@@ -257,6 +275,9 @@ public class GameplayManager : MonoBehaviour
 
 
                         UpdateLeaderboard();
+                        if (!isRecivePhase && CountPlayerAlive()<=1)
+                            UpdateGameplayEveryOne(winnerId, false, true);
+
                         winScreen.SetActive(true);
 
                     }
@@ -377,6 +398,38 @@ public class GameplayManager : MonoBehaviour
             }
         }
     }
+    public void AssingPlayerId()
+    {
+        int count = 0;
+        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        {
+
+            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
+            {
+                player.playerCharacter.playerMovement.playerId = count;
+
+                count++;
+            }
+        }
+    }
+    public void UpdatePLayersAlive(int playerId)
+    {
+
+
+        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        {
+
+            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
+            {
+                if (player.playerCharacter.gameObject.activeSelf && player.playerCharacter.playerMovement.playerId == playerId && player.playerCharacter.playerMovement.isAlive  )
+                {
+                    Debug.Log("ESTA MUERTOOOOOaaaaa " + player.playerCharacter.playerMovement.isAlive);
+                    player.playerCharacter.playerMovement.ReceiveDamage(20);
+                    Debug.Log("PLAYER IDDDDDDD" +  playerId);
+                }
+            }
+        }
+    }
     public void UpdateLeaderboard()
     {
         int count = 0;
@@ -418,23 +471,36 @@ public class GameplayManager : MonoBehaviour
     {
         int count = 0;
 
-        foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        //foreach (PlayerCharacterLink player in PartyManager.Instance.playerCharacterLinks)
+        //{
+
+        //    if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
+        //    {
+        //        for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
+        //        {
+
+        //            if (winsList[count].transform.childCount >= player.playerCharacter.playerMovement.wins)
+        //            {
+        //                winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.gray;
+        //            }
+        //        }
+        //        winsPlayers[count] = player.playerCharacter.playerMovement.wins = 0;
+
+        //        count++;
+        //    }
+        //}
+        for (int i = 0; i < winsPlayers.Length; i++)
         {
-
-            if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
+            winsPlayers[i] = 0;
+            //if (winsList[i]!=null && winsList[i].transform.childCount >= i && winsList[i].transform.GetChild(i)!=null)
+            //{
+            //}
+            for (int j = 0; j < winsList[i].transform.childCount; j++)
             {
-                for (int i = 0; i < player.playerCharacter.playerMovement.wins; i++)
-                {
+                winsList[i].transform.GetChild(j).GetComponent<RawImage>().color = Color.gray;
 
-                    if (winsList[count].transform.childCount >= player.playerCharacter.playerMovement.wins)
-                    {
-                        winsList[count].transform.GetChild(i).GetComponent<RawImage>().color = Color.gray;
-                    }
-                }
-                winsPlayers[count] = player.playerCharacter.playerMovement.wins = 0;
-
-                count++;
             }
+            count++;
         }
     }
 
@@ -459,6 +525,7 @@ public class GameplayManager : MonoBehaviour
         {
             randomLvl = Random.Range(startLevelsIndex, levelsCount);
         }
+        Debug.Log("NEXT LEVEL IS: " + randomLvl);
         lastLevelIndex = randomLvl;
         return randomLvl;
     }
@@ -478,7 +545,7 @@ public class GameplayManager : MonoBehaviour
 
         }
     }
-    private PlayerCharacterLink GetWinner()
+    private PlayerCharacterLink GetWinner(bool isReceivePhase = false, int playerId = -1)
     {
         PlayerCharacterLink link = null;
 
@@ -488,10 +555,21 @@ public class GameplayManager : MonoBehaviour
             if (item != null && item.playerCharacter != null && item.playerCharacter.playerMovement != null)
             {
 
-                if (item.playerCharacter.playerMovement.isAlive)
+                if (!isReceivePhase)
                 {
+                    if (item.playerCharacter.playerMovement.isAlive)
+                    {
 
-                    return item;
+                        return item;
+                    }
+                }
+                else
+                {
+                    if (item.playerCharacter.playerMovement.playerId == playerId)
+                    {
+
+                        return item;
+                    }
                 }
             }
         }
@@ -524,9 +602,9 @@ public class GameplayManager : MonoBehaviour
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
     //updates the gameplay for everyone except for yourself
-    private void UpdateGameplayEveryOne()
+    public void UpdateGameplayEveryOne(int playerId = -1, bool isDead = false, bool isChangingPhase = false)
     {
-        UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused);
+        UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused, playerId, isDead, isChangingPhase);
         _updateGameplay.transferType = TransferType.AllExceptLocal;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }

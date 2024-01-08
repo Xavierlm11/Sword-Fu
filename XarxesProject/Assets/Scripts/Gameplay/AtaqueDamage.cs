@@ -15,6 +15,8 @@ public class AttackDamage : MonoBehaviour
         {
             Debug.Log("Le hace daño");
             player.ReceiveDamage(damageAmount);
+            Debug.Log("ESTA MUERTOOOOO " + player.isAlive);
+            GameplayManager.Instance.UpdateGameplayEveryOne(player.playerId, true);
             //player.Die();
 
         }

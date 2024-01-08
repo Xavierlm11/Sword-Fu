@@ -326,16 +326,23 @@ public class UpdateGameplay : GenericSendClass
 {
     
     public bool isPaused;
+    public bool isDead;
+    public bool isChangePhase;
+
+    public int playerId;
 
     public UpdateGameplay()
     {
 
     }
-    public UpdateGameplay(bool isPuased) : base(true)
+    public UpdateGameplay(bool isPaused, int playerId, bool isDead, bool isChangePhase) : base(true)
     {
-        this.isPaused = isPuased;
-
         sendCode = SendCode.UpdateGameplay;
+        this.isPaused = isPaused;
+        this.playerId = playerId;
+
+        this.isDead = isDead;
+        this.isChangePhase = isChangePhase;
     }
 }
 #endregion

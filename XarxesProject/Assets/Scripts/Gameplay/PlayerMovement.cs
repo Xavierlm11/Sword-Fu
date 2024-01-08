@@ -635,6 +635,8 @@ public class PlayerMovement : MonoBehaviour
         isAlive = false;
         GameplayManager.Instance.CheckEndOfRound();
         GameplayManager.Instance.CountPlayerAlive();
+        //GameplayManager.Instance.UpdateGameplayEveryOne(playerId, true);
+        Debug.Log("PLAYER IDDDDDDD muertoooooo" + playerId);
         gameObject.SetActive(false);
     }
 
