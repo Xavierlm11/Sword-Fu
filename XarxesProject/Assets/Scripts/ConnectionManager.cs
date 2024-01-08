@@ -466,6 +466,8 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_FallSword(FallSword fallSword)
     {
+        Debug.LogError("Received that sword has fallen");
+
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == fallSword.player.client.nickname)
@@ -477,6 +479,9 @@ public class ConnectionManager : MonoBehaviour
                     PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet.GetComponent<Bullet>().positionToFall = newPos;
                     PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet.GetComponent<Bullet>().isDestroying = true;
                     //Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet);
+
+                    Debug.LogError("isDestroying set to true and position to fall set");
+                
                 }
             }
         }
@@ -484,7 +489,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_CollectFallSword(CollectFallSword fallSword)
     {
-        //Debug.LogError("AAA");
+        Debug.LogError("Received that sword is collected 1");
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             //Find the collector of the fallen sword
@@ -497,7 +502,7 @@ public class ConnectionManager : MonoBehaviour
                         //Find the owner of the fallen sword
                         if (fallSword.ownerOfSword != null && PartyManager.Instance.playerCharacterLinks[j].playerInfo.client.nickname == fallSword.ownerOfSword.client.nickname && PartyManager.Instance.playerCharacterLinks[j].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[j].playerCharacter.playerMovement != null)
                         {
-                            //Debug.LogError("BBB");
+                            Debug.LogError("Received that sword is collected 2");
                             //The collector gets the sword
                             StartCoroutine(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.CollectFallenSword_Wait(PartyManager.Instance.playerCharacterLinks[i].playerInfo));
                         }
@@ -891,14 +896,18 @@ public class ConnectionManager : MonoBehaviour
     //information you want to send, serialize them and send them.
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
-        string json = JsonConvert.SerializeObject(objectToSerialize);
+        lock (lockObject)
+        {
+            string json = JsonConvert.SerializeObject(objectToSerialize);
 
-        stream = new MemoryStream();
-        binaryWriter = new BinaryWriter(stream);
-        binaryWriter.Write(json);
+            stream = new MemoryStream();
+            binaryWriter = new BinaryWriter(stream);
+            binaryWriter.Write(json);
 
-        byte[] data = stream.ToArray();
-        dataToSendList.Add(data);
+            byte[] data = stream.ToArray();
+            dataToSendList.Add(data);
+        }
+        
 
         //try
         //{

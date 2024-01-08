@@ -80,6 +80,11 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
 
+    public Coroutine collectSword_Wait;
+
+    public bool isWaitingForCollectingSword;
+    public bool swordCanBeCollected;
+
     private void Start()
     {
         syncFrameCount = 0;
@@ -366,12 +371,11 @@ public class PlayerMovement : MonoBehaviour
     public void SetTransformInterpolation_Sword(Vector3 newPos, Vector3 newRot)
     {
 
-        //Debug.LogError("BBB");
         if(bullet == null)
         {
             return;
         }
-        //Debug.LogError("CCC");
+        Debug.LogError("Tick received for bullet interpolation");
         syncFrameCount++;
 
         //Get the position and rotation to set next
@@ -408,20 +412,28 @@ public class PlayerMovement : MonoBehaviour
         if (bullet != null && syncFrameCount >= 2)
         {
             bullet.GetComponent<Bullet>().blade.enabled = true;
-            //Debug.LogError("Active");
+            Debug.LogError("Active. Frame Count: " + syncFrameCount);
         }
+
+        //Debug.Log("Frame Count: " + syncFrameCount);
 
         if (bullet == null)
         {
+            // Debug.Log("1A");
             return;
         }
-        else if (!canSyncSword && !bullet.GetComponent<Bullet>().isDestroying)
+
+
+        if(bullet.GetComponent<Bullet>().isDestroying)
         {
-            return;
-        }
-        else if(!canSyncSword && bullet.GetComponent<Bullet>().isDestroying)
-        {
+            Debug.Log("isDestroying is true, so destroy the bullet");
             Destroy(bullet);
+            return;
+        }
+
+        if (!canSyncSword)
+        {
+            Debug.Log("CanSyncSword is false, so no updates on transform");
             return;
         }
         ////else if (bullet.GetComponent<Bullet>().isDestroying && !canSyncSword)
@@ -449,7 +461,7 @@ public class PlayerMovement : MonoBehaviour
 
         
 
-        //Debug.LogError("DDD");
+        Debug.LogError("Bullet interpolation is going on");
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -552,14 +564,14 @@ public class PlayerMovement : MonoBehaviour
                     if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword == other.gameObject)
                     {
                         collectFallSword.ownerOfSword = PartyManager.Instance.playerCharacterLinks[i].playerInfo;
-                        //Debug.LogError("Owner Set");
+                        Debug.LogError("Owner Set");
                     }
                 }
                 
                 collectFallSword.transferType = TransferType.AllExceptLocal;
                 ConnectionManager.Instance.SerializeToJsonAndSend(collectFallSword);
 
-                StartCoroutine(CollectFallenSword_Wait(collectFallSword.ownerOfSword));
+                collectSword_Wait = StartCoroutine(CollectFallenSword_Wait(collectFallSword.ownerOfSword));
             }
         }
        
@@ -574,38 +586,53 @@ public class PlayerMovement : MonoBehaviour
     {
         bool ownerHasFallenSword = false;
 
+        Debug.Log("LOOP STARTS");
+
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == owner.client.nickname)
             {
                 if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
                 {
-                    //Debug.LogError("CCCA");
-                    Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
-                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
+                    if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected)
+                    {
+                        Debug.LogError("Sword is collected A");
+                        Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
+                        PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 
-                    haveSword = true;
+                        haveSword = true;
+                        PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected = false;
 
-                    yield break;
+                        yield break;
+                    }
+                    
                 }
             }
         }
 
         while (!ownerHasFallenSword)
         {
+            //if (!isWaitingForCollectingSword)
+            //{
+            //    yield break;
+            //}
+
             for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
             {
                 if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == owner.client.nickname)
                 {
                     if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
                     {
-                        //Debug.LogError("CCCB");
-                        Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
-                        PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
+                        if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected)
+                        {
+                            Debug.LogError("Sword is collected B");
+                            Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
+                            PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 
-                        haveSword = true;
+                            PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected = false;
 
-                        yield break;
+                            yield break;
+                        }
                     }
                 }
             }
@@ -672,7 +699,7 @@ public class PlayerMovement : MonoBehaviour
         //Destruye la bullet 5 segundos despues de ser creada
         //////Destroy(bullet, 5f);
 
-        //Debug.LogError("AAAA");
+        Debug.LogError("Shoot method");
 
 
 

@@ -92,9 +92,10 @@ public class Bullet : MonoBehaviour
         //    owner.GetComponent<PlayerMovement>().fallenSword = null;
         //}
 
-        //Debug.LogError("000");
-        owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
+        Debug.LogError("Bullet converted to fallen sword");
 
+        owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
+        owner.GetComponent<PlayerMovement>().swordCanBeCollected = true;
     }
 
     public void SetOwner(GameObject player)
