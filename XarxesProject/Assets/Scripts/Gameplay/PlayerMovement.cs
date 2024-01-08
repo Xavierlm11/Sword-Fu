@@ -552,7 +552,7 @@ public class PlayerMovement : MonoBehaviour
                     if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword == other.gameObject)
                     {
                         collectFallSword.ownerOfSword = PartyManager.Instance.playerCharacterLinks[i].playerInfo;
-                        Debug.LogError("Owner Set");
+                        //Debug.LogError("Owner Set");
                     }
                 }
                 
@@ -580,7 +580,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
                 {
-                    Debug.LogError("CCCA");
+                    //Debug.LogError("CCCA");
                     Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
                     PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 
@@ -599,7 +599,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
                     {
-                        Debug.LogError("CCCB");
+                        //Debug.LogError("CCCB");
                         Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
                         PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 

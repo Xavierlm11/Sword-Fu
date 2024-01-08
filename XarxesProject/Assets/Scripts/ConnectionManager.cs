@@ -180,27 +180,30 @@ public class ConnectionManager : MonoBehaviour
 
                 try
                 {
-                    Remote = ipEndPointOfSender;
+                    //lock (lockObject)
+                    //{
+                        Remote = ipEndPointOfSender;
 
-                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
-                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
+                        byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                        int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                    if (Remote is IPEndPoint remoteEndPoint)
-                    {
-                        
+                        if (Remote is IPEndPoint remoteEndPoint)
+                        {
 
-                        // Accede a la información de la IP y el puerto remotos
-                        IPAddress remoteIPAdress = remoteEndPoint.Address;
-                        int remotePort = remoteEndPoint.Port;
 
-                        //Debug.LogError("Server receiving using " + remoteEndPoint.Port.ToString());
+                            // Accede a la información de la IP y el puerto remotos
+                            IPAddress remoteIPAdress = remoteEndPoint.Address;
+                            int remotePort = remoteEndPoint.Port;
 
-                        string remoteIP = remoteIPAdress.ToString();
+                            //Debug.LogError("Server receiving using " + remoteEndPoint.Port.ToString());
 
-                        UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
+                            string remoteIP = remoteIPAdress.ToString();
 
-                        //recv = 0;
-                    }
+                            UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
+
+                            //recv = 0;
+                        }
+                    //}
 
                     //receivedData = null;
                 }
@@ -227,24 +230,26 @@ public class ConnectionManager : MonoBehaviour
 
                 try
                 {
-                    Remote = ipEndPointOfSender;
-                    byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
+                    //lock (lockObject)
+                    //{
+                        Remote = ipEndPointOfSender;
+                        byte[] receivedData = new byte[NetworkManager.Instance.maxTransferedDataSize];
 
-                    int recv = socket.ReceiveFrom(receivedData, ref Remote);
+                        int recv = socket.ReceiveFrom(receivedData, ref Remote);
 
-                    if (Remote is IPEndPoint remoteEndPoint)
-                    {
-                        // Accede a la información de la IP y el puerto remotos
-                        IPAddress remoteIPAdress = remoteEndPoint.Address;
-                        int remotePort = remoteEndPoint.Port;
+                        if (Remote is IPEndPoint remoteEndPoint)
+                        {
+                            // Accede a la información de la IP y el puerto remotos
+                            IPAddress remoteIPAdress = remoteEndPoint.Address;
+                            int remotePort = remoteEndPoint.Port;
 
-                        //Debug.LogError("Client receiving using " + remoteEndPoint.Port.ToString());
+                            //Debug.LogError("Client receiving using " + remoteEndPoint.Port.ToString());
 
-                        string remoteIP = remoteIPAdress.ToString();
+                            string remoteIP = remoteIPAdress.ToString();
 
-                        UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
-                    }
-
+                            UnityMainThreadDispatcher.Instance().Enqueue(() => DeserializeJsonAndReceive(receivedData, recv, remoteIP, remotePort));
+                        }
+                    //}
                     //receivedData = null;
                 }
                 catch (SocketException ex)
@@ -479,7 +484,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_CollectFallSword(CollectFallSword fallSword)
     {
-        Debug.LogError("AAA");
+        //Debug.LogError("AAA");
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             //Find the collector of the fallen sword
@@ -492,7 +497,7 @@ public class ConnectionManager : MonoBehaviour
                         //Find the owner of the fallen sword
                         if (fallSword.ownerOfSword != null && PartyManager.Instance.playerCharacterLinks[j].playerInfo.client.nickname == fallSword.ownerOfSword.client.nickname && PartyManager.Instance.playerCharacterLinks[j].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[j].playerCharacter.playerMovement != null)
                         {
-                            Debug.LogError("BBB");
+                            //Debug.LogError("BBB");
                             //The collector gets the sword
                             StartCoroutine(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.CollectFallenSword_Wait(PartyManager.Instance.playerCharacterLinks[i].playerInfo));
                         }
@@ -933,10 +938,9 @@ public class ConnectionManager : MonoBehaviour
         {
             while (!NetworkManager.Instance.appIsQuitting)
             {
-
-                lock (lockObject)
+                for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
-                    for (int i = dataToSendList.Count - 1; i >= 0; i--)
+                    lock (lockObject)
                     {
                         if (dataToSendList.Count > 0 && i < dataToSendList.Count)
                         {
@@ -1090,55 +1094,52 @@ public class ConnectionManager : MonoBehaviour
 
             while (!NetworkManager.Instance.appIsQuitting)
             {
-
-
+                
                 for (int i = dataToSendList.Count - 1; i >= 0; i--)
                 {
-                    
 
-                    if(dataToSendList.Count > 0 && i < dataToSendList.Count)
+                    lock (lockObject)
                     {
-                        
-
-                        try
+                        if (dataToSendList.Count > 0 && i < dataToSendList.Count)
                         {
-                            if (dataToSendList[i] != null)
+
+
+                            try
                             {
-                                //GenericSendClass dataInfo = new GenericSendClass();
-                                //dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
-                                //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+                                if (dataToSendList[i] != null)
+                                {
+                                    //GenericSendClass dataInfo = new GenericSendClass();
+                                    //dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
+                                    //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
-                                //if(dataInfo.sendCode == SendCode.ConnectionRequest)
-                                //{
-                                //    Debug.LogError("Request");
-                                //}
+                                    //if(dataInfo.sendCode == SendCode.ConnectionRequest)
+                                    //{
+                                    //    Debug.LogError("Request");
+                                    //}
 
-                                //if (dataToSendList.Count > i && dataToSendList[i].Length > 0 && ipEndPointToSend != null)
-                                //{
-                                //Debug.Log(dataToSendList.Count);
-                                //Debug.Log(dataToSendList[i].Length);
+                                    //if (dataToSendList.Count > i && dataToSendList[i].Length > 0 && ipEndPointToSend != null)
+                                    //{
+                                    //Debug.Log(dataToSendList.Count);
+                                    //Debug.Log(dataToSendList[i].Length);
 
-                                socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
-                                dataToSendList.RemoveAt(i);
-                                //Debug.LogError("Client sending using " + NetworkManager.Instance.defaultPort.ToString());
-                                //}
-                                //else
-                                //{
-                                //    Debug.LogError("Error al enviar datos");
+                                    socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+                                    dataToSendList.RemoveAt(i);
+                                    //Debug.LogError("Client sending using " + NetworkManager.Instance.defaultPort.ToString());
+                                    //}
+                                    //else
+                                    //{
+                                    //    Debug.LogError("Error al enviar datos");
 
-                                //}
+                                    //}
+                                }
                             }
-
-
-
-                        }
-                        catch (SocketException ex)
-                        {
-                            // Manejar la excepción
-                            Debug.LogError("Error al enviar datos: " + ex.Message);
+                            catch (SocketException ex)
+                            {
+                                // Manejar la excepción
+                                Debug.LogError("Error al enviar datos: " + ex.Message);
+                            }
                         }
                     }
-                   
 
                 }
             }

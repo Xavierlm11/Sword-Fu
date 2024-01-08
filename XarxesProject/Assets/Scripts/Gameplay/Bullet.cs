@@ -23,7 +23,7 @@ public class Bullet : MonoBehaviour
 
     void Update()
     {
-        if (owner.GetComponent<PlayerMovement>().playerCharacter.characterLink.isLocal)
+        if (owner != null && owner.GetComponent<PlayerMovement>().playerCharacter!= null && owner.GetComponent<PlayerMovement>().playerCharacter.characterLink != null && owner.GetComponent<PlayerMovement>().playerCharacter.characterLink.isLocal)
         {
             //Hace que lo bullet se mueva hacia delante
             transform.Translate(direccion * velocidad * Time.deltaTime);
@@ -92,7 +92,7 @@ public class Bullet : MonoBehaviour
         //    owner.GetComponent<PlayerMovement>().fallenSword = null;
         //}
 
-        Debug.LogError("000");
+        //Debug.LogError("000");
         owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
 
     }
