@@ -631,8 +631,22 @@ public class ConnectionManager : MonoBehaviour
             Debug.Log("RESTARTING " );
             GameplayManager.Instance.RestartGame(); 
         }
-        GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
-        GameplayManager.Instance.isEndOfRound = updateGameplay.isEnd;
+        if (!updateGameplay.isLvlSync)
+        {
+            GameplayManager.Instance.randomLvl = updateGameplay.nextLvl;
+            GameplayManager.Instance.isEndOfRound = updateGameplay.isEnd; 
+        }
+        else
+        {
+            if (!NetworkManager.Instance.GetLocalClient().isHost)
+            {
+                GameplayManager.Instance.SendLvlIndex(); 
+            }
+            else
+            {
+                GameplayManager.Instance.listLvlIndex.Add(updateGameplay.lvlIndex);
+            }
+        }
         
     }
      public void Receive_UpdateGameplay(UpdateGameplay updateGameplay)

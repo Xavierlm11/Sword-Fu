@@ -50,6 +50,18 @@ public class GameplayManager : MonoBehaviour
     private float dtIsAlive = 0f;
 
     [SerializeField]
+    private float timeCheckLvlSync = 2.0f;
+
+    [SerializeField]
+    private float dtCheckLvlSync = 0f;
+
+    [SerializeField]
+    private float timeSendLvlSync = 7.0f;
+
+    [SerializeField]
+    private float dtSendLvlSync = 0f;
+
+    [SerializeField]
     private int levelsCount = 0;
 
     [SerializeField]
@@ -103,7 +115,13 @@ public class GameplayManager : MonoBehaviour
 
     public bool isChangPhase = false;
     public bool isRecivePhase = false;
+    public bool isLvlSend = false;
     public int winnerId = -1;
+    public int actualLvl = 1;
+
+    public List<int> listLvlIndex = new List<int>();
+
+
     public TextMeshProUGUI localNicknameText;
 
     #endregion
@@ -158,7 +176,7 @@ public class GameplayManager : MonoBehaviour
             case roundPhase.Starting:
                 {
                     isChangPhase = isRecivePhase = false;
-                    winnerId = -1;  
+                    winnerId = -1;
                     CountPlayerAlive();
                     if (!isRoundZero)
                         PlayerManager.Instance.SpawnCharacters();
@@ -166,7 +184,7 @@ public class GameplayManager : MonoBehaviour
                     AssingPlayerId();
                     AssingPlayerWins();
                     roundState = roundPhase.InGame;
-
+                    actualLvl = lastLevelIndex;
                 }
                 break;
             //What happens during the game
@@ -223,25 +241,41 @@ public class GameplayManager : MonoBehaviour
                     //    CountPlayerAlive();
                     //}
 
-                    // Debug kay in case someone is async sync everyone in the same escene
-                    if (Input.GetKeyDown(KeyCode.F1))
+                    // Debug key in case someone is async sync everyone in the same escene
+                    if (NetworkManager.Instance.GetLocalClient().isHost)
                     {
-                        if (NetworkManager.Instance.GetLocalClient().isHost)
+                        if (Input.GetKeyDown(KeyCode.F1))
                         {
-                            isF1 = true;
-                            isEndOfRound = true;
-                            GetRandomNextLvl();
-                            UpdateGameplayEveryOneHost();
+                            LoadNewLevel();
                         }
-                    }
-                    if (Input.GetKeyDown(KeyCode.F2))
-                    {
-                        if (NetworkManager.Instance.GetLocalClient().isHost)
+                        if (Input.GetKeyDown(KeyCode.F2))
                         {
-                            RestartGame(); 
+
+                            RestartGame();
                         }
+                        dtSendLvlSync += Time.deltaTime;
+                        if (dtCheckLvlSync >= timeCheckLvlSync)
+                        {
+                            CheckIsLvlSync();
+                            dtSendLvlSync = 0;
+                            dtCheckLvlSync = 0;
+                            isLvlSend = false;
+                        }
+                        else if(dtSendLvlSync>=timeSendLvlSync)
+                        {
+                            dtCheckLvlSync += Time.deltaTime;
+                            if (!isLvlSend)
+                            {
+                                isLvlSend = true;
+                                listLvlIndex.Clear();
+                                SendLvlIndex(); 
+                            }
+                        }
+
+
                     }
-                        dtIsAlive += Time.deltaTime;
+
+                    dtIsAlive += Time.deltaTime;
                     if (dtIsAlive >= timeIsAlive)
                     {
                         dtIsAlive = 0f;
@@ -275,7 +309,7 @@ public class GameplayManager : MonoBehaviour
 
 
                         UpdateLeaderboard();
-                        if (!isRecivePhase && CountPlayerAlive()<=1)
+                        if (!isRecivePhase && CountPlayerAlive() <= 1)
                             UpdateGameplayEveryOne(winnerId, false, true);
 
                         winScreen.SetActive(true);
@@ -369,6 +403,50 @@ public class GameplayManager : MonoBehaviour
 
 
     }
+    private void CheckIsLvlSync()
+    {
+        int count = 0;
+
+        foreach (int player in listLvlIndex)
+        {
+            if (player == actualLvl)
+            {
+                count++;
+                Debug.Log("Count level synccc: " + count);
+            }
+        }
+        if (count != listLvlIndex.Count /*&& count != PartyManager.Instance.playerCharacterLinks.Count*/)
+        {
+            LoadNewLevel();
+        }
+        else
+        {
+            Debug.Log("All levels sync");
+        }
+    }
+    public void SendLvlIndex()
+    {
+        
+
+        if (!NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            UpdateGameplayEveryOneHost(false,true,actualLvl);
+        }
+        else
+        {
+            UpdateGameplayEveryOneHost(false, true);
+        }
+    }
+    private void LoadNewLevel()
+    {
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            isF1 = true;
+            isEndOfRound = true;
+            GetRandomNextLvl();
+            UpdateGameplayEveryOneHost();
+        }
+    }
 
     public void PauseTheGame()
     {
@@ -421,11 +499,11 @@ public class GameplayManager : MonoBehaviour
 
             if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
             {
-                if (player.playerCharacter.gameObject.activeSelf && player.playerCharacter.playerMovement.playerId == playerId && player.playerCharacter.playerMovement.isAlive  )
+                if (player.playerCharacter.gameObject.activeSelf && player.playerCharacter.playerMovement.playerId == playerId && player.playerCharacter.playerMovement.isAlive)
                 {
                     Debug.Log("ESTA MUERTOOOOOaaaaa " + player.playerCharacter.playerMovement.isAlive);
                     player.playerCharacter.playerMovement.ReceiveDamage(20);
-                    Debug.Log("PLAYER IDDDDDDD" +  playerId);
+                    Debug.Log("PLAYER IDDDDDDD" + playerId);
                 }
             }
         }
@@ -492,9 +570,7 @@ public class GameplayManager : MonoBehaviour
         for (int i = 0; i < winsPlayers.Length; i++)
         {
             winsPlayers[i] = 0;
-            //if (winsList[i]!=null && winsList[i].transform.childCount >= i && winsList[i].transform.GetChild(i)!=null)
-            //{
-            //}
+
             for (int j = 0; j < winsList[i].transform.childCount; j++)
             {
                 winsList[i].transform.GetChild(j).GetComponent<RawImage>().color = Color.gray;
@@ -595,10 +671,19 @@ public class GameplayManager : MonoBehaviour
         return count;
     }
     //updates the gameplay for everyone except the host
-    private void UpdateGameplayEveryOneHost(bool isRestart = false)
+    private void UpdateGameplayEveryOneHost(bool isRestart = false, bool isLlvSync = false, int lvlIndex = 1)
     {
-        UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound, isRestart);
-        _updateGameplay.transferType = TransferType.OnlyClients;
+        UpdateGameplayHost _updateGameplay = new UpdateGameplayHost(randomLvl, isEndOfRound, isRestart, isLlvSync, lvlIndex);
+
+        if (NetworkManager.Instance.GetLocalClient().isHost)
+        {
+            _updateGameplay.transferType = TransferType.OnlyClients;
+
+        }
+        else
+        {
+            _updateGameplay.transferType = TransferType.Host;
+        }
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
     //updates the gameplay for everyone except for yourself
@@ -608,4 +693,6 @@ public class GameplayManager : MonoBehaviour
         _updateGameplay.transferType = TransferType.AllExceptLocal;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
+
+
 }

@@ -306,18 +306,21 @@ public class UpdateGameplayHost : GenericSendClass
     public int nextLvl;
     public bool isEnd;
     public bool isRestart;
-    
+    public bool isLvlSync;
+    public int lvlIndex;
     //public string winnerName;
 
     public UpdateGameplayHost()
     {
 
     }
-    public UpdateGameplayHost(int nextLvl, bool isEnd, bool isRestart) : base(true)
+    public UpdateGameplayHost(int nextLvl, bool isEnd, bool isRestart, bool isLvlSync, int lvlIndex) : base(true)
     {
         this.nextLvl = nextLvl;
         this.isEnd = isEnd;
         this.isRestart = isRestart;
+        this.isLvlSync = isLvlSync;
+        this.lvlIndex = lvlIndex;
         sendCode = SendCode.UpdateGameplayHost;
     }   
 }
