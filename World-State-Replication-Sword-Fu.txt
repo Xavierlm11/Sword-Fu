@@ -1,0 +1,21 @@
+
+Github:
+https://github.com/Xavierlm11/Sword-Fu
+
+Github Release:
+https://github.com/Xavierlm11/Sword-Fu/releases/tag/v0.2
+
+Tasks:
+-Xavier Casadó: Package Replication System, players data and connections, in-game players synchronization
+-Xavier López: Game Loop
+-Albert Martín: Gameplay, Escenarios
+
+Instructions:
+Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre y crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. El nombre no puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Una vez todos los jugadores están dentro el host puede empezar la partida. Los jugadores deben ganar la ronda eliminando a los demás, entonces ganará un punto y empezará una nueva ronda. Aquel jugador que consiga ganar 3 rondas ganará la partida. Para jugar, usa W/A/S/D para moverte, click izquierdo para lanzar tu espada y click derecho para pararte y atacar cuerpo a cuerpo con tu otra espada. Ten cuidado, si lanzas tu espada, no podrás volver a hacerlo hasta que la recogas del suelo. Además, ten en cuenta que tus ataques se lanzan en la dirección del personaje, no en el ratón. Con tabulador se muestran las puntuaciones de la partida y con Escape un jugador puede pausar la partida y reanudarla de nuevo (ha de ser el mismo quien haga ambas cosas). Por último, y a modo de debug, el host puede usar F1 para que todos los jugadores avancen a un nuevo escenario, sobretodo en caso de que debido a las pérdidas de paquetes los jugadores queden desincronizados.
+
+Main Scene:
+Lobby
+
+Difficulties:
+Aunque un game loop correcto es posible, desde la conexión inicial de todos los jugadores hasta la victoria de uno, a menudo es interrumpido por pérdidas de paquetes que desincronizan el estado de la partida, sobretodo cuando un jugador gana la ronda.
+Además, aun tenemos que investigar los motivos, pero haciendo testing nos hemos dado cuenta que las desincronizaciones ocurren con más frecuencia si es el Host quien gana la ronda.

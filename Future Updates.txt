@@ -53,3 +53,12 @@ Solucionar cambios de escena --- Xavi L
 
 [x]Escenarios --- Albert
 
+
+------------------------
+To do:
+
+-Atenea (link a github, link a release, contributions, instructions, scene name, difficulties and bugs, improvements)
+-Release (build, video, package)
+
+
+
