@@ -375,7 +375,7 @@ public class PlayerMovement : MonoBehaviour
         {
             return;
         }
-        Debug.LogError("Tick received for bullet interpolation");
+        ////1234Debug.LogError("Tick received for bullet interpolation");
         syncFrameCount++;
 
         //Get the position and rotation to set next
@@ -412,7 +412,7 @@ public class PlayerMovement : MonoBehaviour
         if (bullet != null && syncFrameCount >= 2)
         {
             bullet.GetComponent<Bullet>().blade.enabled = true;
-            Debug.LogError("Active. Frame Count: " + syncFrameCount);
+            ////1234Debug.LogError("Active. Frame Count: " + syncFrameCount);
         }
 
         //Debug.Log("Frame Count: " + syncFrameCount);
@@ -459,9 +459,9 @@ public class PlayerMovement : MonoBehaviour
 
         elapsedTime = Time.time - currentInterpolationTime_Sword;
 
-        
 
-        Debug.LogError("Bullet interpolation is going on");
+
+        ////1234Debug.LogError("Bullet interpolation is going on");
 
         switch (NetworkManager.Instance.movementInterpolation)
         {
@@ -564,7 +564,7 @@ public class PlayerMovement : MonoBehaviour
                     if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword == other.gameObject)
                     {
                         collectFallSword.ownerOfSword = PartyManager.Instance.playerCharacterLinks[i].playerInfo;
-                        Debug.LogError("Owner Set");
+                        ////1234Debug.LogError("Owner Set");
                     }
                 }
                 
@@ -596,7 +596,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected)
                     {
-                        Debug.LogError("Sword is collected A");
+                        ////1234Debug.LogError("Sword is collected A");
                         Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
                         PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 
@@ -625,7 +625,7 @@ public class PlayerMovement : MonoBehaviour
                     {
                         if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.swordCanBeCollected)
                         {
-                            Debug.LogError("Sword is collected B");
+                            ////1234Debug.LogError("Sword is collected B");
                             Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
                             PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
 
@@ -699,7 +699,7 @@ public class PlayerMovement : MonoBehaviour
         //Destruye la bullet 5 segundos despues de ser creada
         //////Destroy(bullet, 5f);
 
-        Debug.LogError("Shoot method");
+        ////1234Debug.LogError("Shoot method");
 
 
 

@@ -466,7 +466,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_FallSword(FallSword fallSword)
     {
-        Debug.LogError("Received that sword has fallen");
+        ////1234Debug.LogError("Received that sword has fallen");
 
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
@@ -480,8 +480,8 @@ public class ConnectionManager : MonoBehaviour
                     PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet.GetComponent<Bullet>().isDestroying = true;
                     //Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.bullet);
 
-                    Debug.LogError("isDestroying set to true and position to fall set");
-                
+                    ////1234Debug.LogError("isDestroying set to true and position to fall set");
+
                 }
             }
         }
@@ -489,7 +489,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_CollectFallSword(CollectFallSword fallSword)
     {
-        Debug.LogError("Received that sword is collected 1");
+        ////1234Debug.LogError("Received that sword is collected 1");
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
             //Find the collector of the fallen sword
@@ -502,7 +502,7 @@ public class ConnectionManager : MonoBehaviour
                         //Find the owner of the fallen sword
                         if (fallSword.ownerOfSword != null && PartyManager.Instance.playerCharacterLinks[j].playerInfo.client.nickname == fallSword.ownerOfSword.client.nickname && PartyManager.Instance.playerCharacterLinks[j].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[j].playerCharacter.playerMovement != null)
                         {
-                            Debug.LogError("Received that sword is collected 2");
+                            ////1234Debug.LogError("Received that sword is collected 2");
                             //The collector gets the sword
                             StartCoroutine(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.CollectFallenSword_Wait(PartyManager.Instance.playerCharacterLinks[i].playerInfo));
                         }
