@@ -65,9 +65,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.2
-  m_Height: 1.46
+  m_Height: 2.5
   m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0, z: -0.5}
 --- !u!114 &621175765456266192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,6 +85,7 @@ MonoBehaviour:
   damageAmount: 20
   fallensword: {fileID: 8171556430097898244, guid: 6796a784ec628f74e82be9a198c4002f, type: 3}
   isDestroying: 0
+  blade: {fileID: 3972805070794653275}
   positionToFall: {x: 0, y: 0, z: 0}
 --- !u!54 &2339256770099562770
 Rigidbody:
@@ -260,11 +261,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 8476647132405694862, guid: 1456565f3c519da4d8555380c661a320, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1456565f3c519da4d8555380c661a320, type: 3}
+--- !u!23 &3972805070794653275 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8476647132405694862, guid: 1456565f3c519da4d8555380c661a320, type: 3}
+  m_PrefabInstance: {fileID: 4792151672479940565}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6447900096555530179 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2016115612842182678, guid: 1456565f3c519da4d8555380c661a320, type: 3}

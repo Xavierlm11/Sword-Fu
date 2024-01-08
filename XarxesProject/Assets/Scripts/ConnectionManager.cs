@@ -54,6 +54,8 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField]
     private PartyManager partyObj;
 
+    public object lockObject = new object();
+
     //[Serializable]
     //public class PlayerPositionsInfo
     //{
@@ -477,17 +479,22 @@ public class ConnectionManager : MonoBehaviour
 
     public void Receive_CollectFallSword(CollectFallSword fallSword)
     {
+        Debug.LogError("AAA");
         for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
+            //Find the collector of the fallen sword
             if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == fallSword.playerWhoCollect.client.nickname)
             {
                 if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement != null)
                 {
                     for (int j = 0; j < PartyManager.Instance.playerCharacterLinks.Count; j++)
                     {
+                        //Find the owner of the fallen sword
                         if (fallSword.ownerOfSword != null && PartyManager.Instance.playerCharacterLinks[j].playerInfo.client.nickname == fallSword.ownerOfSword.client.nickname && PartyManager.Instance.playerCharacterLinks[j].playerCharacter != null && PartyManager.Instance.playerCharacterLinks[j].playerCharacter.playerMovement != null)
                         {
-                            PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.CollectFallenSword(PartyManager.Instance.playerCharacterLinks[j].playerCharacter.playerMovement.fallenSword);
+                            Debug.LogError("BBB");
+                            //The collector gets the sword
+                            StartCoroutine(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.CollectFallenSword_Wait(PartyManager.Instance.playerCharacterLinks[i].playerInfo));
                         }
                     }
                 }
@@ -863,25 +870,34 @@ public class ConnectionManager : MonoBehaviour
     //information you want to send, serialize them and send them.
     public void SerializeToJsonAndSend<T>(T objectToSerialize)
     {
-        try
-        {
-            string json = JsonConvert.SerializeObject(objectToSerialize);
+        string json = JsonConvert.SerializeObject(objectToSerialize);
 
-            stream = new MemoryStream();
-            binaryWriter = new BinaryWriter(stream);
-            binaryWriter.Write(json);
+        stream = new MemoryStream();
+        binaryWriter = new BinaryWriter(stream);
+        binaryWriter.Write(json);
 
-            byte[] data = stream.ToArray();
-            dataToSendList.Add(data);
+        byte[] data = stream.ToArray();
+        dataToSendList.Add(data);
 
-            //byte[] data = stream.ToArray();
+        //try
+        //{
+        //    string json = JsonConvert.SerializeObject(objectToSerialize);
 
-            //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
-        }
-        catch
-        {
-            Debug.LogError("Cannot serialize");
-        }
+        //    stream = new MemoryStream();
+        //    binaryWriter = new BinaryWriter(stream);
+        //    binaryWriter.Write(json);
+
+        //    byte[] data = stream.ToArray();
+        //    dataToSendList.Add(data);
+
+        //    //byte[] data = stream.ToArray();
+
+        //    //socket.SendTo(data, data.Length, SocketFlags.None, ipEndPointToSend);
+        //}
+        //catch
+        //{
+        //    Debug.LogError("Cannot serialize");
+        //}
        
     }
 
@@ -902,134 +918,151 @@ public class ConnectionManager : MonoBehaviour
             while (!NetworkManager.Instance.appIsQuitting)
             {
 
-                for (int i = dataToSendList.Count - 1; i >= 0; i--)
+                lock (lockObject)
                 {
-                    if (dataToSendList.Count > 0 && i < dataToSendList.Count)
+                    for (int i = dataToSendList.Count - 1; i >= 0; i--)
                     {
-                        try
+                        if (dataToSendList.Count > 0 && i < dataToSendList.Count)
                         {
-                            if (dataToSendList[i] != null && dataToSendList[i].Length > 0)
+                            try
                             {
-                                //Checking the info to send
-
-                                //Debug.Log(stream.ToString());
-                                //Debug.Log(i.ToString());
-                                //Debug.Log(dataToSendList[i].ToString());
-                                //Debug.Log(dataToSendList[i].Length.ToString());
-
-
-                                stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
-                                stream.Seek(0, SeekOrigin.Begin);
-                                binaryReader = new BinaryReader(stream);
-                                stream.Seek(0, SeekOrigin.Begin);
-
-                                string json = binaryReader.ReadString();
-
-
-
-                                GenericSendClass dataInfo = new GenericSendClass();
-                                dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
-
-                                //Debug.Log(dataInfo.sendCode);
-
-                                if (dataInfo.hasToCheckTargets)
+                                if (dataToSendList[i] != null && dataToSendList[i].Length > 0)
                                 {
-                                    SetTargetsAsChecked(dataInfo, json);
-                                    //Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
-                                    dataToSendList.RemoveAt(i);
-                                    break;
-                                }
+                                    //Checking the info to send
+
+                                    //Debug.Log(stream.ToString());
+                                    //Debug.Log(i.ToString());
+                                    //Debug.Log(dataToSendList[i].ToString());
+                                    //Debug.Log(dataToSendList[i].Length.ToString());
+
+                                    try
+                                    {
+                                        stream.Flush();
+                                        stream = new MemoryStream(dataToSendList[i], 0, dataToSendList[i].Length);
+                                        stream.Seek(0, SeekOrigin.Begin);
+                                        binaryReader = new BinaryReader(stream);
+                                        stream.Seek(0, SeekOrigin.Begin);
+
+                                        string json = binaryReader.ReadString();
 
 
-                                //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
 
+                                        GenericSendClass dataInfo = new GenericSendClass();
+                                        dataInfo = JsonConvert.DeserializeObject<GenericSendClass>(json);
 
+                                        //Debug.Log(dataInfo.sendCode);
 
-                                switch (dataInfo.transferType)
-                                {
-                                    case TransferType.AllClients:
-                                        dataInfo.receivers.Clear();
-                                        foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                        if (dataInfo.hasToCheckTargets)
                                         {
-                                            dataInfo.receivers.Add(cl);
+                                            SetTargetsAsChecked(dataInfo, json);
+                                            //Debug.Log("Sending Data Targets Set: [" + dataInfo.sendCode.ToString() + "] - [" + dataInfo.transferType.ToString() + "]");
+                                            dataToSendList.RemoveAt(i);
+                                            break;
                                         }
-                                        break;
 
-                                    case TransferType.OnlyClients:
-                                        dataInfo.receivers.Clear();
-                                        foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+
+                                        //Debug.Log("Sending Data: " + dataInfo.sendCode.ToString());
+
+
+
+                                        switch (dataInfo.transferType)
                                         {
-                                            if (!cl.isHost)
-                                            {
-                                                dataInfo.receivers.Add(cl);
-                                            }
-                                        }
-                                        break;
-                                    case TransferType.Custom:
+                                            case TransferType.AllClients:
+                                                dataInfo.receivers.Clear();
+                                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                                {
+                                                    dataInfo.receivers.Add(cl);
+                                                }
+                                                break;
 
-                                        break;
-                                    case TransferType.Host:
-                                        dataInfo.receivers.Clear();
-                                        dataInfo.receivers.Add(NetworkManager.Instance.activeRoom.host);
-                                        break;
-                                    case TransferType.AllExceptLocal:
-                                        dataInfo.receivers.Clear();
-                                        foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                            case TransferType.OnlyClients:
+                                                dataInfo.receivers.Clear();
+                                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                                {
+                                                    if (!cl.isHost)
+                                                    {
+                                                        dataInfo.receivers.Add(cl);
+                                                    }
+                                                }
+                                                break;
+                                            case TransferType.Custom:
+
+                                                break;
+                                            case TransferType.Host:
+                                                dataInfo.receivers.Clear();
+                                                dataInfo.receivers.Add(NetworkManager.Instance.activeRoom.host);
+                                                break;
+                                            case TransferType.AllExceptLocal:
+                                                dataInfo.receivers.Clear();
+                                                foreach (Client cl in NetworkManager.Instance.activeRoom.clients)
+                                                {
+                                                    if (cl.nickname != dataInfo.sender.nickname)
+                                                    {
+                                                        dataInfo.receivers.Add(cl);
+                                                    }
+                                                }
+                                                break;
+                                            default:
+                                                dataInfo.receivers.Clear();
+                                                break;
+                                        }
+
+
+
+                                        //if (dataInfo.sender.globalPort == 0)
+                                        //{
+                                        //    dataInfo.sender.globalPort = dataInfo.remotePort;
+                                        //    ipEndPointToSend = new IPEndPoint(
+                                        //            IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
+                                        //    Debug.LogError("Server sending using " + dataInfo.remotePort.ToString());
+
+                                        //    socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+
+                                        //    //}
+
+                                        //    dataToSendList.RemoveAt(i);
+                                        //}
+                                        //else
+                                        //{
+                                        foreach (Client receiver in dataInfo.receivers)
                                         {
-                                            if (cl.nickname != dataInfo.sender.nickname)
-                                            {
-                                                dataInfo.receivers.Add(cl);
-                                            }
+                                            ipEndPointToSend = new IPEndPoint(
+                                                    IPAddress.Parse(receiver.globalIP), receiver.globalPort);
+                                            //Debug.LogError("Server sending using " + receiver.globalPort);
+
+                                            socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
+
+                                            //}
+
+
                                         }
-                                        break;
-                                    default:
-                                        dataInfo.receivers.Clear();
-                                        break;
-                                }
+                                        //}
 
+                                        dataToSendList.RemoveAt(i);
+                                    }
+                                    catch
+                                    {
 
-
-                                //if (dataInfo.sender.globalPort == 0)
-                                //{
-                                //    dataInfo.sender.globalPort = dataInfo.remotePort;
-                                //    ipEndPointToSend = new IPEndPoint(
-                                //            IPAddress.Parse(dataInfo.remoteIP), dataInfo.remotePort);
-                                //    Debug.LogError("Server sending using " + dataInfo.remotePort.ToString());
-
-                                //    socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
-
-                                //    //}
-
-                                //    dataToSendList.RemoveAt(i);
-                                //}
-                                //else
-                                //{
-                                foreach (Client receiver in dataInfo.receivers)
-                                {
-                                    ipEndPointToSend = new IPEndPoint(
-                                            IPAddress.Parse(receiver.globalIP), receiver.globalPort);
-                                    //Debug.LogError("Server sending using " + receiver.globalPort);
-
-                                    socket.SendTo(dataToSendList[i], dataToSendList[i].Length, SocketFlags.None, ipEndPointToSend);
-
-                                    //}
+                                    }
 
 
                                 }
-                                //}
-
-                                dataToSendList.RemoveAt(i);
                             }
-                        }
-                        catch (SocketException ex)
-                        {
-                            // Manejar la excepción
-                            Debug.Log("Error al enviar datos: " + ex.Message);
-                        }
-                    }
-                
+                            catch
+                            {
 
+                            }
+                            //catch (SocketException ex)
+                            //{
+                            //    // Manejar la excepción
+                            //    Debug.Log("Error al enviar datos: " + ex.Message);
+                            //}
+                        }
+
+
+                    }
                 }
+                
             }
         }
         else

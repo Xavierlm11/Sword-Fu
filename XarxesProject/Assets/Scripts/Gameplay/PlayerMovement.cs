@@ -76,6 +76,8 @@ public class PlayerMovement : MonoBehaviour
 
     public int syncFrameCount;
 
+    public float elapsedTime;
+
     #endregion
 
     private void Start()
@@ -400,21 +402,52 @@ public class PlayerMovement : MonoBehaviour
 
     public void CheckTransformInterpolation_Sword()
     {
-        
-        float elapsed_time = Time.time - currentInterpolationTime_Sword;
 
         float interpolationDelay = 1;
 
-        if (bullet == null || !canSyncSword)
+        if (bullet != null && syncFrameCount >= 2)
+        {
+            bullet.GetComponent<Bullet>().blade.enabled = true;
+            //Debug.LogError("Active");
+        }
+
+        if (bullet == null)
         {
             return;
         }
-
-        if(syncFrameCount >= 2)
+        else if (!canSyncSword && !bullet.GetComponent<Bullet>().isDestroying)
         {
-            bullet.SetActive(true);
-            //Debug.LogError("Active");
+            return;
         }
+        else if(!canSyncSword && bullet.GetComponent<Bullet>().isDestroying)
+        {
+            Destroy(bullet);
+            return;
+        }
+        ////else if (bullet.GetComponent<Bullet>().isDestroying && !canSyncSword)
+        ////{
+        ////    //float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
+        ////    //bullet.transform.position = Vector3.Lerp(currentInterpolationPosition_Sword, positionToSet_Sword, t);
+
+        ////    //if (bullet.GetComponent<Bullet>().isDestroying && t >= 1)
+        ////    //{
+        ////    //    Debug.Log("MAYOR");
+        ////        Destroy(bullet);
+        ////    //}
+        ////    //else if (bullet.GetComponent<Bullet>().isDestroying)
+        ////    //{
+        ////    //    Debug.Log("MENOR");
+        ////    //}
+        ////    return;
+        ////}
+        //else if(!canSyncSword)
+        //{
+        //    return;
+        //}
+
+        elapsedTime = Time.time - currentInterpolationTime_Sword;
+
+        
 
         //Debug.LogError("DDD");
 
@@ -428,26 +461,31 @@ public class PlayerMovement : MonoBehaviour
 
             case InterpolationMode.Lerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
                     bullet.transform.position = Vector3.Lerp(currentInterpolationPosition_Sword, positionToSet_Sword, t);
 
                     if(bullet.GetComponent<Bullet>().isDestroying && t >= 1)
                     {
+                        Debug.Log("MAYOR");
                         Destroy(bullet);
+                    }
+                    else if (bullet.GetComponent<Bullet>().isDestroying)
+                    {
+                        Debug.Log("MENOR");
                     }
                 }
                 break;
 
             case InterpolationMode.Slerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
                     bullet.transform.position = Vector3.Slerp(currentInterpolationPosition_Sword, positionToSet_Sword, t);
                 }
                 break;
 
             case InterpolationMode.SmoothStep:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
 
                     float xPos = Mathf.SmoothStep(currentInterpolationPosition_Sword.x, positionToSet_Sword.x, t);
                     float yPos = Mathf.SmoothStep(currentInterpolationPosition_Sword.y, positionToSet_Sword.y, t);
@@ -470,21 +508,21 @@ public class PlayerMovement : MonoBehaviour
 
             case InterpolationMode.Lerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
                     bullet.transform.rotation = Quaternion.Euler(Vector3.Lerp(currentInterpolationRotation_Sword, rotationToSet_Sword, t));
                 }
                 break;
 
             case InterpolationMode.Slerp:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
                     bullet.transform.rotation = Quaternion.Euler(Vector3.Slerp(currentInterpolationRotation_Sword, rotationToSet_Sword, t));
                 }
                 break;
 
             case InterpolationMode.SmoothStep:
                 {
-                    float t = Mathf.Clamp01(elapsed_time / (interpolationTimeDiff_Sword * interpolationDelay));
+                    float t = Mathf.Clamp01(elapsedTime / (interpolationTimeDiff_Sword * interpolationDelay));
 
                     float xRot = Mathf.SmoothStep(currentInterpolationRotation_Sword.x, rotationToSet_Sword.x, t);
                     float yRot = Mathf.SmoothStep(currentInterpolationRotation_Sword.y, rotationToSet_Sword.y, t);
@@ -514,26 +552,67 @@ public class PlayerMovement : MonoBehaviour
                     if(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword == other.gameObject)
                     {
                         collectFallSword.ownerOfSword = PartyManager.Instance.playerCharacterLinks[i].playerInfo;
+                        Debug.LogError("Owner Set");
                     }
                 }
                 
                 collectFallSword.transferType = TransferType.AllExceptLocal;
                 ConnectionManager.Instance.SerializeToJsonAndSend(collectFallSword);
 
-                CollectFallenSword(other.gameObject);
+                StartCoroutine(CollectFallenSword_Wait(collectFallSword.ownerOfSword));
             }
         }
        
     }
 
-    public void CollectFallenSword(GameObject sword)
+    //public void CollectFallenSword(GameObject sword)
+    //{
+    //    CollectFallenSword_Wait();
+    //}
+
+    public IEnumerator CollectFallenSword_Wait(PlayerInfo owner)
     {
-        if(sword != null)
+        bool ownerHasFallenSword = false;
+
+        for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
         {
-            Destroy(sword);
+            if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == owner.client.nickname)
+            {
+                if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
+                {
+                    Debug.LogError("CCCA");
+                    Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
+                    PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
+
+                    haveSword = true;
+
+                    yield break;
+                }
+            }
         }
 
-        haveSword = true;
+        while (!ownerHasFallenSword)
+        {
+            for (int i = 0; i < PartyManager.Instance.playerCharacterLinks.Count; i++)
+            {
+                if (PartyManager.Instance.playerCharacterLinks[i].playerInfo.client.nickname == owner.client.nickname)
+                {
+                    if (PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword != null)
+                    {
+                        Debug.LogError("CCCB");
+                        Destroy(PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword);
+                        PartyManager.Instance.playerCharacterLinks[i].playerCharacter.playerMovement.fallenSword = null;
+
+                        haveSword = true;
+
+                        yield break;
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
     }
 
     public void ReceiveDamage(int damage)
@@ -583,13 +662,13 @@ public class PlayerMovement : MonoBehaviour
         rbullet = bullet.GetComponent<Rigidbody>();
         if(!playerCharacter.characterLink.isLocal)
         {
-            bullet.SetActive(false);
+            bullet.GetComponent<Bullet>().blade.enabled = false;
         }
 
         syncFrameCount = 0;
 
         //Destruye la bullet 5 segundos despues de ser creada
-        Destroy(bullet, 5f);
+        //////Destroy(bullet, 5f);
 
         //Debug.LogError("AAAA");
 

@@ -11,6 +11,7 @@ public class Bullet : MonoBehaviour
     private GameObject owner;
     private Rigidbody rb;
     public bool isDestroying;
+    public MeshRenderer blade;
 
     public Vector3 positionToFall;
 
@@ -53,14 +54,24 @@ public class Bullet : MonoBehaviour
 
         }
 
-        FallSword fallSword = new FallSword(transform.position);
-        fallSword.player = owner.GetComponent<PlayerMovement>().playerCharacter.characterLink.playerInfo;
-        fallSword.transferType = TransferType.AllExceptLocal;
-        ConnectionManager.Instance.SerializeToJsonAndSend(fallSword);
+        if(other.tag == "Player" && other.GetComponent<PlayerCharacter>().characterLink.isLocal)
+        {
 
-        positionToFall = transform.position;
+        }
+        else
+        {
+            FallSword fallSword = new FallSword(transform.position);
+            fallSword.player = owner.GetComponent<PlayerMovement>().playerCharacter.characterLink.playerInfo;
+            fallSword.transferType = TransferType.AllExceptLocal;
+            ConnectionManager.Instance.SerializeToJsonAndSend(fallSword);
 
-        Destroy(gameObject);
+            positionToFall = transform.position;
+
+            Debug.Log("DADO");
+            Destroy(gameObject);
+        }
+
+        
     }
 
     public void ConvertToFallen()
@@ -73,7 +84,16 @@ public class Bullet : MonoBehaviour
         owner.GetComponent<PlayerMovement>().canSyncSword = false;
         GameObject FallenSword = Instantiate(fallensword, positionToFall, Quaternion.identity);
 
+
+        //if(owner.GetComponent<PlayerMovement>().fallenSword != null)
+        //{
+        //    Destroy(owner.GetComponent<PlayerMovement>().fallenSword);
+        //    owner.GetComponent<PlayerMovement>().fallenSword = null;
+        //}
+
+        Debug.LogError("000");
         owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
+
     }
 
     public void SetOwner(GameObject player)
