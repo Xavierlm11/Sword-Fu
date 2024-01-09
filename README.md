@@ -7,26 +7,17 @@ Github: https://github.com/Xavierlm11/Sword-Fu
 
 ### Novedades
 En esta versión hemos terminado de pulir el funcionamiento de las mecánicas y el game loop, solventando algunos errores que se producían a veces y perfeccionando su desempeño y sincronización entre clientes.
-También hemos añadido más contenido para que el juego se vea más como un resultado final. Un ejemplo de estos agregados son una pequeña marca en el jugador local, personajes 
-distintos para cada jugador, animaciones sincronizadas y posibles espectadores en la partida.
+También hemos añadido más contenido para que el juego se vea más como un resultado final. Un ejemplo de estos agregados son una pequeña marca en el jugador local, personajes distintos para cada jugador, animaciones sincronizadas y posibles espectadores en la partida.
 Por último, nos hemos asegurado de que no hayan errores, por lo menos que hayamos detectado durante nuestro testeo final.
 
 ### Funcionamiento
 Las escenas usadas son "Lobby", "Game", "Level1", "Level2", "Level3" y "Level4", siendo "Lobby" la primera.
 
-Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre y
-crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. El nombre no
-puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Adicionalmente, otros jugadores pueden unirse, pero no competirán, 
-sino que serán espectadores. Una vez todos los jugadores están dentro el host puede empezar la partida. Los jugadores deben ganar la ronda eliminando a los demás, 
-entonces ganará un punto y empezará una nueva ronda. Aquel jugador que consiga ganar 3 rondas ganará la partida. 
+Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre y crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. El nombre no puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Adicionalmente, otros jugadores pueden unirse, pero no competirán, sino que serán espectadores. Una vez todos los jugadores están dentro el host puede empezar la partida. Los jugadores deben ganar la ronda eliminando a los demás, entonces ganará un punto y empezará una nueva ronda. Aquel jugador que consiga ganar 3 rondas ganará la partida. 
 
 Controles:
-Para jugar, usa __W/A/S/D__ para moverte, __click derecho__ para lanzar tu espada
-y __click izquierdo__ para pararte y atacar cuerpo a cuerpo con tu otra espada. Ten cuidado, si lanzas tu espada, no podrás volver a hacerlo
-hasta que la recogas del suelo. Además, ten en cuenta que tus ataques se lanzan en la dirección del personaje, no en el ratón.
-Con __tabulador__ se muestran las puntuaciones de la partida y con __Escape__ un jugador puede pausar la partida y reanudarla de nuevo (ha de ser
-el mismo quien haga ambas cosas). A modo de debug, el host puede usar __F1__ para que todos los jugadores avancen a un nuevo
-escenario. También puede usar __F2__ para reiniciar la partida junto a las puntuaciones.
+Para jugar, usa __W/A/S/D__ para moverte, __click derecho__ para lanzar tu espada y __click izquierdo__ para pararte y atacar cuerpo a cuerpo con tu otra espada. Ten cuidado, si lanzas tu espada, no podrás volver a hacerlo hasta que la recogas del suelo. Además, ten en cuenta que tus ataques se lanzan en la dirección del personaje, no en el ratón.
+Con __tabulador__ se muestran las puntuaciones de la partida y con __Escape__ un jugador puede pausar la partida y reanudarla de nuevo (ha de ser el mismo quien haga ambas cosas). A modo de debug, el host puede usar __F1__ para que todos los jugadores avancen a un nuevo escenario. También puede usar __F2__ para reiniciar la partida junto a las puntuaciones.
 
 ### Estructura
 
@@ -34,79 +25,74 @@ En general, la estructura del código del proyecto se mantiene igual que la ante
 
 Algunos de los principales son:
 
--NetworkManager: 
-Tiene información y ajustes que se usan en el juego y en las conexiones, como el intervalo de tiempo en el que se envían packages 
-para actualizar la posición de los jugadores. Además es un ScriptableObject en la carpeta Resources.
-En el script también se ecuentran clases personalizadas para transeferir en packages, las cuales derivan de GenericSendClass y son
-fácilmente serializables y deserialiables a Json.
+ - NetworkManager: 
+Tiene información y ajustes que se usan en el juego y en las conexiones, como el intervalo de tiempo en el que se envían packages para actualizar la posición de los jugadores. Además es un ScriptableObject en la carpeta Resources.
+En el script también se ecuentran clases personalizadas para transeferir en packages, las cuales derivan de GenericSendClass y son fácilmente serializables y deserialiables a Json.
 
--ConnectionManager:
+ - ConnectionManager:
 Gestiona las conexiones de los jugadores y la replicación de paquetes, los cuales son enviados o recibidos en 2 threats respectivos.
 El threat de enviar serializa todas las clases personalizadas a enviar que hay en una lista y las manda a los demás jugadores.
-Hay diferentes configuraciones que se le pueden aplicar en la variable "transferType" de cada Custom Class. Dependiendo esta,
-el paquete se enviará al host y, después, este lo reenviará a los destinatarios adecuados.
+Hay diferentes configuraciones que se le pueden aplicar en la variable "transferType" de cada Custom Class. Dependiendo esta, el paquete se enviará al host y, después, este lo reenviará a los destinatarios adecuados.
 
--LobbyManager:
+ - LobbyManager:
 Gestiona la escena inicial de Lobby y el primer contacto que tienen los jugadores con la conexión multijugador.
 
--PlayerManager:
+ - PlayerManager:
 Gestiona la unión de los jugadores a la partida y su Spawn.
 
--GameManager:
+ - GameManager:
 Gestiona eventos generales de los clientes de la party.
 
--GameplayManager:
+ - GameplayManager:
 Gestiona y sincroniza eventos del Game Loop, como las muertes, cambios de escena y puntuaciones.
 
--PartyManager:
+ - PartyManager:
 Se usa sobretodo para obtener la lista de jugadores y su información. Los jugadores se representan en la clase PlayerCharacterLink. Esta clase es un enlace de dos clases.
 La primera es la información de los jugadores entre niveles (PlayerInfo), la cual también tiene una referencia a la información de los clientes (clase Client) en sí, como su IP o Nickname.
-La segunda es la información de los jugadores dentro del nivel actual (PlayerCharacter), la cual es un propio script del GameObject del personaje del jugador y también tiene una referencia a PlayerMovement,
-donde se controlan las acciones de los personajes.
+La segunda es la información de los jugadores dentro del nivel actual (PlayerCharacter), la cual es un propio script del GameObject del personaje del jugador y también tiene una referencia a PlayerMovement, donde se controlan las acciones de los personajes.
 
 ### Problemas
 Hemos modificado el comportamiento de algunos elementos para que se adapten mejor a una experiencia de juego fluida entre clientes, solucionando algunos problemas que impedían esto.
 
 Un ejemplo de esto es la mecánica del lanzamiento de espada, la cual contempla varias opciones que pueden ocurrir:
-- La interpolación requiere un "tick" extra de delay en los clientes replicantes, pero a su vez debe acabar en el mismo punto que la original (en el cliente que la lanza), 
-y no detenerse cuando la original deja de enviar su posición (cuando esta se choca con algo).
-- Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue
- antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
+
+-La interpolación requiere un "tick" extra de delay en los clientes replicantes, pero a su vez debe acabar en el mismo punto que la original (en el cliente que la lanza), y no detenerse cuando la original deja de enviar su posición (cuando esta se choca con algo).
+
+-Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
 
 Otro ejemplo de esto es ...........................................
-
 
 Aún así, finalmente hemos conseguido solucionar estos problemas y lograr esa fluidez y sincronización entre clientes deseada.
 
 ### Actualizaciones futuras
 
--Implementar predicción en las acciones de los personajes
--Añadir contenido (por ejemplo, Power-Ups)
+ - Implementar predicción en las acciones de los personajes
+ - Añadir contenido (por ejemplo, Power-Ups)
 
 ### External
 
--Newtonsoft Json: 
+ - Newtonsoft Json: 
 https://github.com/JamesNK/Newtonsoft.Json
 Hemos usado este package para poder serializar objectos dentro de otros objetos y ponerlos en un Json.
 Para instalar en Unity: Window -> Package Manager -> Add package from git URL -> "com.unity.nuget.newtonsoft-json"
 
--UnityMainThreadDispatcher: 
+ - UnityMainThreadDispatcher: 
 https://github.com/PimDeWitte/UnityMainThreadDispatcher
 Hemos usado esta clase para llamar a funciones en el threat principal
 
--Character models and animations:
+ - Character models and animations:
 https://www.mixamo.com/#/
 
--Scene assets:
+ - Scene assets:
 https://assetstore.unity.com/packages/3d/environments/dungeons/lite-dungeon-pack-low-poly-3d-art-by-gridness-242692
 
 ### Main Tasks
 
--Xavier Casadó: In-game players synchronization (animations and mechanics), QA testing, Bug fixing, extra Features (different characters, spectator mode)
+ - Xavier Casadó: In-game players synchronization (animations and mechanics), QA testing, Bug fixing, extra Features (different characters, spectator mode)
 
--Xavier López: Game Loop
+ - Xavier López: Game Loop
 
--Albert Martín: Gameplay, Escenarios
+ - Albert Martín: Gameplay, Escenarios
 
 ----------------------------------------------------------------------------------------
 
