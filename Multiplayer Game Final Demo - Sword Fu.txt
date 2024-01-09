@@ -1,0 +1,57 @@
+
+Github:
+https://github.com/Xavierlm11/Sword-Fu
+
+Github Release:
+https://github.com/Xavierlm11/Sword-Fu/releases/tag/v0.3-Delivery
+https://github.com/Xavierlm11/Sword-Fu/releases/tag/v0.3-Demo (fullscreen for Demo Day)
+
+Contribuciones:
+
+ - Xavier Casadó: In-game players synchronization (animations and mechanics), QA testing, Bug fixing, extra Features (different characters, spectator mode)
+
+ - Xavier López: Game Loop
+
+ - Albert Martín: Gameplay, Escenarios
+
+Intrucciones:
+Las escenas usadas son "Lobby", "Game", "Level1", "Level2", "Level3" y "Level4", siendo "Lobby" la primera.
+
+Para jugar, primero un jugador tiene que asumir el rol de host. Él debe seleccionar el botón de "Host", escribir su nombre 
+y crear una sala. Luego, los clientes deben darle al botón de "Client" y unirse al host poniendo su IP y un nombre. 
+El nombre no puede repetirse con otro jugador de la sala y el máximo de jugadores totales por sala son 4. Adicionalmente, 
+otros jugadores pueden unirse, pero no competirán, sino que serán espectadores. Una vez todos los jugadores están dentro 
+el host puede empezar la partida. Los jugadores deben ganar la ronda eliminando a los demás, entonces ganará un punto y 
+empezará una nueva ronda. Aquel jugador que consiga ganar 3 rondas ganará la partida. 
+
+Controles:
+Para jugar, usa __W/A/S/D__ para moverte, __click derecho__ para lanzar tu espada y __click izquierdo__ para pararte y atacar 
+cuerpo a cuerpo con tu otra espada. Ten cuidado, si lanzas tu espada, no podrás volver a hacerlo hasta que la recogas del suelo. 
+Además, ten en cuenta que tus ataques se lanzan en la dirección del personaje, no en el ratón.
+Con __tabulador__ se muestran las puntuaciones de la partida y con __Escape__ un jugador puede pausar la partida y reanudarla 
+de nuevo (ha de ser el mismo quien haga ambas cosas). A modo de debug, el host puede usar __F1__ para que todos los jugadores 
+avancen a un nuevo escenario. También puede usar __F2__ para reiniciar la partida junto a las puntuaciones.
+
+Main Scene:
+Lobby
+
+Dificultades:
+Hemos modificado el comportamiento de algunos elementos para que se adapten mejor a una experiencia de juego fluida entre clientes, solucionando algunos problemas que impedían esto.
+
+Un ejemplo de esto es la mecánica del lanzamiento de espada, la cual contempla varias opciones que pueden ocurrir:
+
+ - La interpolación requiere un "tick" extra de delay en los clientes replicantes, pero a su vez debe acabar en el mismo punto que la original (en el cliente que la lanza), y no detenerse cuando la original deja de enviar su posición (cuando esta se choca con algo).
+
+ - Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
+
+Otro ejemplo de esto es la sincronización de las muertes de jugadores y cambios de escena:
+
+ - Al poder ocurrir perdidas de paquetes no se puede confiar del todo en que cada jugador siga el mismo ritmo que otros en la partida, así que hemos implementado métodos para comprobar si todos están viendo lo mismo y se encuentran en la misma escena.
+En caso de que no, a todos se les carga una nueva escena. También hemos tenido que enlazar esto correctamente con las muertes de los personajes y hacer comprobaciones periódicas de quién sigue vivo y en qué escena, así como manejar situaciones en las que no quedaba nadie vivo.
+
+Aún así, finalmente hemos conseguido solucionar estos problemas y lograr esa fluidez y sincronización entre clientes deseada.
+
+Mejoras previas:
+En esta versión hemos terminado de pulir el funcionamiento de las mecánicas y el game loop, solventando algunos errores que se producían a veces y perfeccionando su desempeño y sincronización entre clientes.
+También hemos añadido más contenido para que el juego se vea más como un resultado final. Un ejemplo de estos agregados son una pequeña marca en el jugador local, personajes distintos para cada jugador, animaciones sincronizadas y posibles espectadores en la partida.
+Por último, nos hemos asegurado de que no hayan errores, por lo menos que hayamos detectado durante nuestro testeo final.
