@@ -60,8 +60,10 @@ Un ejemplo de esto es la mecánica del lanzamiento de espada, la cual contempla 
 
  - Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
 
-Otro ejemplo de esto es Sincronizar jugadores con las muertes y cambios de escenas:
- - Al poder ocurrir perdidas de paquetes  no se puede confiar del todo en que cada jugador siga el mismo rito que otros en la partida, cosa que ocurria frecuentemente con muertes y cambios de escenas, así que se ha implementado metodos para chekear si todos están viendo lo mismo y se encuentran en la misma escena, y en caso que no se encuentren en la misma escena a todos se les carga una nueva escena para que nadie coja ventaja, y en caso delas muertes se envia una comprobación a los demás para comprobar si ese jugador ha muerto.
+Otro ejemplo de esto es la sincronización de las muertes de jugadores y cambios de escena:
+
+ - Al poder ocurrir perdidas de paquetes no se puede confiar del todo en que cada jugador siga el mismo ritmo que otros en la partida, así que hemos implementado métodos para comprobar si todos están viendo lo mismo y se encuentran en la misma escena.
+En caso de que no, a todos se les carga una nueva escena. También hemos tenido que enlazar esto correctamente con las muertes de los personajes y hacer comprobaciones periódicas de quién sigue vivo y en qué escena, así como manejar situaciones en las que no quedaba nadie vivo.
 
 Aún así, finalmente hemos conseguido solucionar estos problemas y lograr esa fluidez y sincronización entre clientes deseada.
 
