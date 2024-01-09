@@ -252,7 +252,7 @@ public class ConnectionManager : MonoBehaviour
                     //}
                     //receivedData = null;
                 }
-                catch (SocketException ex)
+                catch //(SocketException ex)
                 {
                    // Debug.LogError($"Error al recibir datos: {ex.Message}");
                 }
@@ -401,7 +401,7 @@ public class ConnectionManager : MonoBehaviour
         }
         catch
         {
-            Debug.Log("Error deserializing");
+           // Debug.Log("Error deserializing");
         }
         
     }
