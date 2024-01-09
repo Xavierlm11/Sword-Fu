@@ -668,7 +668,7 @@ public class ConnectionManager : MonoBehaviour
         }
         else
         {
-            GameplayManager.Instance.UpdatePLayersAlive(updateGameplay.playerId);
+            GameplayManager.Instance.UpdatePLayersAlive(updateGameplay.playerName);
         }
 
         if(updateGameplay.isChangePhase)

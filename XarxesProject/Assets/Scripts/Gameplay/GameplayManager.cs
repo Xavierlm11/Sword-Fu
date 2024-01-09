@@ -16,8 +16,8 @@ public class GameplayManager : MonoBehaviour
     [SerializeField]
     private int rounds = 3;
 
-    [SerializeField]
-    private int currentRound = 1;
+    //[SerializeField]
+    //private int currentRound = 1;
 
     [SerializeField]
     private GameObject winScreen;
@@ -246,6 +246,7 @@ public class GameplayManager : MonoBehaviour
                     {
                         if (Input.GetKeyDown(KeyCode.F1))
                         {
+                            isF1 = true;
                             LoadNewLevel();
                         }
                         if (Input.GetKeyDown(KeyCode.F2))
@@ -261,7 +262,7 @@ public class GameplayManager : MonoBehaviour
                             dtCheckLvlSync = 0;
                             isLvlSend = false;
                         }
-                        else if(dtSendLvlSync>=timeSendLvlSync)
+                        else if (dtSendLvlSync >= timeSendLvlSync)
                         {
                             dtCheckLvlSync += Time.deltaTime;
                             if (!isLvlSend)
@@ -269,7 +270,7 @@ public class GameplayManager : MonoBehaviour
                                 isLvlSend = true;
                                 listLvlIndex.Clear();
                                 listLvlIndex = new List<int>();
-                                SendLvlIndex(); 
+                                SendLvlIndex();
                             }
                         }
 
@@ -291,15 +292,29 @@ public class GameplayManager : MonoBehaviour
                     if (winScreen.activeSelf == false)
                     {
                         PlayerCharacterLink winnerLink = null;
-                        if (!isRecivePhase && CountPlayerAlive() <= 1) winnerLink = GetWinner();
-                        else winnerLink = GetWinner(true, winnerId);
+                        if (!isRecivePhase && CountPlayerAlive() <= 1)
+                        {
+                            winnerLink = GetWinner();
+                        }
+                        else
+                        {
+                            winnerLink = GetWinner(true, winnerId);
+                        }
 
                         if (winnerLink != null)
                         {
                             WinnerText.text = winnerLink.playerInfo.client.nickname + " somehow won";
                             winnerId = winnerLink.playerCharacter.playerMovement.playerId;
-                            if (!isF1) winnerLink.playerCharacter.playerMovement.wins++;
-                            else isF1 = false;
+                            if (!isF1)
+                            {
+                                winnerLink.playerCharacter.playerMovement.wins++;
+                            }
+                            else
+                            {
+
+                                isF1 = false;
+
+                            }
                             //winnerLink.playerCharacter.playerMovement.wins=3;
                         }
                         else
@@ -427,12 +442,12 @@ public class GameplayManager : MonoBehaviour
     }
     public void SendLvlIndex()
     {
-        
+
 
         if (!NetworkManager.Instance.GetLocalClient().isHost)
         {
-            Debug.Log("Actual lvl:  "+actualLvl);
-            UpdateGameplayEveryOneHost(false,true,actualLvl);
+            // Debug.Log("Actual lvl:  " + actualLvl);
+            UpdateGameplayEveryOneHost(false, true, actualLvl);
         }
         else
         {
@@ -443,7 +458,7 @@ public class GameplayManager : MonoBehaviour
     {
         if (NetworkManager.Instance.GetLocalClient().isHost)
         {
-            isF1 = true;
+            
             isEndOfRound = true;
             GetRandomNextLvl();
             UpdateGameplayEveryOneHost();
@@ -492,7 +507,7 @@ public class GameplayManager : MonoBehaviour
             }
         }
     }
-    public void UpdatePLayersAlive(int playerId)
+    public void UpdatePLayersAlive(string playerName)
     {
 
 
@@ -501,11 +516,14 @@ public class GameplayManager : MonoBehaviour
 
             if (player != null && player.playerCharacter != null && player.playerCharacter.playerMovement != null)
             {
-                if (player.playerCharacter.gameObject.activeSelf && player.playerCharacter.playerMovement.playerId == playerId && player.playerCharacter.playerMovement.isAlive)
+                if (player.playerCharacter.gameObject.activeSelf && player.playerCharacter.playerMovement.isAlive)
                 {
-                    Debug.Log("ESTA MUERTOOOOOaaaaa " + player.playerCharacter.playerMovement.isAlive);
-                    player.playerCharacter.playerMovement.ReceiveDamage(20);
-                    Debug.Log("PLAYER IDDDDDDD" + playerId);
+                    if (player.playerInfo.client.nickname == playerName)
+                    {
+                        //Debug.Log("ESTA MUERTOOOOOaaaaa " + player.playerCharacter.playerMovement.isAlive);
+                        player.playerCharacter.playerMovement.ReceiveDamage(20);
+                        // Debug.Log("PLAYER IDDDDDDD" + playerId);
+                    }
                 }
             }
         }
@@ -603,7 +621,7 @@ public class GameplayManager : MonoBehaviour
         {
             randomLvl = Random.Range(startLevelsIndex, levelsCount);
         }
-        Debug.Log("NEXT LEVEL IS: " + randomLvl);
+       // Debug.Log("NEXT LEVEL IS: " + randomLvl);
         lastLevelIndex = randomLvl;
         return randomLvl;
     }
@@ -689,9 +707,9 @@ public class GameplayManager : MonoBehaviour
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }
     //updates the gameplay for everyone except for yourself
-    public void UpdateGameplayEveryOne(int playerId = -1, bool isDead = false, bool isChangingPhase = false)
+    public void UpdateGameplayEveryOne(int playerId = -1, bool isDead = false, bool isChangingPhase = false, string playerName = "manolo")
     {
-        UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused, playerId, isDead, isChangingPhase);
+        UpdateGameplay _updateGameplay = new UpdateGameplay(isPaused, playerId, isDead, isChangingPhase, playerName);
         _updateGameplay.transferType = TransferType.AllExceptLocal;
         ConnectionManager.Instance.SerializeToJsonAndSend(_updateGameplay);
     }

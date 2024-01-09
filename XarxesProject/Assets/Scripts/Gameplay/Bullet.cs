@@ -50,7 +50,7 @@ public class Bullet : MonoBehaviour
         {
             Debug.Log("Takes Damage");
             player.ReceiveDamage(damageAmount);
-            GameplayManager.Instance.UpdateGameplayEveryOne(player.playerId,true);
+            GameplayManager.Instance.UpdateGameplayEveryOne(player.playerId, true, false, player.playerCharacter.characterLink.playerInfo.client.nickname);
             // player.Die();
 
         }
