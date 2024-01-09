@@ -82,20 +82,23 @@ public class Bullet : MonoBehaviour
             positionToFall = transform.position;
         }
 
-        owner.GetComponent<PlayerMovement>().canSyncSword = false;
-        GameObject FallenSword = Instantiate(fallensword, positionToFall, Quaternion.identity);
+        if (owner!=null)
+        {
+            owner.GetComponent<PlayerMovement>().canSyncSword = false;
+            GameObject FallenSword = Instantiate(fallensword, positionToFall, Quaternion.identity);
 
 
-        //if(owner.GetComponent<PlayerMovement>().fallenSword != null)
-        //{
-        //    Destroy(owner.GetComponent<PlayerMovement>().fallenSword);
-        //    owner.GetComponent<PlayerMovement>().fallenSword = null;
-        //}
+            //if(owner.GetComponent<PlayerMovement>().fallenSword != null)
+            //{
+            //    Destroy(owner.GetComponent<PlayerMovement>().fallenSword);
+            //    owner.GetComponent<PlayerMovement>().fallenSword = null;
+            //}
 
-        ////1234 Debug.LogError("Bullet converted to fallen sword");
+            ////1234 Debug.LogError("Bullet converted to fallen sword");
 
-        owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
-        owner.GetComponent<PlayerMovement>().swordCanBeCollected = true;
+            owner.GetComponent<PlayerMovement>().fallenSword = FallenSword;
+            owner.GetComponent<PlayerMovement>().swordCanBeCollected = true; 
+        }
     }
 
     public void SetOwner(GameObject player)
