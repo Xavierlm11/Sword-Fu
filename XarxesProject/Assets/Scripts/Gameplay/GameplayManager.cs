@@ -246,7 +246,7 @@ public class GameplayManager : MonoBehaviour
                     {
                         if (Input.GetKeyDown(KeyCode.F1))
                         {
-                            isF1 = true;
+
                             LoadNewLevel();
                         }
                         if (Input.GetKeyDown(KeyCode.F2))
@@ -325,8 +325,8 @@ public class GameplayManager : MonoBehaviour
 
 
                         UpdateLeaderboard();
-                        if (!isRecivePhase && CountPlayerAlive() <= 1)
-                            UpdateGameplayEveryOne(winnerId, false, true);
+                        //if (!isRecivePhase && CountPlayerAlive() <= 1)
+                        //    UpdateGameplayEveryOne(winnerId, false, true);
 
                         winScreen.SetActive(true);
 
