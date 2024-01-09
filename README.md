@@ -56,11 +56,12 @@ Hemos modificado el comportamiento de algunos elementos para que se adapten mejo
 
 Un ejemplo de esto es la mecánica del lanzamiento de espada, la cual contempla varias opciones que pueden ocurrir:
 
--La interpolación requiere un "tick" extra de delay en los clientes replicantes, pero a su vez debe acabar en el mismo punto que la original (en el cliente que la lanza), y no detenerse cuando la original deja de enviar su posición (cuando esta se choca con algo).
+ - La interpolación requiere un "tick" extra de delay en los clientes replicantes, pero a su vez debe acabar en el mismo punto que la original (en el cliente que la lanza), y no detenerse cuando la original deja de enviar su posición (cuando esta se choca con algo).
 
--Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
+ - Si se lanza la espada contra una pared muy cercana o adyacente al jugador (y por ende, el jugador la recoge instantáneamente) es posible que la orden de ser recogida le llegue antes a los demás clientes, antes que la propia orden de que la espada ha parado su trayectoria.
 
-Otro ejemplo de esto es ...........................................
+Otro ejemplo de esto es Sincronizar jugadores con las muertes y cambios de escenas:
+ - Al poder ocurrir perdidas de paquetes  no se puede confiar del todo en que cada jugador siga el mismo rito que otros en la partida, cosa que ocurria frecuentemente con muertes y cambios de escenas, así que se ha implementado metodos para chekear si todos están viendo lo mismo y se encuentran en la misma escena, y en caso que no se encuentren en la misma escena a todos se les carga una nueva escena para que nadie coja ventaja, y en caso delas muertes se envia una comprobación a los demás para comprobar si ese jugador ha muerto.
 
 Aún así, finalmente hemos conseguido solucionar estos problemas y lograr esa fluidez y sincronización entre clientes deseada.
 
